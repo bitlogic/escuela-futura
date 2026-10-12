@@ -1,0 +1,29 @@
+{
+  "$schema": "https://open-plugin-spec.org/schema/v1/plugin.json",
+  "id": "io.bitlogic.escuela-futura",
+  "name": "Escuela Futura",
+  "version": "0.1.0",
+  "description": "Cinco agentes institucionales de Escuela Futura, una escuela ficticia para la demo de Innova Educa 21.",
+  "author": "Bitlogic",
+  "license": "UNLICENSED",
+  "keywords": ["educacion", "escuela-agentica", "demo", "buzz"],
+  "personas": [
+    "agents/coordinacion.persona.md",
+    "agents/tutor.persona.md",
+    "agents/advisor.persona.md",
+    "agents/bienestar.persona.md",
+    "agents/admisiones.persona.md"
+  ],
+  "pack_instructions": "instructions.md",
+  "mcp_config": ".mcp.json",
+  "defaults": {
+    "temperature": 0.4,
+    "triggers": {
+      "mentions": true,
+      "keywords": [],
+      "all_messages": false
+    },
+    "thread_replies": true,
+    "broadcast_replies": false
+  }
+}

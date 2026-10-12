@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Salida generada (se rearma con scripts/build-team.mjs)
+dist/
+
+# Fuentes licenciadas del brand kit (viven en ~/github/brand-kit)
+stage/assets/*.otf
+stage/assets/*.ttf
+
+# Node
+node_modules/

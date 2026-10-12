@@ -1,0 +1,13 @@
+{
+  "agentes": [
+    { "id": "coordinacion", "nombre": "Coordinación", "iniciales": "CO", "casa": "coordinacion", "color": "azul" },
+    { "id": "tutor", "nombre": "Tutor", "iniciales": "TU", "casa": "aula-bio1", "color": "manteca" },
+    { "id": "advisor", "nombre": "Advisor", "iniciales": "AD", "casa": "secretaria", "color": "celeste" },
+    { "id": "bienestar", "nombre": "Bienestar", "iniciales": "BI", "casa": "bienestar", "color": "durazno" },
+    { "id": "admisiones", "nombre": "Admisiones", "iniciales": "AM", "casa": "admisiones", "color": "amarillo" }
+  ],
+  "personas": {
+    "casa": "direccion",
+    "nombrePorDefecto": "Dirección"
+  }
+}

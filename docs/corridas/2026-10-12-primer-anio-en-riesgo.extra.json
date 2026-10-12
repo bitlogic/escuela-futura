@@ -1,0 +1,18 @@
+[
+  {
+    "kind": 9,
+    "pubkey": "69469eb0989b484d0de011c72fb5e2e120c6f36072d8e91f380b1bf14ade6eb2",
+    "created_at": 1791769128,
+    "tags": [["h", "e1343f4a-82ac-4627-846f-3b460f886466"], ["p", "9863ec14107f9938ec56022e2a9e8a9ac3d3ce0d7862158be4b5127cfb448d02"]],
+    "content": "@Coordinación antes del parcial del 3/11, identificá qué estudiantes de primer año de Biología están en riesgo y proponé qué hacemos con cada uno.",
+    "_nota": "Sintético: buzz-probe no guardó los mensajes del canal en esta corrida. Texto según el guion de docs/escenario.md."
+  },
+  {
+    "kind": 9,
+    "pubkey": "69469eb0989b484d0de011c72fb5e2e120c6f36072d8e91f380b1bf14ade6eb2",
+    "created_at": 1791769216,
+    "tags": [["h", "e1343f4a-82ac-4627-846f-3b460f886466"], ["p", "9863ec14107f9938ec56022e2a9e8a9ac3d3ce0d7862158be4b5127cfb448d02"]],
+    "content": "Aprobado para Martina y Lucía. Tomás: refuerzo sí, pero con el docente. Joaquín: lo llamo yo.",
+    "_nota": "Sintético: reconstruido a partir del resumen que publicó Coordinación."
+  }
+]

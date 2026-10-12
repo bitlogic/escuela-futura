@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escuela Futura · desde arriba</title>
+<style>
+  @font-face { font-family: 'Plain'; src: url('assets/Plain-Regular.otf') format('opentype'); font-weight: 400; }
+  @font-face { font-family: 'Plain'; src: url('assets/Plain-Medium.otf') format('opentype'); font-weight: 500; }
+  @font-face { font-family: 'Plain'; src: url('assets/Plain-Bold.otf') format('opentype'); font-weight: 700; }
+  @font-face { font-family: 'Apple Garamond'; src: url('assets/AppleGaramond-Light.ttf') format('truetype'); font-weight: 300; }
+
+  :root {
+    --ink: #121212; --papel: #F9F4EA; --azul: #3E6BE8; --celeste: #B2C5F1;
+    --naranja: #FC5C22; --durazno: #FEAF9B; --amarillo: #ECE241; --manteca: #F4E9A6;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--papel); color: var(--ink); font-family: 'Plain', system-ui, sans-serif; overflow: hidden; }
+  #marco { position: fixed; inset: 0; display: grid; place-items: center; }
+  .escena { position: relative; width: 1920px; height: 1080px; background: var(--papel); transform-origin: center; overflow: hidden; }
+
+  /* Formas de marca, recortadas por el borde */
+  .forma { position: absolute; pointer-events: none; }
+  .forma-naranja { right: -70px; bottom: -120px; width: 300px; opacity: 1; }
+
+  /* Barra superior */
+  .barra { position: absolute; left: 80px; right: 80px; top: 28px; height: 64px; display: flex; align-items: center; gap: 28px; z-index: 6; }
+  .barra img.logo { height: 40px; }
+  .barra .titulo { font-size: 15px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+  .chip { display: inline-flex; align-items: center; gap: 10px; background: var(--manteca); border-radius: 999px; padding: 10px 20px; font-size: 20px; font-weight: 500; letter-spacing: 0.01em; white-space: nowrap; }
+  .chip b { font-weight: 700; letter-spacing: 0.06em; font-size: 14px; text-transform: uppercase; }
+  .controles { margin-left: auto; display: flex; gap: 10px; }
+  .boton { font: inherit; font-size: 19px; font-weight: 700; border: 0; border-radius: 999px; padding: 12px 22px; background: var(--celeste); color: var(--ink); cursor: pointer; transition: background 160ms var(--ease), color 160ms var(--ease); }
+  .boton:hover { background: var(--ink); color: var(--papel); }
+  .boton.primario { background: var(--azul); color: var(--papel); }
+  .boton:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  select.boton { padding-right: 18px; }
+
+  /* Plano */
+  .sala { position: absolute; border-radius: 28px; padding: 22px 26px; }
+  .sala .nombre { font-size: 15px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; }
+  .sala.celeste { background: var(--celeste); } .sala.durazno { background: var(--durazno); } .sala.manteca { background: var(--manteca); }
+  .pasillo { position: absolute; left: 80px; right: 80px; }
+  .pasillo .nombre { position: absolute; left: 26px; top: 50%; transform: translateY(-50%); font-size: 15px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.45; }
+  .pupitre { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: var(--ink); opacity: 0.16; }
+  .estudiante { position: absolute; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); }
+  .estudiante.foco { box-shadow: 0 0 0 4px var(--papel), 0 0 0 8px var(--naranja); }
+  .estudiante-nombre { position: absolute; font-size: 15px; font-weight: 500; letter-spacing: 0.04em; }
+
+  /* Fichas */
+  .ficha { position: absolute; width: 84px; height: 84px; transition: left 1.4s var(--ease), top 1.4s var(--ease); z-index: 2; }
+  .ficha.hablando { z-index: 4; }
+  .escena.instantaneo .ficha { transition: none; }
+  .ficha .cuerpo { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; font-size: 24px; font-weight: 700; position: relative; }
+  .ficha.persona .cuerpo { border-radius: 18px; background: var(--ink); color: var(--papel); }
+  .ficha.azul .cuerpo { background: var(--azul); color: var(--papel); }
+  .ficha.celeste .cuerpo { background: var(--celeste); } .ficha.durazno .cuerpo { background: var(--durazno); }
+  .ficha.manteca .cuerpo { background: var(--manteca); } .ficha.amarillo .cuerpo { background: var(--amarillo); }
+  .ficha .cuerpo::after { content: ''; position: absolute; inset: -7px; border-radius: inherit; border: 3px dashed var(--ink); opacity: 0; transition: opacity 300ms; }
+  .ficha.trabajando .cuerpo::after { opacity: 1; animation: girar 6s linear infinite; }
+  .ficha.persona.esperando .cuerpo::after { opacity: 1; border: 5px solid var(--naranja); animation: latir 1.6s ease-in-out infinite; }
+  @keyframes girar { to { transform: rotate(360deg); } }
+  @keyframes latir { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+  @media (prefers-reduced-motion: reduce) { .ficha.trabajando .cuerpo::after, .ficha.persona.esperando .cuerpo::after { animation: none; } .ficha { transition-duration: 0.2s; } }
+  .ficha .etiqueta { position: absolute; left: 50%; top: 92px; transform: translateX(-50%); white-space: nowrap; background: var(--ink); color: var(--papel); border-radius: 999px; padding: 5px 13px; font-size: 17px; font-weight: 500; letter-spacing: 0.02em; }
+  .globo { position: absolute; left: 42px; bottom: 100px; transform: translateX(-50%); width: max-content; max-width: 400px; background: var(--papel); border: 1.5px solid var(--ink); border-radius: 16px; padding: 12px 16px; font-size: 21px; line-height: 1.3; opacity: 0; transition: opacity 240ms var(--ease); }
+  .globo-texto { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .globo.visible { opacity: 1; }
+  .globo::after { content: ''; position: absolute; left: 50%; bottom: -8px; width: 13px; height: 13px; background: var(--papel); border-right: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); transform: translateX(-50%) rotate(45deg); }
+  .ficha.abajo .globo { bottom: auto; top: 128px; } .ficha.abajo .globo::after { bottom: auto; top: -8px; transform: translateX(-50%) rotate(225deg); }
+  .ficha.borde-derecho .globo { left: auto; right: -20px; transform: none; } .ficha.borde-derecho .globo::after { left: auto; right: 54px; }
+  .ficha.borde-izquierdo .globo { left: -20px; transform: none; } .ficha.borde-izquierdo .globo::after { left: 62px; }
+
+  /* Banda de lectura */
+  .banda { position: absolute; left: 80px; right: 80px; top: 912px; height: 140px; display: flex; align-items: flex-start; gap: 40px; }
+  .lectura { flex: 1; min-width: 0; }
+  .lectura h1 { margin: 0; font-family: 'Apple Garamond', Garamond, Georgia, serif; font-weight: 300; font-size: 54px; line-height: 1.05; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lectura .meta { margin-top: 14px; font-size: 16px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.7; }
+  .progreso { position: absolute; left: 80px; right: 80px; top: 896px; height: 3px; background: var(--ink); opacity: 0.15; }
+  .progreso-hecho { position: absolute; left: 80px; top: 896px; height: 3px; background: var(--ink); width: 0; }
+  .marca-decision { position: absolute; top: 890px; width: 15px; height: 15px; border-radius: 50%; background: var(--naranja); transform: translateX(-50%); }
+  .firma { display: flex; align-items: center; gap: 18px; padding-top: 16px; }
+  .firma img.byhumans { height: 46px; }
+  .firma img.iso { height: 40px; }
+
+  /* Panel en vivo */
+  .panel { position: absolute; right: 80px; top: 104px; width: 420px; background: var(--papel); border: 1.5px solid var(--ink); border-radius: 16px; padding: 22px; display: none; flex-direction: column; gap: 12px; z-index: 5; }
+  .panel.abierto { display: flex; }
+  .panel label { font-size: 13px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; display: flex; flex-direction: column; gap: 6px; }
+  .panel input { font: inherit; font-size: 17px; background: var(--papel); border: 1.5px solid var(--ink); border-radius: 12px; padding: 10px 14px; }
+  .panel input:focus { outline: 0; border: 2px solid var(--azul); }
+  .panel .estado { font-size: 15px; line-height: 1.4; min-height: 40px; }
+  .oculto { display: none !important; }
+</style>
+</head>
+<body>
+<div id="marco">
+<div class="escena" id="escena">
+  <img class="forma forma-naranja" src="assets/forma-2-naranja.png" alt="">
+
+  <div class="barra">
+    <img class="logo" src="assets/logo-azul-01.png" alt="Bitlogic">
+    <div class="titulo">Escuela Futura · desde arriba</div>
+    <div class="chip"><b>Objetivo</b><span id="objetivo">Primer año de Biología en riesgo, antes del parcial</span></div>
+    <div class="controles">
+      <button class="boton" id="btn-prev" aria-label="Paso anterior">‹</button>
+      <button class="boton primario" id="btn-play">Play</button>
+      <button class="boton" id="btn-next" aria-label="Paso siguiente">›</button>
+      <select class="boton" id="velocidad" aria-label="Velocidad"><option value="1">1×</option><option value="2" selected>2×</option><option value="4">4×</option></select>
+      <button class="boton" id="btn-vivo">En vivo</button>
+      <label class="boton" for="archivo">Cargar</label><input type="file" id="archivo" accept="application/json" class="oculto">
+    </div>
+  </div>
+
+  <div id="plano"></div>
+  <div id="fichas"></div>
+
+  <div class="progreso"></div><div class="progreso-hecho" id="progreso-hecho"></div><div id="marcas"></div>
+  <div class="banda">
+    <div class="lectura">
+      <h1 id="lectura">La escuela, antes de que empiece el día.</h1>
+      <div class="meta" id="meta">Listo para empezar</div>
+    </div>
+    <div class="firma"><img class="byhumans" src="assets/by-humans.png" alt="by humans"><img class="iso" src="assets/isologo-azul-01.png" alt="Bitlogic"></div>
+  </div>
+
+  <div class="panel" id="panel">
+    <label>Relay<input id="relay" value="wss://escuelafutura.communities.buzz.xyz"></label>
+    <label>Clave privada (nsec)<input id="nsec" type="password"></label>
+    <label>Canal (id de #coordinacion)<input id="canal" placeholder="e1343f4a-…"></label>
+    <div style="display:flex;gap:10px"><button class="boton primario" id="btn-conectar">Conectar</button><button class="boton" id="btn-cerrar-panel">Cerrar</button></div>
+    <div class="estado" id="estado-vivo">La clave no sale de esta pestaña. Los agentes se mueven con lo que pasa en Buzz.</div>
+  </div>
+</div>
+</div>
+
+<script type="module">
+import { crearNormalizador } from './normalizar.js';
+
+const $ = (id) => document.getElementById(id);
+const escena = $('escena');
+
+// ── Plano ────────────────────────────────────────────────────────────────────
+// Cada sala: caja en px sobre 1920×1080 y lugares (slots) donde se paran las fichas.
+const SALAS = {
+  secretaria:   { nombre: 'Secretaría',           x: 80,   y: 124, w: 340, h: 270, tono: 'celeste' },
+  direccion:    { nombre: 'Dirección',            x: 440,  y: 124, w: 340, h: 270, tono: 'durazno' },
+  coordinacion: { nombre: 'Coordinación',         x: 800,  y: 124, w: 340, h: 270, tono: 'manteca' },
+  biblioteca:   { nombre: 'Biblioteca',           x: 1160, y: 124, w: 320, h: 270, tono: 'celeste' },
+  bienestar:    { nombre: 'Bienestar',            x: 1500, y: 124, w: 340, h: 270, tono: 'durazno' },
+  admisiones:   { nombre: 'Admisiones · entrada', x: 80,   y: 544, w: 340, h: 336, tono: 'manteca' },
+  'aula-bio1':  { nombre: 'Aula · Biología 1',    x: 440,  y: 544, w: 520, h: 336, tono: 'celeste' },
+  'aula-quim':  { nombre: 'Aula · Química',       x: 980,  y: 544, w: 420, h: 336, tono: 'manteca' },
+  patio:        { nombre: 'Patio',                x: 1420, y: 544, w: 420, h: 336, tono: 'durazno' },
+  pasillo:      { nombre: 'Pasillo',              x: 80,   y: 414, w: 1760, h: 110, tono: null },
+};
+for (const s of Object.values(SALAS)) {
+  // 4 lugares por sala (2×2), 6 en el pasillo
+  const n = s.tono ? 4 : 6, cols = s.tono ? 2 : 6;
+  s.lugares = [];
+  for (let i = 0; i < n; i++) {
+    const c = i % cols, r = Math.floor(i / cols);
+    const px = s.x + s.w / 2 + (c - (cols - 1) / 2) * (s.tono ? 150 : 260);
+    const py = s.tono ? s.y + 92 + r * 110 + (s.h > 300 ? 40 : 0) : s.y + 55;
+    s.lugares.push({ x: px, y: py, ocupado: null });
+  }
+}
+
+function dibujarPlano() {
+  const plano = $('plano');
+  let html = '';
+  for (const [id, s] of Object.entries(SALAS)) {
+    if (!s.tono) { html += `<div class="pasillo" style="top:${s.y}px;height:${s.h}px"><div class="nombre">${s.nombre}</div></div>`; continue; }
+    html += `<div class="sala ${s.tono}" data-sala="${id}" style="left:${s.x}px;top:${s.y}px;width:${s.w}px;height:${s.h}px"><div class="nombre">${s.nombre}</div></div>`;
+  }
+  // Pupitres en las aulas y Martina en Biología 1
+  const pupitres = (s, filas, cols, dx = 0) => { let out = ''; for (let r = 0; r < filas; r++) for (let c = 0; c < cols; c++) out += `<div class="pupitre" style="left:${s.x + 40 + dx + c * 56}px;top:${s.y + 70 + r * 48}px"></div>`; return out; };
+  html += pupitres(SALAS['aula-bio1'], 4, 4) + pupitres(SALAS['aula-quim'], 4, 3, 20);
+  const b = SALAS['aula-bio1'];
+  html += `<div class="estudiante foco" style="left:${b.x + 40 + 3 * 56 - 7}px;top:${b.y + 70 + 3 * 48 - 7}px"></div><div class="estudiante-nombre" style="left:${b.x + 40 + 3 * 56 + 32}px;top:${b.y + 70 + 3 * 48 - 2}px">Martina</div>`;
+  plano.innerHTML = html;
+}
+
+// ── Elenco ───────────────────────────────────────────────────────────────────
+let CONFIG = { agentes: [], personas: { casa: 'direccion', nombrePorDefecto: 'Dirección' } };
+const fichas = new Map(); // id → {el, sala, lugar, nombre, ...}
+
+function crearFicha(id, { nombre, iniciales, color, casa, persona }) {
+  const el = document.createElement('div');
+  el.className = 'ficha ' + (persona ? 'persona' : color);
+  el.innerHTML = `<div class="globo"><div class="globo-texto"></div></div><div class="cuerpo">${iniciales}</div><div class="etiqueta">${nombre}</div>`;
+  $('fichas').appendChild(el);
+  const f = { id, el, nombre, casa, sala: null, lugar: null, persona: !!persona, globoTimer: null };
+  fichas.set(id, f);
+  mover(f, casa);
+  return f;
+}
+function personaFicha(id, nombre) {
+  if (fichas.has(id)) return fichas.get(id);
+  const n = nombre || CONFIG.personas.nombrePorDefecto;
+  return crearFicha(id, { nombre: n, iniciales: n.trim()[0].toUpperCase(), casa: CONFIG.personas.casa, persona: true });
+}
+function liberar(f) { if (f.lugar) { f.lugar.ocupado = null; f.lugar = null; } f.sala = null; }
+function mover(f, salaId) {
+  const s = SALAS[salaId] || SALAS.pasillo;
+  if (f.sala === salaId && f.lugar) return;
+  liberar(f);
+  const lugar = s.lugares.find((l) => !l.ocupado) || s.lugares[s.lugares.length - 1];
+  lugar.ocupado = f.id; f.lugar = lugar; f.sala = salaId;
+  f.el.style.left = (lugar.x - 42) + 'px';
+  f.el.style.top = (lugar.y - 42) + 'px';
+  f.el.classList.toggle('abajo', lugar.y < 300);
+  f.el.classList.toggle('borde-derecho', lugar.x > 1700);
+  f.el.classList.toggle('borde-izquierdo', lugar.x < 300);
+}
+function moverJunto(f, otro) {
+  // Ir a la sala del otro (o al pasillo si el otro está en el pasillo)
+  mover(f, otro.sala || otro.casa);
+}
+function decir(f, texto, duracionMs = 9000) {
+  const g = f.el.querySelector('.globo');
+  g.querySelector('.globo-texto').textContent = limpiar(texto);
+  g.classList.add('visible'); f.el.classList.add('hablando');
+  if (f.globoTimer) clearTimeout(f.globoTimer);
+  f.globoTimer = programar(duracionMs, () => { g.classList.remove('visible'); f.el.classList.remove('hablando'); });
+}
+function limpiar(t) {
+  return String(t).replace(/\*\*/g, '').replace(/^@[^\s]+(?: [A-ZÁÉÍÓÚ][^\s]+)?\s*/, '').replace(/\s+/g, ' ').trim();
+}
+
+// ── Reloj virtual y reproducción ─────────────────────────────────────────────
+let eventos = [], indice = 0, reloj = 0, reproduciendo = false, velocidad = 2, ultimoFrame = 0;
+let temporizadores = []; // {t, fn} en tiempo virtual
+let decisionPendiente = null;
+
+function programar(ms, fn) { const t = { t: reloj + ms, fn }; temporizadores.push(t); return t; }
+function clearTimeout(t) { temporizadores = temporizadores.filter((x) => x !== t); }
+
+function nombreDe(id) { const f = fichas.get(id); return f ? f.nombre : (id.startsWith('persona:') ? CONFIG.personas.nombrePorDefecto : id); }
+function listar(ids) { const n = ids.map(nombreDe); return n.length <= 1 ? n.join('') : n.slice(0, -1).join(', ') + ' y ' + n[n.length - 1]; }
+function lectura(frase) { $('lectura').textContent = frase; }
+
+function aplicar(ev) {
+  if (ev.tipo === 'persona') {
+    const p = personaFicha(ev.quien, ev.nombre);
+    decir(p, ev.texto, 12000);
+    if (decisionPendiente) {
+      p.el.classList.remove('esperando'); decisionPendiente = null;
+      lectura(`${p.nombre} decide. Lo que aprobó se pone en marcha.`);
+    } else if (ev.a && ev.a.length) {
+      lectura(`${p.nombre} le da un objetivo a ${listar(ev.a)}.`);
+    } else {
+      lectura(`${p.nombre} escribe en el canal.`);
+    }
+    return;
+  }
+  const f = fichas.get(ev.quien) || crearFicha(ev.quien, { nombre: ev.quien.replace('agente:', 'Agente '), iniciales: 'AG', color: 'celeste', casa: 'pasillo' });
+  if (ev.tipo === 'inicio') { f.el.classList.add('trabajando'); if (f.sala === f.casa) lectura(`${f.nombre} se pone a trabajar.`); return; }
+  if (ev.tipo === 'fin') { f.el.classList.remove('trabajando'); programar(2500, () => { if (!f.el.classList.contains('trabajando')) mover(f, f.casa); }); return; }
+  if (ev.tipo === 'herramienta') {
+    if (ev.lugar) mover(f, ev.lugar);
+    decir(f, ev.texto);
+    lectura(`${f.nombre} ${ev.texto.charAt(0).toLowerCase() + ev.texto.slice(1)}${ev.lugar && SALAS[ev.lugar] ? ' en ' + SALAS[ev.lugar].nombre.split(' · ')[0] : ''}.`);
+    return;
+  }
+  if (ev.tipo === 'piensa') { decir(f, ev.texto, 5000); return; }
+  if (ev.tipo === 'dice') {
+    const destinos = ev.a || [];
+    const agentes = destinos.filter((d) => fichas.has(d) && !fichas.get(d).persona);
+    const personas = destinos.filter((d) => d.startsWith('persona:'));
+    const esPropuesta = /^\W*propuesta|para decidir|¿aprob|aprobás, editás/i.test(limpiar(ev.texto));
+    if (personas.length) {
+      const p = personaFicha(personas[0]);
+      mover(f, p.casa);
+      decir(f, ev.texto, 12000);
+      if (esPropuesta) { p.el.classList.add('esperando'); decisionPendiente = p; lectura(`${f.nombre} trae la propuesta. ${p.nombre} tiene que decidir.`); }
+      else lectura(`${f.nombre} le informa a ${p.nombre}.`);
+    } else if (agentes.length) {
+      const hermanos = eventos.filter((e) => e.tipo === 'dice' && e.quien === ev.quien && Math.abs(e.t - ev.t) < 1500);
+      const todos = [...new Set(hermanos.flatMap((e) => (e.a || []).filter((d) => fichas.has(d) && !fichas.get(d).persona)))];
+      if (todos.length > 1) {
+        mover(f, 'pasillo');
+        decir(f, ev.texto);
+        if (hermanos.indexOf(ev) <= hermanos.findIndex((e) => (e.a || []).some((d) => fichas.has(d) && !fichas.get(d).persona))) lectura(`${f.nombre} reparte el trabajo entre ${listar(todos)}.`);
+      } else {
+        moverJunto(f, fichas.get(agentes[0]));
+        decir(f, ev.texto);
+        lectura(`${f.nombre} le escribe a ${listar(agentes)}.`);
+      }
+    } else {
+      decir(f, ev.texto);
+      lectura(`${f.nombre} habla en el canal.`);
+    }
+  }
+}
+
+function reiniciar() {
+  for (const f of fichas.values()) f.el.remove();
+  fichas.clear();
+  for (const s of Object.values(SALAS)) for (const l of s.lugares) l.ocupado = null;
+  temporizadores = []; decisionPendiente = null; indice = 0; reloj = 0;
+  for (const a of CONFIG.agentes) crearFicha(a.id, a);
+  lectura('La escuela, antes de que empiece el día.');
+  actualizarMeta();
+}
+function correrTemporizadores() {
+  const listos = temporizadores.filter((x) => x.t <= reloj).sort((a, b) => a.t - b.t);
+  temporizadores = temporizadores.filter((x) => x.t > reloj);
+  for (const x of listos) x.fn();
+}
+function avanzarHasta(t) {
+  while (indice < eventos.length && eventos[indice].t <= t) { reloj = eventos[indice].t; correrTemporizadores(); aplicar(eventos[indice]); indice++; }
+  reloj = t; correrTemporizadores();
+  actualizarMeta();
+}
+function irAlPaso(i) {
+  // Reconstruye el estado desde cero sin animar, hasta el evento i inclusive.
+  escena.classList.add('instantaneo');
+  reiniciar();
+  if (i >= 0) avanzarHasta(eventos[Math.min(i, eventos.length - 1)].t);
+  requestAnimationFrame(() => requestAnimationFrame(() => escena.classList.remove('instantaneo')));
+}
+function actualizarMeta() {
+  const total = eventos.length;
+  const fin = total ? eventos[total - 1].t : 0;
+  const mm = Math.floor(reloj / 60000), ss = Math.floor((reloj % 60000) / 1000);
+  $('meta').textContent = total ? `Paso ${Math.min(indice, total)} de ${total} · ${mm}:${String(ss).padStart(2, '0')}${modoVivo ? ' · en vivo' : ''}` : (modoVivo ? 'En vivo · esperando actividad' : 'Listo para empezar');
+  $('progreso-hecho').style.width = fin ? (1760 * Math.min(1, reloj / fin)) + 'px' : '0px';
+}
+function marcarDecisiones() {
+  const fin = eventos.length ? eventos[eventos.length - 1].t : 0;
+  $('marcas').innerHTML = fin ? eventos.filter((e) => e.tipo === 'persona').map((e) => `<div class="marca-decision" style="left:${80 + 1760 * e.t / fin}px"></div>`).join('') : '';
+}
+function loop(ts) {
+  if (reproduciendo && !modoVivo) {
+    const dt = ultimoFrame ? ts - ultimoFrame : 0;
+    avanzarHasta(reloj + dt * velocidad);
+    if (indice >= eventos.length && !temporizadores.length) { reproduciendo = false; $('btn-play').textContent = 'Otra vez'; }
+  }
+  if (modoVivo) { const dt = ultimoFrame ? ts - ultimoFrame : 0; reloj += dt; correrTemporizadores(); }
+  ultimoFrame = ts;
+  requestAnimationFrame(loop);
+}
+
+// ── Controles ────────────────────────────────────────────────────────────────
+$('btn-play').onclick = () => {
+  if (modoVivo) return;
+  if (indice >= eventos.length) { irAlPaso(-1); }
+  reproduciendo = !reproduciendo;
+  $('btn-play').textContent = reproduciendo ? 'Pausa' : 'Play';
+};
+$('btn-next').onclick = () => { reproduciendo = false; $('btn-play').textContent = 'Play'; if (indice < eventos.length) { escena.classList.remove('instantaneo'); avanzarHasta(eventos[indice].t); } };
+$('btn-prev').onclick = () => { reproduciendo = false; $('btn-play').textContent = 'Play'; irAlPaso(indice - 2); };
+$('velocidad').onchange = (e) => { velocidad = Number(e.target.value); };
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space') { e.preventDefault(); $('btn-play').click(); }
+  if (e.key === 'ArrowRight') $('btn-next').click();
+  if (e.key === 'ArrowLeft') $('btn-prev').click();
+  if (e.key === 'r') irAlPaso(-1);
+  if (e.key === 'f') document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+});
+$('archivo').onchange = async (e) => {
+  const file = e.target.files[0]; if (!file) return;
+  const data = JSON.parse(await file.text());
+  if (Array.isArray(data)) {
+    // Export crudo de buzz-probe: normalizar acá mismo
+    const canal = prompt('Id del canal a reproducir (vacío = todos):', $('canal').value || '') || undefined;
+    const linea = crearNormalizador({ agentes: CONFIG.agentes, canal })(data);
+    const t0 = linea.length ? linea[0].t : 0;
+    cargarEventos(linea.map((ev) => ({ ...ev, t: ev.t - t0 })));
+  } else cargarEventos(data.eventos || []);
+};
+function cargarEventos(lista) { modoVivo = false; eventos = lista; marcarDecisiones(); irAlPaso(-1); reproduciendo = false; $('btn-play').textContent = 'Play'; }
+
+// ── Escala a la ventana ──────────────────────────────────────────────────────
+function escalar() { const k = Math.min(innerWidth / 1920, innerHeight / 1080); escena.style.transform = `scale(${k})`; }
+addEventListener('resize', escalar); escalar();
+
+// ── Modo en vivo (relay de Buzz) ─────────────────────────────────────────────
+let modoVivo = false, ws = null;
+$('btn-vivo').onclick = () => $('panel').classList.toggle('abierto');
+$('btn-cerrar-panel').onclick = () => $('panel').classList.remove('abierto');
+$('btn-conectar').onclick = async () => {
+  const estado = (t) => { $('estado-vivo').textContent = t; };
+  try {
+    const nt = await import('https://cdn.jsdelivr.net/npm/nostr-tools@2.7.0/+esm');
+    const { getPublicKey, finalizeEvent, nip19, nip44 } = nt;
+    const N44 = nip44.v2 || nip44;
+    const convKey = (sk, pub) => (N44.utils && N44.utils.getConversationKey ? N44.utils.getConversationKey(sk, pub) : N44.getConversationKey(sk, pub));
+    const v = $('nsec').value.trim();
+    const sk = v.startsWith('nsec') ? nip19.decode(v).data : Uint8Array.from(v.match(/../g).map((h) => parseInt(h, 16)));
+    const myPub = getPublicKey(sk);
+    const canal = $('canal').value.trim();
+    const relay = $('relay').value.trim();
+    const procesar = crearNormalizador({ agentes: CONFIG.agentes, canal: canal || undefined });
+    if (ws) ws.close();
+    reproduciendo = false; eventos = []; marcarDecisiones(); reiniciar(); modoVivo = true; reloj = 0;
+    $('btn-play').textContent = 'En vivo';
+    ws = new WebSocket(relay);
+    const send = (m) => ws.readyState === 1 && ws.send(JSON.stringify(m));
+    let tBase = null;
+    ws.onopen = () => estado('Conectado. Esperando autenticación…');
+    ws.onclose = () => { estado('Desconectado.'); modoVivo = false; };
+    ws.onerror = () => estado('No se pudo conectar al relay.');
+    ws.onmessage = (m) => {
+      let msg; try { msg = JSON.parse(m.data); } catch { return; }
+      const [type, a, b] = msg;
+      if (type === 'AUTH') { send(['AUTH', finalizeEvent({ kind: 22242, created_at: Math.floor(Date.now() / 1000), tags: [['relay', relay], ['challenge', a]], content: '' }, sk)]); }
+      else if (type === 'OK' && b === true) {
+        estado('Autenticado. Escuchando a los agentes' + (canal ? ' y el canal.' : '.'));
+        const since = Math.floor(Date.now() / 1000) - 120;
+        send(['REQ', 'vivo-obs', { kinds: [24200], '#p': [myPub], since, limit: 500 }]);
+        send(['REQ', 'vivo-perfiles', { kinds: [0], limit: 200 }]);
+        if (canal) send(['REQ', 'vivo-canal', { '#h': [canal], since, limit: 200 }]);
+      } else if (type === 'EVENT') {
+        const ev = b;
+        if (ev.kind === 24200) { try { ev._descifrado = JSON.parse(N44.decrypt(ev.content, convKey(sk, ev.pubkey))); } catch { return; } }
+        const nuevos = procesar([ev]);
+        if (!nuevos.length) return;
+        if (tBase == null) tBase = nuevos[0].t;
+        for (const n of nuevos) { n.t = n.t - tBase; eventos.push(n); }
+        eventos.sort((x, y) => x.t - y.t);
+        // En vivo se aplica de inmediato, con animación
+        for (const n of nuevos) { aplicar(n); indice = eventos.length; }
+        marcarDecisiones(); actualizarMeta();
+      } else if (type === 'CLOSED') estado('El relay cerró una suscripción: ' + b);
+    };
+  } catch (e) { estado('Error: ' + e.message); }
+};
+
+// ── Arranque ─────────────────────────────────────────────────────────────────
+dibujarPlano();
+try {
+  CONFIG = await (await fetch('agentes.json')).json();
+  reiniciar();
+  const q = new URLSearchParams(location.search).get('corrida') || 'corridas/2026-10-12-primer-anio-en-riesgo.eventos.json';
+  const data = await (await fetch(q)).json();
+  cargarEventos(data.eventos);
+  const paso = Number(new URLSearchParams(location.search).get('paso'));
+  if (paso > 0) irAlPaso(paso - 1);
+} catch (e) {
+  $('meta').textContent = 'Abrí esta página desde un servidor local (ver README) o cargá una corrida con "Cargar".';
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
