@@ -7,6 +7,14 @@ dist/
 # Fuentes licenciadas del brand kit (viven en ~/github/brand-kit)
 stage/assets/*.otf
 stage/assets/*.ttf
+!stage/assets/Silkscreen-*.ttf
 
 # Node
 node_modules/
+
+# Clave de la vista en vivo (local)
+stage/conexion.local.js
+__pycache__/
+
+# Salida del QA exploratorio (capturas y videos)
+dogfood-output/

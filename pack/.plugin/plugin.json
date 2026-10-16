@@ -3,7 +3,7 @@
   "id": "io.bitlogic.escuela-futura",
   "name": "Escuela Futura",
   "version": "0.1.0",
-  "description": "Cinco agentes institucionales de Escuela Futura, una escuela ficticia para la demo de Innova Educa 21.",
+  "description": "Seis agentes institucionales de Escuela Futura, una escuela ficticia para la demo de Innova Educa 21.",
   "author": "Bitlogic",
   "license": "UNLICENSED",
   "keywords": ["educacion", "escuela-agentica", "demo", "buzz"],
@@ -12,7 +12,8 @@
     "agents/tutor.persona.md",
     "agents/advisor.persona.md",
     "agents/bienestar.persona.md",
-    "agents/admisiones.persona.md"
+    "agents/admisiones.persona.md",
+    "agents/academia.persona.md"
   ],
   "pack_instructions": "instructions.md",
   "mcp_config": ".mcp.json",

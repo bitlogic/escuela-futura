@@ -88,6 +88,18 @@ const TOOLS = [
     inputSchema: { type: 'object', properties: {} },
     run: (db) => ({ aspirantes: db.aspirantes }),
   },
+  {
+    name: 'ver_oferta_academica',
+    description: 'Programas vigentes de la escuela: nivel, duración, modalidad, cupo e inscriptos. Para Academia.',
+    inputSchema: { type: 'object', properties: {} },
+    run: (db) => ({ hoy: db.hoy, oferta: db.oferta }),
+  },
+  {
+    name: 'ver_demanda_formativa',
+    description: 'Temas que piden aspirantes, estudiantes, docentes y empresas, con la señal que los sostiene. Para Academia.',
+    inputSchema: { type: 'object', properties: {} },
+    run: (db) => ({ hoy: db.hoy, demanda: db.demanda }),
+  },
 ];
 
 const send = (msg) => process.stdout.write(JSON.stringify(msg) + '\n');

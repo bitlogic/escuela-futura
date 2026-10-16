@@ -1,6 +1,6 @@
 # Escuela Futura
 
-Demo de la charla **Escuela Agéntica** (Innova Educa 21, 5/11/2026): una escuela ficticia donde cinco agentes institucionales trabajan junto a personas en [Buzz](https://github.com/block/buzz).
+Demo de la charla **Escuela Agéntica** (Innova Educa 21, 5/11/2026): una escuela ficticia donde seis agentes institucionales trabajan junto a personas en [Buzz](https://github.com/block/buzz).
 
 Todo es ficticio: la escuela, los estudiantes y los datos.
 
@@ -10,7 +10,7 @@ Todo es ficticio: la escuela, los estudiantes y los datos.
 pack/                     Persona Pack de Buzz (fuente de verdad de los agentes)
   .plugin/plugin.json     manifiesto
   instructions.md         instrucciones del equipo (compartidas)
-  agents/*.persona.md     Coordinación, Tutor, Advisor, Bienestar, Admisiones
+  agents/*.persona.md     Coordinación, Tutor, Advisor, Bienestar, Admisiones, Academia
   avatars/                íconos (.svg editables + .png)
   .mcp.json               servidor MCP de la escuela
 mcp-escuela/server.mjs    herramientas de la escuela (MCP por stdio, sin dependencias)
@@ -18,13 +18,18 @@ data/escuela-futura.json  datos sintéticos (24 estudiantes de Biología 1)
 scripts/
   generar_datos.py        regenera data/ (python3 scripts/generar_datos.py)
   build-team.mjs          arma dist/escuela-futura.team.json desde pack/
+  entorno.sh              estado / apagar / buzz / vista del entorno de demo
+  canales.py + canales.json  estado / miembros / vaciar / reset de los canales (vía CLI de Buzz)
 dist/escuela-futura.team.json   equipo listo para importar en el desktop de Buzz
+docs/entorno.md           receta para levantar y apagar el entorno
 docs/escenario.md         guion de la prueba "Primer año en riesgo"
 ```
 
 ## Puesta en marcha
 
-Requisitos: Buzz corriendo (relay + desktop), Node 18+ y Claude Code instalado y logueado.
+La receta completa y repetible (qué app, qué relay, cómo limpiar y cómo levantar cada vez) está en **[docs/entorno.md](docs/entorno.md)**; el comando es `bash scripts/entorno.sh` (`estado`, `apagar`, `buzz`, `vista`). Lo que sigue es el detalle de cada paso.
+
+Requisitos: Buzz Dev (build del repo de Buzz), Node 18+ y Claude Code instalado y logueado.
 
 1. **Registrar las herramientas de la escuela en Claude Code** (los agentes de Buzz con runtime Claude las toman de ahí):
 
@@ -34,7 +39,7 @@ Requisitos: Buzz corriendo (relay + desktop), Node 18+ y Claude Code instalado y
    ```
 
 2. **Importar el equipo en Buzz:** desktop → Agents → *Agent teams* → **Import** → `dist/escuela-futura.team.json`.
-   Se crean los 5 agentes con sus avatares, prompts e instrucciones del equipo.
+   Se crean los 6 agentes con sus avatares, prompts e instrucciones del equipo.
 
 3. **Crear los canales** y sumar a los agentes:
 
@@ -45,6 +50,7 @@ Requisitos: Buzz corriendo (relay + desktop), Node 18+ y Claude Code instalado y
    | `#secretaria` | Advisor, Coordinación |
    | `#aula-biologia-1` | Tutor, Coordinación |
    | `#admisiones` | Admisiones |
+   | `#academia` | Academia, Coordinación |
 
 4. Seguí `docs/escenario.md`.
 

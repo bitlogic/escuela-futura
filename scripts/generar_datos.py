@@ -141,6 +141,17 @@ data = {
                 "programa": TEMAS,
                 "proxima_evaluacion": {"evaluacion": "Parcial 2", "fecha": PARCIAL.isoformat(), "temas": TEMAS_PARCIAL}}],
     "estudiantes": casos + resto,
+    "oferta": [
+        {"programa": "Tecnicatura en Biotecnología", "nivel": "pregrado", "duracion": "3 años", "modalidad": "presencial", "cupo": 60, "inscriptos_2026": 52},
+        {"programa": "Profesorado de Biología", "nivel": "grado", "duracion": "4 años", "modalidad": "presencial", "cupo": 40, "inscriptos_2026": 31},
+        {"programa": "Tecnicatura en Gestión Ambiental", "nivel": "pregrado", "duracion": "2,5 años", "modalidad": "híbrida", "cupo": 40, "inscriptos_2026": 19},
+    ],
+    "demanda": [
+        {"tema": "Bioinformática", "senal": "11 consultas de aspirantes y 7 ingresantes la mencionaron como interés", "fuente": "Admisiones"},
+        {"tema": "Ciencia de datos aplicada a la salud", "senal": "6 consultas de aspirantes; 2 empresas locales piden perfiles", "fuente": "Vinculación"},
+        {"tema": "Educación ambiental para docentes", "senal": "4 docentes de escuelas vecinas pidieron formación", "fuente": "Secretaría"},
+        {"tema": "Cursos cortos en horario nocturno", "senal": "9 ingresantes que trabajan piden cursar de noche", "fuente": "Bienestar"},
+    ],
     "aspirantes": [
         {"nombre": "Ramiro B.", "carrera": "Biotecnología", "estado": "consultó por becas", "fecha": "2026-10-20"},
         {"nombre": "Paula G.", "carrera": "Profesorado de Biología", "estado": "inscripción iniciada, falta documentación", "fecha": "2026-10-24"},

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Levanta "Escenario": la escuela vista desde arriba (http://localhost:8080/stage/).
+#   ./escenario                 abre el navegador
+#   ./escenario --sin-navegador
+#   ./escenario --puerto 9090
+cd "$(dirname "$0")" && exec python3 escuela.py "$@"

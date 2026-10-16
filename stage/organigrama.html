@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Organigrama · Escuela Futura</title>
+<style>
+  :root { --ink: #1a1a2e; --papel: #f4efe2; --naranja: #ff7a3d; --verde: #5fae6a; --fuera: #0b0b12; --panel: #10101b; --tarjeta: #181826; --linea: #2c2f48; --tenue: #8f93b0;
+    --mono: "Silkscreen", "Press Start 2P", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--fuera); overflow: hidden; font-family: var(--sans); color: var(--papel); cursor: default; }
+  /* Mismo escenario 16:9 de 1920×1080 que la vista de la escuela, escalado a la ventana */
+  #escenario { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; background: var(--panel); }
+  .px { clip-path: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px), 0 4px, 4px 4px); }
+
+  header { position: absolute; left: 46px; right: 46px; top: 26px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+  header h1 { margin: 0; font: 700 38px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+  header h1 span { color: var(--naranja); }
+  .leyenda { display: flex; gap: 28px; align-items: center; font: 700 18px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--tenue); }
+  .leyenda kbd { font: inherit; background: var(--linea); color: var(--papel); padding: 4px 10px; }
+
+  .tarjeta { position: absolute; background: var(--tarjeta); padding: 20px; --c: var(--tenue); }
+  .tarjeta::before { content: ''; position: absolute; inset: 0; border: 4px solid var(--c); pointer-events: none; }
+  .cab { display: flex; gap: 18px; align-items: center; }
+  .cara { flex: none; width: 96px; height: 96px; background: var(--c); }
+  .cara canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+  .nombre { font: 700 27px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c); line-height: 1.1; }
+  .area { margin-top: 6px; font: 700 17px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--tenue); }
+  .rol { margin-top: 14px; font: 600 24px/1.3 var(--sans); color: var(--papel); }
+
+  .persona { background: transparent; --c: var(--naranja); }
+  .persona::before { border-style: dashed; border-width: 3px; }
+  .persona.solida { background: var(--tarjeta); }
+  .persona.solida::before { border-style: solid; border-width: 4px; }
+  .persona .cab { gap: 16px; }
+  .persona .ico { flex: none; width: 56px; height: 56px; background: rgba(255,122,61,.14); display: grid; place-items: center; }
+  .persona .ico canvas { width: 40px; height: 40px; image-rendering: pixelated; }
+  .persona .nombre { font-size: 21px; color: var(--papel); }
+  .persona .area { font-size: 15px; }
+  .persona.solida .nombre { font-size: 34px; }
+  .persona.solida .area { font-size: 19px; }
+  .persona .area { color: var(--naranja); }
+  .etiqueta { position: absolute; top: 16px; right: 20px; background: var(--c); padding: 5px 12px; font: 700 16px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink); }
+
+  .linea { position: absolute; background: var(--tenue) }
+  .linea.pun { background: none; border-left: 3px dashed var(--naranja); width: 0 !important }
+  .ir { color: var(--ink); background: var(--naranja); padding: 8px 16px; text-decoration: none; font: 700 18px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+  .ir:hover, .ir:focus-visible { background: var(--papel); outline: none; }
+  .ir kbd { font: inherit; background: var(--ink); color: var(--papel); padding: 2px 8px; margin-left: 10px; }
+</style>
+</head>
+<body>
+<div id="escenario">
+  <header>
+    <div><h1>Escuela <span>Futura</span> · Organigrama</h1></div>
+    <div class="leyenda"><a class="ir px" id="ir-escuela" href="index.html">Ver la escuela desde arriba <kbd>o</kbd></a></div>
+  </header>
+  <div id="arbol" style="position:absolute;inset:0;top:44px"></div>
+</div>
+
+<script type="module">
+import { COLOR, MODELOS, cargarHojas, caraViva } from './personajes.js';
+
+const $ = (s) => document.querySelector(s);
+const embebido = new URLSearchParams(location.search).has('embebido');
+// Embebido en la vista de la escuela: el link cierra el organigrama; suelto: navega a la escuela.
+$('#ir-escuela').addEventListener('click', (e) => { if (embebido) { e.preventDefault(); parent.postMessage('cerrar-org', '*'); } });
+
+// ── Datos del organigrama ────────────────────────────────────────────────────
+const DIRECCION = { id: 'persona', nombre: 'Dirección', area: 'Greyla Alvarez · directora', rol: 'Fija los objetivos y decide: aprueba, edita o rechaza cada propuesta.', sala: 'Dirección y Coord.' };
+const COORDINACION = { id: 'coordinacion', nombre: 'Coordinación', area: 'Coordinación académica', rol: 'Recibe el objetivo, reparte el trabajo y arma la propuesta.' };
+const AGENTES = [
+  { id: 'tutor', nombre: 'Tutor', area: 'Aulas', rol: 'Sabe en qué temas se traban los estudiantes.' },
+  { id: 'advisor', nombre: 'Advisor', area: 'Secretaría', rol: 'Inscripciones, correlativas, pagos y trámites.' },
+  { id: 'bienestar', nombre: 'Bienestar', area: 'Permanencia', rol: 'Detecta a tiempo señales de riesgo de abandono.' },
+  { id: 'admisiones', nombre: 'Admisiones', area: 'Ingreso', rol: 'Atiende aspirantes y sigue a los ingresantes.' },
+  { id: 'academia', nombre: 'Academia', area: 'Programas', rol: 'Diseña programas nuevos a partir de lo que se pide.' },
+];
+
+// ── Armado ───────────────────────────────────────────────────────────────────
+const hojas = await cargarHojas();
+const arbol = $('#arbol');
+const el = (tag, clase, texto) => { const e = document.createElement(tag); if (clase) e.className = clase; if (texto != null) e.textContent = texto; return e; };
+const pos = (e, x, y, w, h) => { Object.assign(e.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' }); return e; };
+const caja = (x, y, w, h, clase = '') => { const e = el('div', 'linea ' + clase); return arbol.appendChild(pos(e, x, y, w, h)); };
+
+const caras = [];   // las caras con vida (ver más abajo)
+const nuevaCara = (hoja, caja) => { const v = caraViva(hoja, 6); caja.appendChild(v.canvas); const c = { ...v, mirada: 0, parpado: false, mano: 0 }; caras.push(c); return c; };
+function tarjetaAgente(a, x, y, w, h) {
+  const t = el('div', 'tarjeta px'); t.style.setProperty('--c', COLOR[a.id] || COLOR.persona); pos(t, x, y, w, h);
+  const cab = el('div', 'cab'); const f = el('div', 'cara px'); const viva = nuevaCara(hojas[MODELOS[a.id]], f); cab.appendChild(f); t.addEventListener('mouseenter', () => { pedido = viva; });
+  const nom = el('div'); nom.append(el('div', 'nombre', a.nombre), el('div', 'area', a.area)); cab.appendChild(nom);
+  t.append(cab, el('div', 'rol', a.rol));
+  arbol.appendChild(t); return t;
+}
+function silueta() {   // persona genérica en pixel-art
+  const cv = document.createElement('canvas'); cv.width = 10; cv.height = 10; const c = cv.getContext('2d'); c.fillStyle = '#ff7a3d';
+  for (const [x, y, w, h] of [[3, 0, 4, 4], [2, 5, 6, 3], [1, 6, 1, 3], [8, 6, 1, 3]]) c.fillRect(x, y, w, h);
+  return cv;
+}
+function tarjetaPersona(titulo, sub, x, y, w, h, { cara: hoja, solida = false, etiqueta = 'Persona' } = {}) {
+  const t = el('div', 'tarjeta persona px' + (solida ? ' solida' : '')); pos(t, x, y, w, h);
+  const cab = el('div', 'cab');
+  if (hoja) { const f = el('div', 'cara px'); f.style.setProperty('--c', COLOR.persona); const viva = nuevaCara(hoja, f); cab.appendChild(f); t.addEventListener('mouseenter', () => { pedido = viva; }); }
+  else { const i = el('div', 'ico px'); i.appendChild(silueta()); cab.appendChild(i); }
+  const nom = el('div'); nom.append(el('div', 'nombre', titulo), el('div', 'area', sub)); cab.appendChild(nom);
+  t.appendChild(cab); if (etiqueta && solida) t.appendChild(el('div', 'etiqueta', etiqueta));
+  arbol.appendChild(t); return t;
+}
+
+// Nivel 0: Dirección (persona que decide)
+const CX = 960;
+const d = tarjetaPersona(DIRECCION.nombre, DIRECCION.area, CX - 410, 130, 820, 210, { cara: hojas[MODELOS.persona], solida: true, etiqueta: 'Decide' });
+d.querySelector('.cab').after(Object.assign(el('div', 'rol', DIRECCION.rol), { style: 'margin-top:14px' }));
+// Nivel 1: Coordinación
+tarjetaAgente(COORDINACION, CX - 410, 392, 820, 170);
+caja(CX - 1, 340, 3, 52);                                     // Dirección → Coordinación
+// Nivel 2: los cinco agentes
+const AW = 340, GAP = 32, X0 = (1920 - (5 * AW + 4 * GAP)) / 2, YA = 668, AH = 250;
+caja(CX - 1, 562, 3, 52);                                     // Coordinación → barra
+const centros = AGENTES.map((_, i) => X0 + i * (AW + GAP) + AW / 2);
+caja(centros[0], 613, centros[4] - centros[0] + 3, 3);        // barra
+AGENTES.forEach((a, i) => {
+  caja(centros[i], 613, 3, YA - 613);                         // bajada
+  tarjetaAgente(a, X0 + i * (AW + GAP), YA, AW, AH);
+});
+
+
+// ── Vida: se nota que están ahí ──────────────────────────────────────────────
+// Cada cara parpadea y mira a un costado de vez en cuando; cada tanto, una (nunca dos a la vez) levanta la mano y saluda.
+const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const azar = (a, b) => a + Math.random() * (b - a);
+let saluda = null, pedido = null, proximoSaludo = azar(4000, 7000);
+const sorteo = (ms) => caras.forEach((c) => { c.tParpadeo = ms + azar(1500, 5000); c.tMirada = ms + azar(1000, 3500); });
+sorteo(0);
+function vida(ms) {
+  let cambio;
+  for (const c of caras) {
+    cambio = false;
+    if (ms >= c.tParpadeo) { c.parpado = !c.parpado; c.tParpadeo = ms + (c.parpado ? 130 : azar(2000, 6000)); cambio = true; }
+    if (ms >= c.tMirada) { c.mirada = [-1, 0, 0, 1][(Math.random() * 4) | 0]; c.tMirada = ms + azar(1200, 3800); cambio = true; }
+    if (saluda === c) {
+      const fase = ms - c.inicioSaludo;
+      const m = fase > 2200 ? 0 : fase < 250 ? 1 : 1 + ((fase / 260) | 0) % 2;
+      if (m !== c.mano) { c.mano = m; cambio = true; }
+      if (fase > 2200) saluda = null;
+    }
+    if (cambio) c.dibujar(c);
+  }
+  if (!saluda && (pedido || ms >= proximoSaludo)) {   // al pasar el mouse por una tarjeta, esa cara saluda
+    const c = pedido || caras[(Math.random() * caras.length) | 0]; pedido = null; saluda = c; c.inicioSaludo = ms; c.mano = 1; c.parpado = false; c.dibujar(c);
+    proximoSaludo = ms + 2200 + azar(7000, 13000);
+  }
+  requestAnimationFrame(vida);
+}
+if (!reducido) requestAnimationFrame(vida);
+
+// ── Escala a la ventana ──────────────────────────────────────────────────────
+const esc = $('#escenario');
+function escalar() { const f = Math.min(innerWidth / 1920, innerHeight / 1080); esc.style.transform = `translate(${(innerWidth - 1920 * f) / 2}px, ${(innerHeight - 1080 * f) / 2}px) scale(${f})`; }
+addEventListener('resize', escalar); escalar();
+
+addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' || e.key === 'o') { if (embebido) parent.postMessage('cerrar-org', '*'); else location.href = 'index.html'; }
+  if (e.key === 'f' && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+});
+</script>
+</body>
+</html>

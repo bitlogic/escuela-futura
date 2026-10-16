@@ -16,6 +16,8 @@ export const HERRAMIENTA_LUGAR = {
   ver_situacion_administrativa: 'secretaria',
   ver_ingresantes: 'admisiones',
   ver_aspirantes: 'admisiones',
+  ver_oferta_academica: 'academia',
+  ver_demanda_formativa: 'academia',
 };
 
 /** Cómo se lee cada herramienta en el globo del agente. */
@@ -30,6 +32,8 @@ export const HERRAMIENTA_TEXTO = {
   ver_situacion_administrativa: 'Reviso inscripciones y pagos',
   ver_ingresantes: 'Reviso cómo ingresó',
   ver_aspirantes: 'Reviso los aspirantes',
+  ver_oferta_academica: 'Reviso la oferta académica',
+  ver_demanda_formativa: 'Reviso qué se está pidiendo',
 };
 
 const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -91,7 +95,7 @@ export function crearNormalizador(opts = {}) {
     if (n && porNombre[norm(n)]) { porPubkey[pubkey] = porNombre[norm(n)]; return porPubkey[pubkey]; }
     return null; // persona
   };
-  const nombreDe = (pubkey) => nombres[pubkey] || (pubkey ? pubkey.slice(0, 8) : '');
+  const nombreDe = (pubkey) => nombres[pubkey] || (pubkey ? 'Alguien' : '');
   const personaPorNombre = (nombre) => { for (const [pk, n] of Object.entries(nombres)) if (norm(n) === nombre && !idDe(pk)) return 'persona:' + pk; return null; };
   const enCanal = (id) => !opts.canal || (id && String(id).startsWith(opts.canal));
   const desde = opts.desde != null ? opts.desde : -Infinity;

@@ -71,4 +71,9 @@ const team = {
 mkdirSync(join(ROOT, 'dist'), { recursive: true });
 const out = join(ROOT, 'dist', 'escuela-futura.team.json');
 writeFileSync(out, JSON.stringify(team, null, 2) + '\n');
+
+// Cada prompt también como texto plano (dist/prompts/<agente>.txt), para pegarlo en Buzz Dev
+// (Agents → agente → instrucciones) sin tener que reimportar el equipo ni crear agentes nuevos.
+mkdirSync(join(ROOT, 'dist', 'prompts'), { recursive: true });
+for (const m of members) writeFileSync(join(ROOT, 'dist', 'prompts', `${m.definition.name}.txt`), m.definition.systemPrompt + '\n');
 console.log(`${members.length} agentes → ${out}`);
