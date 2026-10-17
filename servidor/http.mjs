@@ -2,7 +2,7 @@
 // Escucha solo en 127.0.0.1 y rechaza Host que no sea local.
 
 import { createServer } from 'node:http';
-import { createReadStream, statSync } from 'node:fs';
+import { createReadStream, statSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join, normalize, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -18,8 +18,9 @@ const leerJson = (req) => new Promise((ok, no) => { let s = ''; req.on('data', (
  * @param {Function} o.reiniciar  reinicia bus + conversaciones
  * @param {object} o.info       {modelo, persona}
  */
-export function crearHttp({ bus, reiniciar, info, log = () => {} }) {
+export function crearHttp({ bus, reiniciar, info, log = () => {}, corridasDir = join(STAGE, 'corridas') }) {
   const clientes = new Set();
+  const leerIndice = () => { try { return JSON.parse(readFileSync(join(corridasDir, 'index.json'), 'utf8')); } catch { return { predeterminada: null, corridas: [] }; } };
   bus.suscribir((frame) => { const d = `event: eventos\ndata: ${JSON.stringify(frame)}\n\n`; for (const c of clientes) c.write(d); });
   const latido = setInterval(() => { for (const c of clientes) c.write(': ping\n\n'); }, 15000);
   latido.unref();
@@ -60,6 +61,25 @@ export function crearHttp({ bus, reiniciar, info, log = () => {} }) {
       }
       if (ruta === '/api/estado' && req.method === 'GET') return json(res, 200, { vivo: true, ...info, ...bus.estado() });
       if (ruta === '/api/corrida' && req.method === 'GET') return json(res, 200, bus.corrida());
+      // Corridas grabadas: el índice (stage/corridas/index.json) y guardar la actual con un título
+      if (ruta === '/api/corridas' && req.method === 'GET') return json(res, 200, leerIndice());
+      if (ruta === '/api/corridas' && req.method === 'POST') {
+        const { titulo } = await leerJson(req);
+        const t = String(titulo || '').trim().slice(0, 80);
+        if (!t) return json(res, 400, { error: 'Falta el título.' });
+        const corrida = bus.corrida();
+        if (!corrida.eventos.length) return json(res, 400, { error: 'Todavía no pasó nada que guardar.' });
+        const d = new Date(), dd = (n) => String(n).padStart(2, '0'), fecha = `${d.getFullYear()}-${dd(d.getMonth() + 1)}-${dd(d.getDate())}`;
+        const slug = t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'corrida';
+        let archivo = `${fecha}-${slug}.eventos.json`;
+        for (let n = 2; existsSync(join(corridasDir, archivo)); n++) archivo = `${fecha}-${slug}-${n}.eventos.json`;
+        const t0 = corrida.eventos[0].t;
+        writeFileSync(join(corridasDir, archivo), JSON.stringify({ ...corrida, titulo: t, eventos: corrida.eventos.map((e) => ({ ...e, t: e.t - t0 })) }, null, 1));
+        const idx = leerIndice(); idx.corridas.unshift({ archivo, titulo: t, fecha }); if (!idx.predeterminada) idx.predeterminada = archivo;
+        writeFileSync(join(corridasDir, 'index.json'), JSON.stringify(idx, null, 2) + '\n');
+        log('corrida guardada', archivo);
+        return json(res, 200, { ok: true, archivo });
+      }
       if (ruta.startsWith('/stage/') && req.method === 'GET') {
         const rel = normalize(decodeURIComponent(ruta.slice('/stage/'.length))).replace(/^(\.\.[/\\])+/, '').replace(/^\.$/, '');
         if (rel.split(/[/\\]/).some((p) => p.startsWith('.'))) { res.writeHead(404); return res.end(); }

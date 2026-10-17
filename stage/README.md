@@ -4,7 +4,7 @@ Vista de escenario de Escuela Futura: un plano de la escuela donde los agentes s
 
 ## Abrir
 
-Lo más corto, desde la raíz del repo: `./escenario` (levanta el servidor de la escuela y abre el navegador en `http://localhost:8080/stage/`). La vista arranca **en vivo**, conectada al servidor; si no hay servidor (p. ej. abierta con `python3 -m http.server 8080`), cae sola a la corrida grabada. `?grabacion=1` fuerza la grabación, `?auto=0` la deja en pausa, `?paso=23` abre en un paso puntual y `?corrida=corridas/otra.eventos.json` carga otra corrida.
+Lo más corto, desde la raíz del repo: `./escenario` (levanta el servidor de la escuela y abre el navegador en `http://localhost:8080/stage/`). La vista arranca **en vivo**, conectada al servidor; si no hay servidor (p. ej. abierta con `python3 -m http.server 8080`), cae sola a la corrida grabada. `?grabacion=1` fuerza la grabación, `?auto=0` la deja en pausa, `?paso=23` abre en un paso puntual y `?corrida=corridas/otra.eventos.json` carga otra corrida. Las grabadas se listan en `corridas/index.json` (la `predeterminada` es la que se reproduce; el desplegable de la barra elige otra).
 
 La vista se acomoda a la ventana: a la izquierda el **chat** del canal `#coordinacion` (una columna de ancho fijo, arrastrable por el borde o con `[` y `]`; queda guardado) y a la derecha la **escuela**, que se escala por aspecto al espacio que queda. Las letras bajan con la pantalla para que entren. Por debajo de 1000 px de ancho el chat pasa abajo. `f` pone pantalla completa.
 
@@ -51,4 +51,4 @@ La vista habla con el servidor de la escuela (`servidor/`) por HTTP: `GET /api/e
 
 ## Grabar una corrida nueva
 
-Corré el escenario en vivo y apretá **Guardar corrida**. Para que quede como plan B, copiá el JSON a `corridas/` y apuntalo con `?corrida=corridas/<archivo>.eventos.json` (o cambiá el nombre por defecto en `index.html`).
+Corré el escenario en vivo y apretá **Guardar corrida**: pide un título y el servidor la escribe en `corridas/<fecha>-<título>.eventos.json` y la suma a `corridas/index.json`. Para que sea la que se reproduce sin servidor (plan B), poné su archivo en `predeterminada` dentro del índice. En modo grabación el mismo botón descarga el JSON de lo que se está viendo.

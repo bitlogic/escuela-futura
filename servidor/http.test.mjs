@@ -2,6 +2,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { request } from 'node:http';
+import { mkdtempSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { crearBus } from './bus.mjs';
 import { crearResolutor } from './menciones.mjs';
 import { crearHttp } from './http.mjs';
@@ -12,7 +15,8 @@ const PERSONA = { id: 'persona:direccion', nombre: 'Dirección' };
 test('la vista puede conectarse, escribir y reiniciar', async () => {
   const correrTurno = async (id, lote, ctx) => { ctx.enviar('@Dirección recibido'); };
   const bus = crearBus({ agentes: AGENTES, persona: PERSONA, resolver: crearResolutor({ agentes: AGENTES, persona: PERSONA }), correrTurno, limites: { espera: 10 } });
-  const http = crearHttp({ bus, reiniciar: () => bus.reiniciar(), info: { modelo: 'm', persona: 'Dirección' } });
+  const corridasDir = mkdtempSync(join(tmpdir(), 'corridas-'));
+  const http = crearHttp({ bus, reiniciar: () => bus.reiniciar(), info: { modelo: 'm', persona: 'Dirección' }, corridasDir });
   const puerto = await http.escuchar(0);
   const base = `http://localhost:${puerto}`;
   try {
@@ -37,6 +41,17 @@ test('la vista puede conectarse, escribir y reiniciar', async () => {
     assert.equal(frames.flat()[2].a[0], 'persona:direccion');
 
     assert.equal((await fetch(base + '/api/mensaje', { method: 'POST', headers: JSON_, body: '{}' })).status, 400);
+
+    // Guardar la corrida con un título: archivo con t desde 0 e índice actualizado
+    assert.deepEqual(await (await fetch(base + '/api/corridas')).json(), { predeterminada: null, corridas: [] });
+    const g = await (await fetch(base + '/api/corridas', { method: 'POST', headers: JSON_, body: JSON.stringify({ titulo: 'Prueba de humo' }) })).json();
+    assert.match(g.archivo, /^\d{4}-\d{2}-\d{2}-prueba-de-humo\.eventos\.json$/);
+    const guardada = JSON.parse(readFileSync(join(corridasDir, g.archivo), 'utf8'));
+    assert.equal(guardada.titulo, 'Prueba de humo'); assert.equal(guardada.eventos[0].t, 0); assert.equal(guardada.eventos.length, 4);
+    const idx = await (await fetch(base + '/api/corridas')).json();
+    assert.equal(idx.predeterminada, g.archivo); assert.equal(idx.corridas[0].titulo, 'Prueba de humo');
+    assert.equal((await fetch(base + '/api/corridas', { method: 'POST', headers: JSON_, body: '{}' })).status, 400);
+
     assert.deepEqual(await (await fetch(base + '/api/reiniciar', { method: 'POST', headers: JSON_ })).json(), { ok: true });
     await leer('event: reinicio');
     assert.deepEqual((await (await fetch(base + '/api/corrida')).json()).eventos, []);

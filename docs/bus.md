@@ -39,7 +39,8 @@ Parámetros: `ESCUELA_MODEL` (`claude-opus-5-5`), `ESCUELA_EFFORT` (`medium`; `l
 - `GET /` → `/stage/`. `GET /stage/*` estáticos.
 - `GET /api/eventos` (SSE): `event: estado` `{vivo, modelo, persona}`; `event: snapshot` `{eventos}` (toda la corrida); luego `event: eventos` con un **array** por frame; `event: reinicio`. Cada evento tiene la forma de `stage/corridas/*.eventos.json` (`t` en ms desde el inicio de la corrida) más `hora` e `id` en `dice`/`persona`.
 - `POST /api/mensaje` `{"texto"}` → `{ok, a, invalidas}`.
-- `POST /api/reiniciar` · `GET /api/corrida` (para guardar y reproducir) · `GET /api/estado`.
+- `POST /api/reiniciar` · `GET /api/corrida` (la corrida actual) · `GET /api/estado`.
+- `GET /api/corridas` → `stage/corridas/index.json` (`{predeterminada, corridas: [{archivo, titulo, fecha}]}`). `POST /api/corridas` `{"titulo"}` guarda la corrida actual en `stage/corridas/<fecha>-<slug>.eventos.json` (con `t` desde 0) y la suma al índice; la predeterminada se cambia a mano en el índice.
 
 ## Tests
 

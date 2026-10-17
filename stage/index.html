@@ -168,6 +168,7 @@
       <select id="velocidad" title="Velocidad"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
       <span class="sep"></span>
       <button id="btn-grab" title="Reproducir la corrida grabada (g)">Grabación</button>
+      <select id="corridas" title="Qué corrida grabada reproducir" hidden></select>
       <button id="btn-vivo" title="Conectar al servidor de la escuela (v)">En vivo</button>
       <button id="btn-reiniciar" title="Sesión nueva: borra la corrida actual (r)">Reiniciar</button>
       <button id="btn-guardar" title="Descargar la corrida actual como JSON">Guardar corrida</button>
@@ -455,8 +456,17 @@ $('btn-reiniciar').onclick = async () => {
   try { const r = await fetch('/api/reiniciar', { method: 'POST', headers: { 'Content-Type': 'application/json' } }); if (!r.ok) throw new Error(); } catch { aviso('No se pudo reiniciar.'); }
 };
 $('btn-guardar').onclick = async () => {
+  if (modoVivo) {   // con servidor: se guarda en stage/corridas/ y entra al índice, con título
+    const titulo = prompt('Título de la corrida (queda en stage/corridas/):', 'Primer año en riesgo'); if (!titulo) return;
+    try {
+      const r = await fetch('/api/corridas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ titulo }) });
+      const d = await r.json(); if (!r.ok) throw new Error(d.error || 'No se pudo guardar.');
+      aviso('Guardada: ' + d.archivo); cargarIndiceCorridas();
+    } catch (e) { aviso(e.message || 'No se pudo guardar.'); }
+    return;
+  }
   let data;
-  try { data = modoVivo ? await (await fetch('/api/corrida')).json() : { origen: 'grabacion', generado: new Date().toISOString(), eventos }; } catch { aviso('No se pudo bajar la corrida.'); return; }
+  try { data = { origen: 'grabacion', generado: new Date().toISOString(), eventos }; } catch { aviso('No se pudo bajar la corrida.'); return; }
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
   const d = new Date(), dd = (n) => String(n).padStart(2, '0');   // fecha local, no UTC: a la noche cambiaba de día
   a.download = `${d.getFullYear()}-${dd(d.getMonth() + 1)}-${dd(d.getDate())}-corrida.eventos.json`; a.click(); URL.revokeObjectURL(a.href);
@@ -498,6 +508,7 @@ addEventListener('message', (e) => {
   else if (e.data && e.data.tipo === 'tema' && e.data.tema !== tema) aplicarTema(e.data.tema);
 });
 $('btn-grab').onclick = () => { desconectar(); cargarGrabacion(); };
+$('corridas').onchange = (e) => { desconectar(); cargarGrabacion(e.target.value); };
 $('btn-vivo').onclick = () => { huboConexion = true; conectar(); };
 let ocultar = null;
 addEventListener('mousemove', () => { $('barra').classList.add('visible'); document.body.style.cursor = 'default'; clearTimeout(ocultar); ocultar = setTimeout(() => { $('barra').classList.remove('visible'); document.body.style.cursor = 'none'; }, 2500); });
@@ -598,9 +609,18 @@ function falla(motivo) {
   desconectar(); cargarGrabacion(); aviso(motivo);
 }
 
-async function cargarGrabacion() {
-  const q = params.get('corrida') || 'corridas/2026-10-12-primer-anio-en-riesgo.eventos.json';
+// Las corridas grabadas viven en corridas/ y se listan en corridas/index.json (con la predeterminada).
+let indiceCorridas = { predeterminada: null, corridas: [] };
+async function cargarIndiceCorridas() {
+  try { indiceCorridas = await (await fetch('corridas/index.json', { cache: 'no-store' })).json(); } catch { /* sin índice: solo ?corrida= o arrastrar */ }
+  const sel = $('corridas'); sel.replaceChildren();
+  for (const c of indiceCorridas.corridas || []) { const o = document.createElement('option'); o.value = c.archivo; o.textContent = `${c.titulo} · ${c.fecha}`; sel.appendChild(o); }
+  sel.hidden = !(indiceCorridas.corridas || []).length;
+}
+async function cargarGrabacion(archivo) {
+  const q = archivo ? 'corridas/' + archivo : params.get('corrida') || (indiceCorridas.predeterminada ? 'corridas/' + indiceCorridas.predeterminada : 'corridas/2026-10-12-primer-anio-en-riesgo.eventos.json');
   const data = await (await fetch(q)).json();
+  const sel = $('corridas'); if ([...sel.options].some((o) => 'corridas/' + o.value === q)) sel.value = q.replace(/^corridas\//, '');
   modoVivo = false; textoEstado = ''; cargarEventos(data.eventos);
   const paso = Number(params.get('paso'));
   if (paso > 0) irAlPaso(paso - 1); else if (params.get('auto') !== '0') setPlay(true);
@@ -612,6 +632,7 @@ async function cargarGrabacion() {
 try {
   CONFIG = await (await fetch('agentes.json')).json();
   if (params.get('nombre')) CONFIG.personas.nombre = params.get('nombre').trim().slice(0, 40);   // ?nombre=Greyla: quién es la persona que decide
+  await cargarIndiceCorridas();
   ofi = await crearOficina($('lienzo')); ofi.tema(tema);
   for (const t of CARTELES) { const c = document.createElement('div'); c.className = 'sala-cartel'; c.textContent = t.texto; c.dataset.x = t.x; c.dataset.y = t.y; $('capa').appendChild(c); }
   const m = document.createElement('div'); m.id = 'martina'; m.className = 'tag martina px'; m.textContent = 'Martina'; $('capa').appendChild(m);

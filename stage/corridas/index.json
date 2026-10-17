@@ -1,0 +1,15 @@
+{
+  "predeterminada": "2026-10-16-primer-anio-en-riesgo.eventos.json",
+  "corridas": [
+    {
+      "archivo": "2026-10-16-primer-anio-en-riesgo.eventos.json",
+      "titulo": "Primer año en riesgo",
+      "fecha": "2026-10-16"
+    },
+    {
+      "archivo": "2026-10-12-primer-anio-en-riesgo.eventos.json",
+      "titulo": "Primer año en riesgo (Buzz)",
+      "fecha": "2026-10-12"
+    }
+  ]
+}

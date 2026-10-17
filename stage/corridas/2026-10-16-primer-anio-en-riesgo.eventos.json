@@ -1,0 +1,1308 @@
+{
+ "origen": "servidor/escuela.mjs (en vivo, claude-opus-5-5, effort medium)",
+ "generado": "2026-10-17T00:59:27.700Z",
+ "titulo": "Primer año en riesgo",
+ "eventos": [
+  {
+   "t": 0,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Dirección",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "Antes del parcial del 3/11, identificá qué estudiantes de primer año de Biología están en riesgo y proponé qué hacemos con cada uno.",
+   "hora": "21:55",
+   "id": "s0-1792198537713"
+  },
+  {
+   "t": 1502,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 4882,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "Dale. Reparto y vuelvo con una propuesta.",
+   "hora": "21:55",
+   "id": "s2-1792198542604"
+  },
+  {
+   "t": 4882,
+   "quien": "coordinacion",
+   "tipo": "herramienta",
+   "herramienta": "buscar_estudiantes",
+   "lugar": "coordinacion",
+   "texto": "Busco la lista del curso de Biología 1"
+  },
+  {
+   "t": 8044,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "bienestar"
+   ],
+   "texto": "@Bienestar Biología 1, 24 estudiantes (e01 a e24): asistencia y actividad en el campus de cada uno. Parcial 2 el 3/11.",
+   "hora": "21:55",
+   "id": "s4-1792198545766"
+  },
+  {
+   "t": 8044,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "tutor"
+   ],
+   "texto": "@Tutor Biología 1, 24 estudiantes (e01 a e24): notas y quién se traba en genética mendeliana, herencia ligada al sexo y ADN, que entran en el parcial del 3/11.",
+   "hora": "21:55",
+   "id": "s5-1792198545766"
+  },
+  {
+   "t": 8044,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "advisor"
+   ],
+   "texto": "@Advisor Biología 1, 24 estudiantes (e01 a e24): inscripciones y pagos, quién tiene algo pendiente.",
+   "hora": "21:55",
+   "id": "s6-1792198545766"
+  },
+  {
+   "t": 9077,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 9545,
+   "tipo": "inicio",
+   "quien": "bienestar"
+  },
+  {
+   "t": 9547,
+   "tipo": "inicio",
+   "quien": "tutor"
+  },
+  {
+   "t": 9548,
+   "tipo": "inicio",
+   "quien": "advisor"
+  },
+  {
+   "t": 29215,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e01"
+  },
+  {
+   "t": 29215,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e02"
+  },
+  {
+   "t": 29215,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e03"
+  },
+  {
+   "t": 29216,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e04"
+  },
+  {
+   "t": 29216,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e05"
+  },
+  {
+   "t": 29216,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e06"
+  },
+  {
+   "t": 29216,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e07"
+  },
+  {
+   "t": 29216,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e08"
+  },
+  {
+   "t": 29216,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e09"
+  },
+  {
+   "t": 29217,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e10"
+  },
+  {
+   "t": 29217,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e11"
+  },
+  {
+   "t": 29217,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e12"
+  },
+  {
+   "t": 29217,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e13"
+  },
+  {
+   "t": 29217,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e14"
+  },
+  {
+   "t": 29217,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e15"
+  },
+  {
+   "t": 29218,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e16"
+  },
+  {
+   "t": 29218,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e17"
+  },
+  {
+   "t": 29218,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e18"
+  },
+  {
+   "t": 29218,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e19"
+  },
+  {
+   "t": 29219,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e20"
+  },
+  {
+   "t": 29219,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e21"
+  },
+  {
+   "t": 29219,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e22"
+  },
+  {
+   "t": 29219,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e23"
+  },
+  {
+   "t": 29219,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de e24"
+  },
+  {
+   "t": 29219,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e01"
+  },
+  {
+   "t": 29220,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e02"
+  },
+  {
+   "t": 29220,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e03"
+  },
+  {
+   "t": 29220,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e04"
+  },
+  {
+   "t": 29220,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e05"
+  },
+  {
+   "t": 29220,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e06"
+  },
+  {
+   "t": 29220,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e07"
+  },
+  {
+   "t": 29221,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e08"
+  },
+  {
+   "t": 29221,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e09"
+  },
+  {
+   "t": 29221,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e10"
+  },
+  {
+   "t": 29221,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e11"
+  },
+  {
+   "t": 29221,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e12"
+  },
+  {
+   "t": 29221,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e13"
+  },
+  {
+   "t": 29222,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e14"
+  },
+  {
+   "t": 29222,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e15"
+  },
+  {
+   "t": 29222,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e16"
+  },
+  {
+   "t": 29222,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e17"
+  },
+  {
+   "t": 29222,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e18"
+  },
+  {
+   "t": 29223,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e19"
+  },
+  {
+   "t": 29223,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e20"
+  },
+  {
+   "t": 29223,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e21"
+  },
+  {
+   "t": 29223,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e22"
+  },
+  {
+   "t": 29224,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e23"
+  },
+  {
+   "t": 29224,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de e24"
+  },
+  {
+   "t": 32678,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_programa",
+   "lugar": "biblioteca",
+   "texto": "Reviso el programa de la materia de Biología 1"
+  },
+  {
+   "t": 32678,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e01"
+  },
+  {
+   "t": 32678,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e01"
+  },
+  {
+   "t": 43175,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e01"
+  },
+  {
+   "t": 43175,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e02"
+  },
+  {
+   "t": 43175,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e03"
+  },
+  {
+   "t": 43175,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e04"
+  },
+  {
+   "t": 43176,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e05"
+  },
+  {
+   "t": 43176,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e06"
+  },
+  {
+   "t": 43176,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e07"
+  },
+  {
+   "t": 43176,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e08"
+  },
+  {
+   "t": 43176,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e09"
+  },
+  {
+   "t": 43177,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e10"
+  },
+  {
+   "t": 43177,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e11"
+  },
+  {
+   "t": 43177,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e12"
+  },
+  {
+   "t": 43178,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e13"
+  },
+  {
+   "t": 43178,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e14"
+  },
+  {
+   "t": 43178,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e15"
+  },
+  {
+   "t": 43178,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e16"
+  },
+  {
+   "t": 43178,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e17"
+  },
+  {
+   "t": 43178,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e18"
+  },
+  {
+   "t": 43179,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e19"
+  },
+  {
+   "t": 43179,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e20"
+  },
+  {
+   "t": 43179,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e21"
+  },
+  {
+   "t": 43179,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e22"
+  },
+  {
+   "t": 43179,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e23"
+  },
+  {
+   "t": 43179,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de e24"
+  },
+  {
+   "t": 48399,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_alertas_previas",
+   "lugar": "bienestar",
+   "texto": "Reviso alertas anteriores de e01"
+  },
+  {
+   "t": 48399,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_alertas_previas",
+   "lugar": "bienestar",
+   "texto": "Reviso alertas anteriores de e04"
+  },
+  {
+   "t": 48399,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_alertas_previas",
+   "lugar": "bienestar",
+   "texto": "Reviso alertas anteriores de e03"
+  },
+  {
+   "t": 53995,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e02"
+  },
+  {
+   "t": 53995,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e02"
+  },
+  {
+   "t": 53995,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e03"
+  },
+  {
+   "t": 53995,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e03"
+  },
+  {
+   "t": 53995,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e04"
+  },
+  {
+   "t": 53996,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e04"
+  },
+  {
+   "t": 53996,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e05"
+  },
+  {
+   "t": 53996,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e05"
+  },
+  {
+   "t": 53996,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e06"
+  },
+  {
+   "t": 53996,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e06"
+  },
+  {
+   "t": 53997,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e07"
+  },
+  {
+   "t": 53997,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e07"
+  },
+  {
+   "t": 53997,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e08"
+  },
+  {
+   "t": 53997,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e08"
+  },
+  {
+   "t": 61872,
+   "tipo": "dice",
+   "quien": "advisor",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Traducción: Martina (e01) no puede anotarse al parcial 2. Debe agosto, septiembre y octubre (la primera venció el 10/8) y la beca que pidió al ingresar no salió.\nLucía (e03) pidió pasar de jueves 14 h a 19 h el 6/10 y lleva 24 días sin respuesta. Los otros 22, al día y habilitados.",
+   "hora": "21:56",
+   "id": "s103-1792198599594"
+  },
+  {
+   "t": 61872,
+   "tipo": "dice",
+   "quien": "advisor",
+   "a": [
+    "bienestar"
+   ],
+   "texto": "@Bienestar para cruzar con asistencia: la deuda de Martina (e01) arranca el 10/8. Lucía (e03) pidió el 6/10 pasar del turno 14 h al de 19 h y nadie le contestó todavía.",
+   "hora": "21:56",
+   "id": "s104-1792198599594"
+  },
+  {
+   "t": 72307,
+   "tipo": "dice",
+   "quien": "bienestar",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Joaquín M.: 0 de 8 clases desde el 28/9, sin entrar al campus desde el 26/9 y 3 entregas pendientes. Riesgo alto. En 2025 tuvo una alerta parecida y se resolvió con una llamada.\nMartina R.: 2 de 10 clases en las últimas 5 semanas, cuando hasta el 17/8 venía a todas. Último ingreso al campus el 14/10, 2 entregas pendientes. Riesgo alto, me preocupa.\nLucía P.: desde el 7/9 falta solo a los jueves de 14 h, va a los martes y entra al campus entre las 22 y la 1, sin entregas pendientes. Riesgo medio. Los otros 21, sin cambios. Propongo llamar antes del 3/11; el porqué se pregunta en persona.",
+   "hora": "21:56",
+   "id": "s105-1792198610029"
+  },
+  {
+   "t": 72307,
+   "tipo": "dice",
+   "quien": "bienestar",
+   "a": [
+    "advisor"
+   ],
+   "texto": "@Advisor Desde el 7/9 Lucía P. (e03) falta solo a Biología 1 de los jueves 14 h y va siempre a la de los martes 9 h. ¿Hay otra comisión o algún horario que le sirva?",
+   "hora": "21:56",
+   "id": "s106-1792198610029"
+  },
+  {
+   "t": 78284,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e09"
+  },
+  {
+   "t": 78285,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e09"
+  },
+  {
+   "t": 78285,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e10"
+  },
+  {
+   "t": 78285,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e10"
+  },
+  {
+   "t": 78285,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e11"
+  },
+  {
+   "t": 78286,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e11"
+  },
+  {
+   "t": 78286,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e12"
+  },
+  {
+   "t": 78286,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e12"
+  },
+  {
+   "t": 78286,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e13"
+  },
+  {
+   "t": 78287,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e13"
+  },
+  {
+   "t": 78287,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e14"
+  },
+  {
+   "t": 78287,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e14"
+  },
+  {
+   "t": 78287,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e15"
+  },
+  {
+   "t": 78287,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e15"
+  },
+  {
+   "t": 78288,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e16"
+  },
+  {
+   "t": 78288,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e16"
+  },
+  {
+   "t": 81839,
+   "tipo": "fin",
+   "quien": "advisor"
+  },
+  {
+   "t": 83339,
+   "tipo": "inicio",
+   "quien": "advisor"
+  },
+  {
+   "t": 86148,
+   "tipo": "dice",
+   "quien": "bienestar",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Con lo de Advisor, cambio. Martina: la deuda arranca el 10/8 y las faltas el 18/8. Van en el mismo tiempo, pero los datos no dicen que una cause la otra: propongo una llamada que abra las dos cosas, sin dar nada por sentado.\nLucía: su pedido del 6/10 para pasar al turno de 19 h sigue sin respuesta. Primero hay que contestarle eso y después ver si hace falta llamarla.",
+   "hora": "21:57",
+   "id": "s125-1792198623870"
+  },
+  {
+   "t": 92206,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e17"
+  },
+  {
+   "t": 92207,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e17"
+  },
+  {
+   "t": 92207,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e18"
+  },
+  {
+   "t": 92207,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e18"
+  },
+  {
+   "t": 92207,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e19"
+  },
+  {
+   "t": 92208,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e19"
+  },
+  {
+   "t": 92208,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e20"
+  },
+  {
+   "t": 92208,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e20"
+  },
+  {
+   "t": 92208,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e21"
+  },
+  {
+   "t": 92208,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e21"
+  },
+  {
+   "t": 92208,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e22"
+  },
+  {
+   "t": 92208,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e22"
+  },
+  {
+   "t": 92209,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e23"
+  },
+  {
+   "t": 92209,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e23"
+  },
+  {
+   "t": 92209,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de e24"
+  },
+  {
+   "t": 92209,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de e24"
+  },
+  {
+   "t": 96467,
+   "tipo": "dice",
+   "quien": "advisor",
+   "a": [
+    "bienestar"
+   ],
+   "texto": "@Bienestar Hay comisión los jueves a las 19 h, y es justo la que ella pidió el 6/10, a un mes de empezar a faltar. Ese pedido sigue sin respuesta.\nPropuesta para que decida Dirección: resolver ese cambio antes del parcial 2. No tengo datos de cupo ni de otras comisiones.",
+   "hora": "21:57",
+   "id": "s142-1792198634189"
+  },
+  {
+   "t": 103229,
+   "tipo": "fin",
+   "quien": "bienestar"
+  },
+  {
+   "t": 104731,
+   "tipo": "inicio",
+   "quien": "bienestar"
+  },
+  {
+   "t": 107219,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 109825,
+   "tipo": "dice",
+   "quien": "tutor",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Martina (e01): 14 consultas en cruzamientos y 3 de 10 resueltos, Parcial 1 5,5. Ganas le sobran, le falta práctica guiada.\nTomás (e02): 1 de 10 en cruzamientos, 3 en el TP 2 de cruzamientos y 4 en el Parcial 1. Le sumaría una tutoría con el docente. Joaquín (e04) no usa el tutor desde el 20/8, Parcial 1 6.\nLos temas de los tres entran en el parcial del 3/11. Los otros 21 resuelven 8 de 10 o más, y los que practicaron ADN o herencia ligada al sexo van 8 de 10.",
+   "hora": "21:57",
+   "id": "s146-1792198647546"
+  },
+  {
+   "t": 109825,
+   "tipo": "dice",
+   "quien": "tutor",
+   "a": [
+    "bienestar"
+   ],
+   "texto": "@Bienestar Tomás (e02) no consulta el tutor desde el 30/9 y después sacó 3 en el TP 2. Joaquín (e04) no entra al tutor desde el 20/8.",
+   "hora": "21:57",
+   "id": "s147-1792198647547"
+  },
+  {
+   "t": 113037,
+   "tipo": "fin",
+   "quien": "advisor"
+  },
+  {
+   "t": 127812,
+   "tipo": "fin",
+   "quien": "tutor"
+  },
+  {
+   "t": 130982,
+   "quien": "bienestar",
+   "tipo": "piensa",
+   "texto": "Sin novedades."
+  },
+  {
+   "t": 130982,
+   "tipo": "fin",
+   "quien": "bienestar"
+  },
+  {
+   "t": 132484,
+   "tipo": "inicio",
+   "quien": "bienestar"
+  },
+  {
+   "t": 133857,
+   "quien": "coordinacion",
+   "tipo": "piensa",
+   "texto": "Todavía falta Tutor, así que no mando nada y espero su respuesta."
+  },
+  {
+   "t": 133857,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 135360,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 140189,
+   "tipo": "dice",
+   "quien": "bienestar",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Con lo de Tutor, sumo a Tomás G. con riesgo bajo: fue a 9 de las últimas 10 clases, entró 22 veces al campus en 30 días y no debe entregas, pero dejó el tutor el 30/9 y sacó 3 en el TP 2. Para mí es más tema de apoyo académico que de permanencia.\nJoaquín: dejó el tutor el 20/8, antes de empezar a faltar el 24/8. Sigue en riesgo alto y se aleja hace más tiempo de lo que pensaba.",
+   "hora": "21:57",
+   "id": "s156-1792198677911"
+  },
+  {
+   "t": 151696,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Propuesta para decidir: riesgo en Biología 1 antes del parcial del 3/11\n1. Martina R., riesgo alto. Debe agosto a octubre y no puede anotarse al parcial (Advisor), vino a 2 de 10 clases desde el 18/8 (Bienestar), resuelve 3 de 10 cruzamientos (Tutor). Secretaría le ofrece plan de pagos y revisa la beca; Bienestar la llama para hablar de las dos cosas.\n2. Joaquín M., riesgo alto. Faltó a las 8 clases desde el 28/9 y no entra al campus desde el 26/9 (Bienestar); no usa el tutor desde el 20/8 (Tutor). Lo llama Bienestar, como en la alerta de 2025.\n3. Tomás G., riesgo medio. Resolvió 1 de 10 cruzamientos y sacó 3 en el TP 2 y 4 en el Parcial 1 (Tutor). El docente le da una tutoría antes del 3/11.\n4. Lucía P., riesgo medio. Desde el 7/9 falta solo a los jueves de 14 h (Bienestar); pidió pasar al turno de 19 h hace 24 días y no tuvo respuesta (Advisor). Secretaría le contesta primero; si sigue faltando, la llama Bienestar.\nPendiente: los datos no explican por qué Martina dejó de venir, qué le pasa a Joaquín ni por qué Lucía no puede los jueves. ¿Aprobás, editás o rechazás cada caso?",
+   "hora": "21:58",
+   "id": "s157-1792198689418"
+  },
+  {
+   "t": 155480,
+   "tipo": "fin",
+   "quien": "bienestar"
+  },
+  {
+   "t": 158531,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Dirección",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "Aprobado Martina y Lucía. Tomás: refuerzo sí, pero con el docente. A Joaquín lo llamo yo.",
+   "hora": "21:58",
+   "id": "s159-1792198696253"
+  },
+  {
+   "t": 160456,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 161958,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 164789,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Martina: plan de pagos y beca, Secretaría; llamada, Bienestar. Lucía: respuesta al cambio de turno, Secretaría. Tomás: tutoría, el docente.\nJoaquín: lo llamás vos; ojo que dejó el tutor el 20/8 y falta desde el 24/8, viene alejándose hace más de dos meses.",
+   "hora": "21:58",
+   "id": "s162-1792198702511"
+  },
+  {
+   "t": 167438,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  }
+ ]
+}
