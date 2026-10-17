@@ -29,6 +29,12 @@ export function crearHttp({ bus, reiniciar, info, log = () => {} }) {
     if (host && host !== 'localhost' && host !== '127.0.0.1' && host !== '[::1]') { res.writeHead(403); return res.end('Solo local.'); }
     const url = new URL(req.url, 'http://localhost');
     const ruta = url.pathname;
+    // Los POST cambian estado (y gastan API): solo desde la propia vista, nunca desde otra página abierta en el navegador.
+    if (req.method === 'POST') {
+      const origen = req.headers.origin;
+      const esJson = /^application\/json\b/i.test(req.headers['content-type'] || '');
+      if (!esJson || (origen && !/^http:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(origen))) { res.writeHead(403); return res.end('Solo desde la vista.'); }
+    }
     try {
       if (ruta === '/') { res.writeHead(302, { Location: '/stage/' }); return res.end(); }
       if (ruta === '/api/eventos' && req.method === 'GET') {
@@ -54,7 +60,7 @@ export function crearHttp({ bus, reiniciar, info, log = () => {} }) {
       if (ruta === '/api/estado' && req.method === 'GET') return json(res, 200, { vivo: true, ...info, ...bus.estado() });
       if (ruta === '/api/corrida' && req.method === 'GET') return json(res, 200, bus.corrida());
       if (ruta.startsWith('/stage/') && req.method === 'GET') {
-        const rel = normalize(decodeURIComponent(ruta.slice('/stage/'.length))).replace(/^(\.\.[/\\])+/, '');
+        const rel = normalize(decodeURIComponent(ruta.slice('/stage/'.length))).replace(/^(\.\.[/\\])+/, '').replace(/^\.$/, '');
         if (rel.split(/[/\\]/).some((p) => p.startsWith('.'))) { res.writeHead(404); return res.end(); }
         let f = join(STAGE, rel || 'index.html');
         if (!f.startsWith(STAGE)) { res.writeHead(404); return res.end(); }

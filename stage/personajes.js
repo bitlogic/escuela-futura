@@ -5,8 +5,16 @@
 /** Qué hoja usa cada uno. Academia es la de Advisor con otra ropa y el pelo violeta (ver cargarHojas). */
 export const MODELOS = { persona: 0, coordinacion: 1, advisor: 2, bienestar: 3, admisiones: 4, tutor: 5, academia: 6 };
 
-/** Color de cada uno en el chat y el organigrama (sobre fondo oscuro). */
-export const COLOR = { coordinacion: '#7a9bff', tutor: '#f0c13f', advisor: '#44c9b3', bienestar: '#f07fb0', admisiones: '#e0b84a', academia: '#6fd987', persona: '#ff7a3d' };
+/** Color de cada uno en el chat y el organigrama, por tema: los del oscuro son claros y viceversa, para llegar a 4,5:1 sobre el panel. */
+export const COLORES = {
+  oscuro: { coordinacion: '#7a9bff', tutor: '#f0c13f', advisor: '#44c9b3', bienestar: '#f07fb0', admisiones: '#e0b84a', academia: '#6fd987', persona: '#ff7a3d' },
+  claro:  { coordinacion: '#3b55c9', tutor: '#7d6000', advisor: '#0d6e60', bienestar: '#b4306a', admisiones: '#7e6212', academia: '#1d7a42', persona: '#c2410c' },
+};
+export const COLOR = COLORES.oscuro;
+/** Deja el color de cada uno en variables CSS (--ag-coordinacion, …) del documento, según el tema. */
+export function aplicarColores(tema, doc = document) {
+  for (const [id, c] of Object.entries(COLORES[tema] || COLORES.oscuro)) doc.documentElement.style.setProperty('--ag-' + id, c);
+}
 
 export function cargarImagen(src) { return new Promise((ok, mal) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => mal(new Error('No se pudo cargar ' + src)); i.src = src; }); }
 

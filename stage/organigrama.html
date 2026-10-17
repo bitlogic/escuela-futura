@@ -1,24 +1,33 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-tema="oscuro">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Organigrama · Escuela Futura</title>
+<script>
+  // Mismo tema que la vista de la escuela: ?tema= (lo manda el iframe) o lo guardado.
+  (function () { try { var q = new URLSearchParams(location.search).get('tema'); var t = q || localStorage.getItem('tema'); if (t === 'claro' || t === 'oscuro') document.documentElement.dataset.tema = t; } catch (e) {} })();
+</script>
 <style>
-  :root { --ink: #1a1a2e; --papel: #f4efe2; --naranja: #ff7a3d; --verde: #5fae6a; --fuera: #0b0b12; --panel: #10101b; --tarjeta: #181826; --linea: #2c2f48; --tenue: #8f93b0;
+  :root { color-scheme: dark; --ink: #1a1a2e; --texto: #f4efe2; --acento: #ff7a3d; --fondo-pagina: #0b0b12; --panel: #10101b; --tarjeta: #181826; --linea: #2c2f48; --tenue: #8f93b0; --persona-fondo: rgba(255,122,61,.14);
     --mono: "Silkscreen", "Press Start 2P", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  :root[data-tema="claro"] { color-scheme: light; --texto: #121212; --acento: #c2410c; --fondo-pagina: #e9e2d3; --panel: #f9f4ea; --tarjeta: #ffffff; --linea: #d6cdb9; --tenue: #585c72; --persona-fondo: rgba(194,65,12,.12); }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; background: var(--fuera); overflow: hidden; font-family: var(--sans); color: var(--papel); cursor: default; }
-  /* Mismo escenario 16:9 de 1920×1080 que la vista de la escuela, escalado a la ventana */
+  html, body { margin: 0; height: 100%; background: var(--fondo-pagina); overflow: hidden; font-family: var(--sans); color: var(--texto); cursor: default; }
+  /* Tablero fijo de 1920×1080 escalado a la ventana (es estático: no necesita layout fluido) */
   #escenario { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; background: var(--panel); }
   .px { clip-path: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px), 0 4px, 4px 4px); }
 
   header { position: absolute; left: 46px; right: 46px; top: 26px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
   header h1 { margin: 0; font: 700 38px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
-  header h1 span { color: var(--naranja); }
-  .leyenda { display: flex; gap: 28px; align-items: center; font: 700 18px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--tenue); }
-  .leyenda kbd { font: inherit; background: var(--linea); color: var(--papel); padding: 4px 10px; }
+  header h1 span { color: var(--acento); }
+  #vistas { display: flex; background: var(--ink); padding: 4px; gap: 4px; }
+  #vistas button { font: 700 18px var(--mono); letter-spacing: .08em; text-transform: uppercase; background: transparent; color: #f4efe2; border: 0; padding: 8px 14px; cursor: pointer; }
+  #vistas button.on { background: var(--acento); color: var(--ink); }
+  #vistas button:hover:not(.on) { background: #2c2f48; }
+  #vistas button:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+  #vistas kbd { font: inherit; background: rgba(255,255,255,.14); padding: 2px 8px; margin-left: 8px; }
 
   .tarjeta { position: absolute; background: var(--tarjeta); padding: 20px; --c: var(--tenue); }
   .tarjeta::before { content: ''; position: absolute; inset: 0; border: 4px solid var(--c); pointer-events: none; }
@@ -27,48 +36,45 @@
   .cara canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
   .nombre { font: 700 27px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--c); line-height: 1.1; }
   .area { margin-top: 6px; font: 700 17px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--tenue); }
-  .rol { margin-top: 14px; font: 600 24px/1.3 var(--sans); color: var(--papel); }
+  .rol { margin-top: 14px; font: 600 24px/1.3 var(--sans); color: var(--texto); }
 
-  .persona { background: transparent; --c: var(--naranja); }
-  .persona::before { border-style: dashed; border-width: 3px; }
-  .persona.solida { background: var(--tarjeta); }
-  .persona.solida::before { border-style: solid; border-width: 4px; }
-  .persona .cab { gap: 16px; }
-  .persona .ico { flex: none; width: 56px; height: 56px; background: rgba(255,122,61,.14); display: grid; place-items: center; }
-  .persona .ico canvas { width: 40px; height: 40px; image-rendering: pixelated; }
-  .persona .nombre { font-size: 21px; color: var(--papel); }
-  .persona .area { font-size: 15px; }
-  .persona.solida .nombre { font-size: 34px; }
-  .persona.solida .area { font-size: 19px; }
-  .persona .area { color: var(--naranja); }
+  /* Dirección: la persona que decide es quien mira la pantalla; no tiene cara, tiene una silueta */
+  .persona { background: var(--tarjeta); --c: var(--acento); }
+  .persona::before { border-style: solid; border-width: 4px; }
+  .persona .cab { gap: 18px; }
+  .persona .ico { flex: none; width: 96px; height: 96px; background: var(--persona-fondo); display: grid; place-items: center; }
+  .persona .ico canvas { width: 60px; height: 60px; image-rendering: pixelated; }
+  .persona .nombre { font-size: 34px; color: var(--texto); }
+  .persona .area { font-size: 19px; color: var(--acento); }
   .etiqueta { position: absolute; top: 16px; right: 20px; background: var(--c); padding: 5px 12px; font: 700 16px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink); }
 
   .linea { position: absolute; background: var(--tenue) }
-  .linea.pun { background: none; border-left: 3px dashed var(--naranja); width: 0 !important }
-  .ir { color: var(--ink); background: var(--naranja); padding: 8px 16px; text-decoration: none; font: 700 18px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
-  .ir:hover, .ir:focus-visible { background: var(--papel); outline: none; }
-  .ir kbd { font: inherit; background: var(--ink); color: var(--papel); padding: 2px 8px; margin-left: 10px; }
 </style>
 </head>
 <body>
 <div id="escenario">
   <header>
     <div><h1>Escuela <span>Futura</span> · Organigrama</h1></div>
-    <div class="leyenda"><a class="ir px" id="ir-escuela" href="index.html">Ver la escuela desde arriba <kbd>o</kbd></a></div>
+    <div id="vistas" class="px"><button id="v-escuela">Escuela <kbd>o</kbd></button><button id="v-org" class="on">Organigrama</button></div>
   </header>
   <div id="arbol" style="position:absolute;inset:0;top:44px"></div>
 </div>
 
 <script type="module">
-import { COLOR, MODELOS, cargarHojas, caraViva } from './personajes.js';
+import { MODELOS, cargarHojas, caraViva, aplicarColores } from './personajes.js';
 
 const $ = (s) => document.querySelector(s);
 const embebido = new URLSearchParams(location.search).has('embebido');
-// Embebido en la vista de la escuela: el link cierra el organigrama; suelto: navega a la escuela.
-$('#ir-escuela').addEventListener('click', (e) => { if (embebido) { e.preventDefault(); parent.postMessage('cerrar-org', '*'); } });
+let tema = document.documentElement.dataset.tema === 'claro' ? 'claro' : 'oscuro';
+function aplicarTema(t) { tema = t === 'claro' ? 'claro' : 'oscuro'; document.documentElement.dataset.tema = tema; aplicarColores(tema); try { localStorage.setItem('tema', tema); } catch {} }
+aplicarTema(tema);
+// Embebido en la vista de la escuela: "Escuela" cierra el organigrama; suelto: navega a la escuela.
+const irEscuela = () => { if (embebido) parent.postMessage('cerrar-org', '*'); else location.href = 'index.html'; };
+$('#v-escuela').addEventListener('click', irEscuela);
+addEventListener('message', (e) => { if (e.data && e.data.tipo === 'tema') aplicarTema(e.data.tema); });
 
 // ── Datos del organigrama ────────────────────────────────────────────────────
-const DIRECCION = { id: 'persona', nombre: 'Dirección', area: 'Greyla Alvarez · directora', rol: 'Fija los objetivos y decide: aprueba, edita o rechaza cada propuesta.', sala: 'Dirección y Coord.' };
+const DIRECCION = { id: 'persona', nombre: 'Dirección', area: 'Persona que decide', rol: 'Quien mira esta pantalla: fija los objetivos y aprueba, edita o rechaza cada propuesta.', sala: 'Dirección y Coord.' };
 const COORDINACION = { id: 'coordinacion', nombre: 'Coordinación', area: 'Coordinación académica', rol: 'Recibe el objetivo, reparte el trabajo y arma la propuesta.' };
 const AGENTES = [
   { id: 'tutor', nombre: 'Tutor', area: 'Aulas', rol: 'Sabe en qué temas se traban los estudiantes.' },
@@ -88,31 +94,30 @@ const caja = (x, y, w, h, clase = '') => { const e = el('div', 'linea ' + clase)
 const caras = [];   // las caras con vida (ver más abajo)
 const nuevaCara = (hoja, caja) => { const v = caraViva(hoja, 6); caja.appendChild(v.canvas); const c = { ...v, mirada: 0, parpado: false, mano: 0 }; caras.push(c); return c; };
 function tarjetaAgente(a, x, y, w, h) {
-  const t = el('div', 'tarjeta px'); t.style.setProperty('--c', COLOR[a.id] || COLOR.persona); pos(t, x, y, w, h);
+  const t = el('div', 'tarjeta px'); t.style.setProperty('--c', `var(--ag-${a.id})`); pos(t, x, y, w, h);
   const cab = el('div', 'cab'); const f = el('div', 'cara px'); const viva = nuevaCara(hojas[MODELOS[a.id]], f); cab.appendChild(f); t.addEventListener('mouseenter', () => { pedido = viva; });
   const nom = el('div'); nom.append(el('div', 'nombre', a.nombre), el('div', 'area', a.area)); cab.appendChild(nom);
   t.append(cab, el('div', 'rol', a.rol));
   arbol.appendChild(t); return t;
 }
-function silueta() {   // persona genérica en pixel-art
-  const cv = document.createElement('canvas'); cv.width = 10; cv.height = 10; const c = cv.getContext('2d'); c.fillStyle = '#ff7a3d';
+function silueta() {   // persona genérica en pixel-art, del color de acento del tema
+  const cv = document.createElement('canvas'); cv.width = 10; cv.height = 10; const c = cv.getContext('2d');
+  c.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--acento').trim() || '#ff7a3d';
   for (const [x, y, w, h] of [[3, 0, 4, 4], [2, 5, 6, 3], [1, 6, 1, 3], [8, 6, 1, 3]]) c.fillRect(x, y, w, h);
   return cv;
 }
-function tarjetaPersona(titulo, sub, x, y, w, h, { cara: hoja, solida = false, etiqueta = 'Persona' } = {}) {
-  const t = el('div', 'tarjeta persona px' + (solida ? ' solida' : '')); pos(t, x, y, w, h);
+function tarjetaPersona(d, x, y, w, h) {
+  const t = el('div', 'tarjeta persona px'); pos(t, x, y, w, h);
   const cab = el('div', 'cab');
-  if (hoja) { const f = el('div', 'cara px'); f.style.setProperty('--c', COLOR.persona); const viva = nuevaCara(hoja, f); cab.appendChild(f); t.addEventListener('mouseenter', () => { pedido = viva; }); }
-  else { const i = el('div', 'ico px'); i.appendChild(silueta()); cab.appendChild(i); }
-  const nom = el('div'); nom.append(el('div', 'nombre', titulo), el('div', 'area', sub)); cab.appendChild(nom);
-  t.appendChild(cab); if (etiqueta && solida) t.appendChild(el('div', 'etiqueta', etiqueta));
+  const i = el('div', 'ico px'); i.appendChild(silueta()); cab.appendChild(i);
+  const nom = el('div'); nom.append(el('div', 'nombre', d.nombre), el('div', 'area', d.area)); cab.appendChild(nom);
+  t.append(cab, el('div', 'rol', d.rol), el('div', 'etiqueta', 'Decide'));
   arbol.appendChild(t); return t;
 }
 
 // Nivel 0: Dirección (persona que decide)
 const CX = 960;
-const d = tarjetaPersona(DIRECCION.nombre, DIRECCION.area, CX - 410, 130, 820, 210, { cara: hojas[MODELOS.persona], solida: true, etiqueta: 'Decide' });
-d.querySelector('.cab').after(Object.assign(el('div', 'rol', DIRECCION.rol), { style: 'margin-top:14px' }));
+tarjetaPersona(DIRECCION, CX - 410, 130, 820, 210);
 // Nivel 1: Coordinación
 tarjetaAgente(COORDINACION, CX - 410, 392, 820, 170);
 caja(CX - 1, 340, 3, 52);                                     // Dirección → Coordinación
@@ -162,7 +167,8 @@ function escalar() { const f = Math.min(innerWidth / 1920, innerHeight / 1080); 
 addEventListener('resize', escalar); escalar();
 
 addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' || e.key === 'o') { if (embebido) parent.postMessage('cerrar-org', '*'); else location.href = 'index.html'; }
+  if (e.key === 'Escape' || e.key === 'o') irEscuela();
+  if (e.key === 't') { aplicarTema(tema === 'oscuro' ? 'claro' : 'oscuro'); if (embebido) parent.postMessage({ tipo: 'tema', tema }, '*'); }
   if (e.key === 'f' && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
 });
 </script>

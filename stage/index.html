@@ -1,130 +1,142 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-tema="oscuro">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Escuela Futura</title>
+<script>
+  // El tema se aplica antes del primer cuadro para no ver un destello del otro. ?tema= manda; si no, lo guardado; si no, oscuro.
+  (function () { try { var q = new URLSearchParams(location.search).get('tema'); var t = q || localStorage.getItem('tema'); if (t === 'claro' || t === 'oscuro') document.documentElement.dataset.tema = t; } catch (e) {} })();
+</script>
 <style>
   @font-face { font-family: "Silkscreen"; src: url("assets/Silkscreen-Regular.ttf"); font-weight: 400; font-display: block; }
   @font-face { font-family: "Silkscreen"; src: url("assets/Silkscreen-Bold.ttf"); font-weight: 700; font-display: block; }
   @font-face { font-family: "Plain"; src: url("assets/Plain-Regular.otf"); font-weight: 400; font-display: block; }
   @font-face { font-family: "Plain"; src: url("assets/Plain-Medium.otf"); font-weight: 500 600; font-display: block; }
   @font-face { font-family: "Plain"; src: url("assets/Plain-Bold.otf"); font-weight: 700; font-display: block; }
-  :root { --ink: #1a1a2e; --papel: #f4efe2; --naranja: #ff7a3d; --azul: #3e6be8; --gris: #9a9eba; --gris-bajo: #8f93b0; --verde: #5fae6a; --fuera: #0b0b12; --panel: #10101b; --linea: #2c2f48;
+
+  /* Colores por función, no por tono. El oscuro es el tema original; el claro usa el papel crema del brand kit. */
+  :root { color-scheme: dark;
+    --fondo-pagina: #0b0b12; --panel: #10101b; --panel-borde: #2c2f48; --texto: #f4efe2; --texto-suave: #9a9eba; --texto-tenue: #8f93b0; --texto-apagado: #6b6f8a; --hora: #a7abc9;
+    --acento: #ff7a3d; --ok: #5fae6a; --azul: #3e6be8; --sobre-azul: #f4efe2; --mencion: #ffb48a;
+    --campo: #1b1b2b; --manija: #4a4f78; --boton: #2c2f48; --boton-hover: #3c4066; --boton-texto: #f4efe2;
+    --globo-fondo: #f4efe2; --globo-texto: #1a1a2e; --globo-borde: #1a1a2e; --etiqueta-fondo: #1a1a2e; --etiqueta-texto: #f4efe2; --cartel-fondo: #1a1a2e; --cartel-texto: #dfe2f5;
+    --ink: #1a1a2e;
+    --esc: 1;   /* escala tipográfica: 1 en 1920×1080, baja en pantallas chicas (la pone escalar()) */
     --mono: "Silkscreen", "Press Start 2P", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     --sans: "Plain", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  :root[data-tema="claro"] { color-scheme: light;
+    --fondo-pagina: #e9e2d3; --panel: #f9f4ea; --panel-borde: #d6cdb9; --texto: #121212; --texto-suave: #5c5f73; --texto-tenue: #585c72; --texto-apagado: #6f738a; --hora: #5c5f73;
+    --acento: #c2410c; --ok: #2f7a3b; --azul: #2f54c8; --sobre-azul: #f9f4ea; --mencion: #b4431a;
+    --campo: #ffffff; --manija: #b9af9a; --boton: #e6dfcd; --boton-hover: #d8cfb9; --boton-texto: #121212;
+    --globo-fondo: #f4efe2; --globo-texto: #1a1a2e; --globo-borde: #1a1a2e; --etiqueta-fondo: #1a1a2e; --etiqueta-texto: #f4efe2; --cartel-fondo: #1a1a2e; --cartel-texto: #f4efe2; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; background: var(--fuera); overflow: hidden; font-family: var(--mono); cursor: default; }
+  html, body { margin: 0; height: 100%; background: var(--fondo-pagina); overflow: hidden; font-family: var(--mono); cursor: default; }
 
-  /* Escenario 16:9 de 1920×1080: se escala entero para llenar la pantalla. A la izquierda el chat, a la derecha la escuela. */
-  #escenario { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; display: flex; align-items: center; background: var(--fuera); }
-  #mundo { position: relative; margin: auto; width: 1200px; height: 1080px; flex: none; overflow: hidden; background: var(--fuera); --u: 1.25; }
-  canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; image-rendering: auto; }
+  /* Layout fluido: el chat es una columna real; la escuela ocupa el resto y se escala por aspecto. */
+  #escenario { position: fixed; inset: 0; display: flex; background: var(--fondo-pagina); }
+  #mundo { position: relative; flex: 1; min-width: 0; min-height: 0; overflow: hidden; background: var(--fondo-pagina); }
+  #mapa { position: absolute; left: 0; top: 0; --u: 1.25; }
+  canvas#lienzo { position: absolute; left: 0; top: 0; width: 100%; height: 100%; image-rendering: auto; }
   #capa { position: absolute; inset: 0; pointer-events: none; }
 
   /* Chat del canal */
-  #chat { position: relative; width: min(var(--cw, 720px), var(--cwmax, 720px)); align-self: stretch; flex: none; display: flex; flex-direction: column; background: var(--panel); border-right: 4px solid var(--linea); color: var(--papel); }
+  #chat { position: relative; flex: none; width: clamp(360px, var(--cw, 31vw), 55vw); display: flex; flex-direction: column; background: var(--panel); border-right: 4px solid var(--panel-borde); color: var(--texto); }
   #chat { container-type: inline-size; }
-  @container (max-width: 560px) { #chat-cab { font-size: 24px; padding: 18px 20px; gap: 6px 12px; flex-wrap: wrap; letter-spacing: 0; } #chat-cab .canal { min-width: 0; white-space: nowrap; } .r { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 12px; row-gap: 0; } .r .av { grid-row: 1 / 3; } .r b { font-size: 17px; } #riel .r:nth-last-child(n+4) { display: none; } #chat-estado { white-space: nowrap; font-size: 16px; } #msgs, #trabajando { padding-left: 20px; padding-right: 20px; } #redactar { padding-left: 20px; padding-right: 20px; } #texto { font-size: 24px; text-overflow: ellipsis; } }
-  #chat-cab { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 28px; border-bottom: 4px solid var(--linea); font-weight: 700; font-size: 24px; letter-spacing: 0; }
+  @container (max-width: 560px) { #chat-cab { font-size: calc(24px * var(--esc)); padding: calc(18px * var(--esc)) calc(20px * var(--esc)); gap: 6px 12px; flex-wrap: wrap; letter-spacing: 0; } #chat-cab .canal { min-width: 0; white-space: nowrap; } .r { display: grid; grid-template-columns: calc(40px * var(--esc)) minmax(0, 1fr); column-gap: 12px; row-gap: 0; } .r .av { grid-row: 1 / 3; } .r b { font-size: calc(17px * var(--esc)); } #riel .r:nth-last-child(n+4) { display: none; } #chat-estado { white-space: nowrap; font-size: calc(16px * var(--esc)); } #msgs, #trabajando { padding-left: calc(20px * var(--esc)); padding-right: calc(20px * var(--esc)); } #redactar { padding-left: calc(20px * var(--esc)); padding-right: calc(20px * var(--esc)); } #texto { font-size: calc(24px * var(--esc)); text-overflow: ellipsis; } }
+  #chat-cab { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: calc(22px * var(--esc)) calc(28px * var(--esc)); border-bottom: 4px solid var(--panel-borde); font-weight: 700; font-size: calc(24px * var(--esc)); letter-spacing: 0; }
   #chat-cab .canal { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #chat-cab .canal b { color: var(--naranja); }
-  #chat-estado { flex: none; white-space: nowrap; display: flex; align-items: center; gap: 10px; font-size: 16px; letter-spacing: .1em; text-transform: uppercase; color: var(--gris-bajo); }
-  #chat-estado::before { content: ''; width: 12px; height: 12px; background: #6b6f8a; }
-  #chat-estado.vivo { color: var(--verde); } #chat-estado.vivo::before { background: var(--verde); animation: parpadeo 1.2s steps(2) infinite; }
-  #msgs { position: relative; flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: 26px 28px; }
-  #msgs .vacio { color: var(--gris); font: 600 24px/1.4 var(--sans); text-align: center; margin: auto 0; }
+  #chat-cab .canal b { color: var(--acento); }
+  #chat-estado { flex: none; white-space: nowrap; display: flex; align-items: center; gap: 10px; font-size: calc(16px * var(--esc)); letter-spacing: .1em; text-transform: uppercase; color: var(--texto-tenue); }
+  #chat-estado::before { content: ''; width: 12px; height: 12px; background: var(--texto-apagado); }
+  #chat-estado.vivo { color: var(--ok); } #chat-estado.vivo::before { background: var(--ok); animation: parpadeo 1.2s steps(2) infinite; }
+  #msgs { position: relative; flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: calc(26px * var(--esc)) calc(28px * var(--esc)); }
+  #msgs .vacio { color: var(--texto-suave); font: 600 calc(24px * var(--esc))/1.4 var(--sans); text-align: center; margin: auto 0; }
   /* Riel: los mensajes ya leídos, de a una línea. Foco: el último, completo. */
-  #riel { flex: none; display: flex; flex-direction: column; gap: 10px; }
-  #riel:not(:empty) { padding-bottom: 20px; margin-bottom: 22px; border-bottom: 3px solid var(--linea); }
+  #riel { flex: none; display: flex; flex-direction: column; gap: calc(10px * var(--esc)); }
+  #riel:not(:empty) { padding-bottom: calc(20px * var(--esc)); margin-bottom: calc(22px * var(--esc)); border-bottom: 3px solid var(--panel-borde); }
   .r { display: flex; align-items: center; gap: 14px; min-width: 0; color: var(--c); }
-  .r .av { flex: none; width: 40px; height: 40px; background: var(--c); overflow: hidden; }
+  .r .av { flex: none; width: calc(40px * var(--esc)); height: calc(40px * var(--esc)); background: var(--c); overflow: hidden; }
   .r .av img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
-  .r b { flex: none; font-size: 19px; letter-spacing: .08em; text-transform: uppercase; }
-  .r span { min-width: 0; flex: 1; font: 600 22px/1.2 var(--sans); color: var(--gris); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .r b { flex: none; font-size: calc(19px * var(--esc)); letter-spacing: .08em; text-transform: uppercase; }
+  .r span { min-width: 0; flex: 1; font: 600 calc(22px * var(--esc))/1.2 var(--sans); color: var(--texto-suave); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #foco { flex: 1; min-height: 0; overflow: hidden; position: relative; }
-  .f { --t: 34px; display: grid; grid-template-columns: 56px minmax(0, 1fr); column-gap: 18px; row-gap: 6px; animation: entra .4s steps(6) both; }
-  .f .av { grid-row: 1 / 3; width: 56px; height: 56px; background: var(--c); overflow: hidden; }
+  .f { --t: 34px; display: grid; grid-template-columns: calc(56px * var(--esc)) minmax(0, 1fr); column-gap: calc(18px * var(--esc)); row-gap: 6px; animation: entra .4s steps(6) both; }
+  .f .av { grid-row: 1 / 3; width: calc(56px * var(--esc)); height: calc(56px * var(--esc)); background: var(--c); overflow: hidden; }
   .f .av img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
-  .f .nom { font-weight: 700; font-size: 21px; letter-spacing: .08em; text-transform: uppercase; color: var(--c); align-self: end; }
-  .f .nom small { font-size: 16px; color: var(--gris); margin-left: 12px; letter-spacing: .04em; }
-  .f .cuerpo { font: 600 var(--t)/1.36 var(--sans); color: var(--papel); overflow-wrap: anywhere; }
+  .f .nom { font-weight: 700; font-size: calc(21px * var(--esc)); letter-spacing: .08em; text-transform: uppercase; color: var(--c); align-self: end; }
+  .f .nom small { font-size: calc(16px * var(--esc)); color: var(--hora); margin-left: 12px; letter-spacing: .04em; }
+  .f .cuerpo { font: 600 var(--t)/1.36 var(--sans); color: var(--texto); overflow-wrap: anywhere; }
   .f .cuerpo p { margin: 0 0 .5em; }
   .f .cuerpo .it { margin: .9em 0 .1em; font-weight: 700; }
   .f .cuerpo .it i { font-style: normal; color: var(--c); margin-right: .45em; }
-  .f .cuerpo .de { margin: 0 0 .1em; padding-left: 1.35em; color: var(--gris); font-weight: 600; }
-  .f .a { color: #ffb48a; }
+  .f .cuerpo .de { margin: 0 0 .1em; padding-left: 1.35em; color: var(--texto-suave); font-weight: 600; }
+  .f .a { color: var(--mencion); }
   #foco.recortado { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent); }
-  #msgs.recortado::after { content: 'sigue en el canal'; position: absolute; right: 28px; bottom: 26px; padding: 4px 10px; background: var(--panel); color: var(--naranja); font: 700 17px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+  #msgs.recortado::after { content: 'sigue en el canal'; position: absolute; right: calc(28px * var(--esc)); bottom: calc(26px * var(--esc)); padding: 4px 10px; background: var(--panel); color: var(--acento); font: 700 calc(17px * var(--esc))/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
   .f.persona .cuerpo { padding: 12px 14px; margin: 6px -14px 0; background: color-mix(in srgb, var(--c) 12%, transparent); }
+  /* La decisión de la persona: el mensaje que cierra la propuesta, en azul */
+  .f.decision .cuerpo { background: var(--azul); color: var(--sobre-azul); font-weight: 700; animation: sube .5s steps(5) both; }
   @keyframes entra { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-  #trabajando { flex: none; min-height: 74px; padding: 18px 28px; border-top: 4px solid var(--linea); font-size: 21px; letter-spacing: .06em; text-transform: uppercase; color: var(--gris-bajo); display: flex; align-items: center; gap: 12px; }
-  #trabajando.on { color: var(--papel); } #trabajando.on::before { content: ''; flex: none; width: 12px; height: 12px; background: var(--naranja); animation: parpadeo .9s steps(2) infinite; }
+  @keyframes sube { from { transform: translateY(16px); } to { transform: none; } }
+  #trabajando { flex: none; min-height: calc(74px * var(--esc)); padding: calc(18px * var(--esc)) calc(28px * var(--esc)); border-top: 4px solid var(--panel-borde); font-size: calc(21px * var(--esc)); letter-spacing: .06em; text-transform: uppercase; color: var(--texto-tenue); display: flex; align-items: center; gap: 12px; }
+  #trabajando.on { color: var(--texto); } #trabajando.on::before { content: ''; flex: none; width: 12px; height: 12px; background: var(--acento); animation: parpadeo .9s steps(2) infinite; }
 
-  #redactar { flex: none; display: flex; padding: 14px 28px 22px; }
-  #texto { display: block; width: 100%; height: 64px; max-height: 230px; resize: none; overflow-y: auto; font: 600 26px/1.3 var(--sans); color: var(--papel); background: #1b1b2b; border: 3px solid var(--linea); padding: 12px 16px; outline: none; border-radius: 0; }
+  /* La caja para escribir. Mientras hay una propuesta sin responder, pide la decisión. */
+  #redactar { flex: none; display: flex; flex-direction: column; gap: 8px; padding: calc(14px * var(--esc)) calc(28px * var(--esc)) calc(22px * var(--esc)); }
+  #decidir { display: none; align-items: center; gap: 12px; color: var(--texto); font: 700 calc(22px * var(--esc))/1 var(--sans); }
+  #decidir::before { content: ''; width: 14px; height: 14px; background: var(--azul); animation: respiro 2.2s cubic-bezier(.25, 1, .5, 1) infinite; }
+  #redactar.esperando #decidir { display: flex; }
+  #redactar.esperando #texto { border-color: var(--azul); }
+  @keyframes respiro { 50% { opacity: .25; } }
+  #texto { display: block; width: 100%; height: calc(64px * var(--esc)); max-height: calc(230px * var(--esc)); resize: none; overflow-y: auto; font: 600 calc(26px * var(--esc))/1.3 var(--sans); color: var(--texto); background: var(--campo); border: 3px solid var(--panel-borde); padding: 12px 16px; outline: none; border-radius: 0; }
   #manija { position: absolute; top: 0; right: -10px; width: 20px; height: 100%; cursor: col-resize; z-index: 30; touch-action: none; }
-  #manija::after { content: ''; position: absolute; left: 8px; top: 50%; width: 4px; height: 90px; margin-top: -45px; background: #4a4f78; opacity: .0; transition: opacity .15s; }
-  #manija:hover::after, #manija.arrastrando::after { opacity: 1; background: var(--naranja); }
-  #texto:focus { border-color: var(--naranja); }
+  #manija::after { content: ''; position: absolute; left: 8px; top: 50%; width: 4px; height: 90px; margin-top: -45px; background: var(--manija); opacity: .0; transition: opacity .15s; }
+  #manija:hover::after, #manija.arrastrando::after { opacity: 1; background: var(--acento); }
+  #texto:focus { border-color: var(--acento); }
   #texto:disabled { opacity: .5; }
-  #texto::placeholder { color: var(--gris); }
+  #texto::placeholder { color: var(--texto-suave); }
+
+  /* Pantallas angostas: el chat pasa abajo, la escuela arriba. */
+  @media (max-width: 999px) {
+    #escenario { flex-direction: column-reverse; }
+    #chat { width: auto; height: 44vh; border-right: 0; border-top: 4px solid var(--panel-borde); }
+    #manija { display: none; }
+  }
 
   /* Esquinas "de pixel": recorte escalonado de 4 px */
   .px { clip-path: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px), 0 4px, 4px 4px); }
 
-  .sala-cartel { position: absolute; background: var(--ink); padding: 2px 8px; font-size: calc(14px * var(--u)); font-weight: 700; letter-spacing: 0; text-transform: uppercase; color: #dfe2f5; opacity: .9; white-space: nowrap; }
+  .sala-cartel { position: absolute; background: var(--cartel-fondo); padding: 2px 8px; font-size: calc(14px * var(--u)); font-weight: 700; letter-spacing: 0; text-transform: uppercase; color: var(--cartel-texto); opacity: .9; white-space: nowrap; }
 
   .pj { position: absolute; left: 0; top: 0; width: 0; height: 0; will-change: transform; }
-  .tag { position: absolute; left: 0; top: calc(10px * var(--u)); transform: translateX(-50%); background: var(--ink); color: var(--papel); padding: calc(3px * var(--u)) calc(8px * var(--u)); font-size: calc(15px * var(--u)); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
-  .pj.persona .tag { background: var(--naranja); color: var(--ink); }
+  .tag { position: absolute; left: 0; top: calc(10px * var(--u)); transform: translateX(-50%); background: var(--etiqueta-fondo); color: var(--etiqueta-texto); padding: calc(3px * var(--u)) calc(8px * var(--u)); font-size: calc(15px * var(--u)); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+  .tag.martina { background: var(--acento); color: var(--ink); }
   /* Globos: sans legible, hasta 4 líneas; el texto completo está en el chat */
-  .bub { position: absolute; left: 0; bottom: calc(112px * var(--u)); transform: translateX(-50%); width: max-content; max-width: 380px; background: var(--ink); padding: 4px; opacity: 0; transition: opacity 180ms steps(3); }
-  .bub span { display: block; background: var(--papel); color: var(--ink); padding: 12px 16px; font: 700 25px/1.3 var(--sans); clip-path: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px), 0 4px, 4px 4px); }
+  .bub { position: absolute; left: 0; bottom: calc(112px * var(--u)); transform: translateX(-50%); width: max-content; max-width: calc(380px * var(--esc)); background: var(--globo-borde); padding: 4px; opacity: 0; transition: opacity 180ms steps(3); }
+  .bub span { display: block; background: var(--globo-fondo); color: var(--globo-texto); padding: 12px 16px; font: 700 calc(25px * var(--esc))/1.3 var(--sans); clip-path: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px), 0 4px, 4px 4px); }
   .bub span i { font-style: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
   .bub.visible { opacity: 1; }
-  .bub::after { content: ''; position: absolute; left: 50%; bottom: -10px; width: 12px; height: 12px; margin-left: -6px; background: var(--ink); clip-path: polygon(0 0, 100% 0, 100% 40%, 66% 40%, 66% 70%, 33% 70%, 33% 40%, 0 40%); }
+  .bub::after { content: ''; position: absolute; left: 50%; bottom: -10px; width: 12px; height: 12px; margin-left: -6px; background: var(--globo-borde); clip-path: polygon(0 0, 100% 0, 100% 40%, 66% 40%, 66% 70%, 33% 70%, 33% 40%, 0 40%); }
   .pj.abajo .bub::after { bottom: auto; top: -10px; transform: scaleY(-1); }
 
-  /* El momento de la decisión: mientras la propuesta espera, un cartel junto a la persona; al decidir, la escuela se atenúa y la persona queda en foco. */
-  .espera { position: absolute; left: 0; top: calc(10px * var(--u) + 46px); transform: translateX(-50%); display: none; align-items: center; gap: 12px; background: var(--papel); color: var(--ink); padding: 8px 16px; font: 700 26px/1 var(--sans); white-space: nowrap; }
-  .espera.on { display: flex; }
-  .espera::before { content: ''; width: 14px; height: 14px; background: var(--azul); animation: respiro 2.2s cubic-bezier(.25, 1, .5, 1) infinite; }
-  @keyframes respiro { 50% { opacity: .25; } }
-  #velo { position: absolute; inset: 0; z-index: 500; pointer-events: none; opacity: 0; transition: opacity 600ms cubic-bezier(.25, 1, .5, 1);
-    background: color-mix(in srgb, var(--papel) 82%, transparent);
-    -webkit-mask-image: radial-gradient(circle at var(--fx, 50%) var(--fy, 50%), transparent 0, transparent 190px, #000 460px); mask-image: radial-gradient(circle at var(--fx, 50%) var(--fy, 50%), transparent 0, transparent 190px, #000 460px); }
-  .enfoque #velo { opacity: 1; }
-  .pj .tag { transition: opacity 300ms; }
-  .enfoque .pj:not(.persona) .bub { opacity: 0; }
-  .enfoque .pj:not(.persona) .tag { opacity: .4; }
-  .bub.decision { max-width: 620px; }
-  .bub.decision span { background: var(--azul); color: var(--papel); font-size: 36px; line-height: 1.25; padding: 18px 24px; }
-  .bub.decision.visible span { animation: sube .5s steps(5) both; }
-  @keyframes sube { from { transform: translateY(16px); } to { transform: none; } }
-  .bub.decision span i { -webkit-line-clamp: 5; }
-
-  /* Controles: aparecen al mover el mouse */
-  #barra { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 8px; align-items: center; background: var(--ink); padding: 8px; opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 20; }
+  /* Conmutador de vistas (arriba a la derecha) y controles (aparecen al mover el mouse) */
+  #vistas { position: absolute; right: 14px; top: 10px; z-index: 20; display: flex; background: var(--ink); padding: 4px; gap: 4px; }
+  #vistas button { font: 700 calc(18px * var(--esc)) var(--mono); letter-spacing: .08em; text-transform: uppercase; background: transparent; color: #f4efe2; border: 0; padding: 8px 14px; cursor: pointer; }
+  #vistas button.on { background: var(--acento); color: var(--ink); }
+  #vistas button:hover:not(.on) { background: #2c2f48; }
+  #vistas kbd { font: inherit; background: rgba(255,255,255,.14); padding: 2px 8px; margin-left: 8px; }
+  #barra { position: absolute; left: 0; right: 0; bottom: 14px; margin: 0 auto; width: max-content; max-width: calc(100% - 28px); display: flex; gap: 8px; align-items: center; background: var(--ink); padding: 8px; opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 20; flex-wrap: wrap; justify-content: center; }
   #barra.visible { opacity: 1; pointer-events: auto; }
-  #barra button, #barra select { font: 700 20px var(--mono); letter-spacing: .06em; text-transform: uppercase; background: #2c2f48; color: var(--papel); border: 0; padding: 10px 16px; cursor: pointer; }
-  #barra button:focus-visible, #barra select:focus-visible, #clave button:focus-visible { outline: 3px solid var(--naranja); outline-offset: 2px; }
+  #barra button, #barra select { font: 700 calc(17px * var(--esc)) var(--mono); letter-spacing: .05em; text-transform: uppercase; background: #2c2f48; color: #f4efe2; border: 0; padding: 10px 13px; cursor: pointer; }
+  #barra .sep { width: 4px; height: 28px; background: #4a4f78; }
+  #barra button:focus-visible, #barra select:focus-visible, #vistas button:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
   #barra button:hover, #barra select:hover { background: #3c4066; }
-  #barra button.on { background: var(--verde); color: var(--ink); }
+  #barra button.on { background: var(--ok); color: var(--ink); }
+  #barra button:disabled { opacity: .4; cursor: default; }
   @keyframes parpadeo { 50% { opacity: .2; } }
-  #clave { position: absolute; left: 50%; bottom: 90px; transform: translateX(-50%); width: 560px; background: var(--ink); padding: 20px; display: none; flex-direction: column; gap: 12px; z-index: 21; color: var(--papel); }
-  #clave.abierto { display: flex; }
-  #clave label { font-size: 16px; letter-spacing: .08em; text-transform: uppercase; }
-  #clave input { font: 700 20px ui-monospace, Menlo, monospace; background: var(--papel); color: var(--ink); border: 0; padding: 12px 14px; width: 100%; margin-top: 8px; }
-  #clave .fila { display: flex; gap: 8px; }
-  #clave button { font: 700 18px var(--mono); letter-spacing: .06em; text-transform: uppercase; background: var(--verde); color: var(--ink); border: 0; padding: 12px 18px; cursor: pointer; }
-  #clave button.sec { background: #2c2f48; color: var(--papel); }
-  #clave .msg { font: 500 17px ui-monospace, Menlo, monospace; line-height: 1.4; min-height: 40px; color: #cfd3ea; }
-  #ir-org { position: absolute; right: 14px; top: 10px; z-index: 20; background: var(--ink); color: var(--papel); padding: 8px 14px; font: 700 18px var(--mono); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
-  #ir-org kbd { font: inherit; background: var(--linea); padding: 2px 8px; margin-left: 8px; }
-  #ir-org:hover, #ir-org:focus-visible { background: var(--naranja); color: var(--ink); outline: none; }
-  @media (prefers-reduced-motion: reduce) { .bub { transition: none; } .f { animation: none; } #velo { transition: none; } .espera::before { animation: none; } .bub.decision.visible span { animation: none; } #chat-estado.vivo::before, #trabajando.on::before { animation: none; } }
-  #org { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; z-index: 50; display: none; background: var(--fuera); }
+  @media (prefers-reduced-motion: reduce) { .bub { transition: none; } .f { animation: none; } .f.decision .cuerpo { animation: none; } #decidir::before { animation: none; } #chat-estado.vivo::before, #trabajando.on::before { animation: none; } }
+  #org { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; z-index: 50; display: none; background: var(--fondo-pagina); }
   #org.abierto { display: block; }
 </style>
 </head>
@@ -136,51 +148,58 @@
     <div id="msgs"><div class="vacio">Todavía no habló nadie. La escuela está en silencio.</div></div>
     <div id="trabajando"></div>
     <div id="manija" title="Arrastrá para mover el chat ( [ y ] )"></div>
-    <form id="redactar" autocomplete="off"><textarea id="texto" rows="1" disabled placeholder="@Coordinación …" spellcheck="false"></textarea></form>
+    <form id="redactar" autocomplete="off"><div id="decidir">Esperando tu decisión</div><textarea id="texto" rows="1" disabled placeholder="@Coordinación …" spellcheck="false"></textarea></form>
   </aside>
   <div id="mundo">
-    <canvas id="lienzo"></canvas>
-    <div id="velo"></div>
-    <div id="capa"></div>
-    <a id="ir-org" class="px" href="organigrama.html">Organigrama <kbd>o</kbd></a>
-    <div id="clave">
-      <label>Clave privada (nsec) · canal #coordinacion<input id="nsec" type="password" autocomplete="off" spellcheck="false"></label>
-      <div class="fila"><button id="btn-conectar">Conectar</button><button class="sec" id="btn-cerrar">Cerrar</button></div>
-      <div class="msg" id="estado-vivo">La clave no sale de esta pestaña.</div>
+    <div id="mapa">
+      <canvas id="lienzo"></canvas>
+      <div id="capa"></div>
     </div>
+    <div id="vistas" class="px"><button id="v-escuela" class="on">Escuela</button><button id="v-org">Organigrama <kbd>o</kbd></button></div>
     <div id="barra">
       <button id="btn-prev" title="Paso anterior (←)">‹</button>
       <button id="btn-play" title="Play / pausa (espacio)">Pausa</button>
       <button id="btn-next" title="Paso siguiente (→)">›</button>
       <select id="velocidad" title="Velocidad"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
-      <button id="btn-org" title="Organigrama (o)">Organigrama</button>
+      <span class="sep"></span>
       <button id="btn-grab" title="Reproducir la corrida grabada (g)">Grabación</button>
-      <button id="btn-vivo" title="Conectar al relay (v)">En vivo</button>
+      <button id="btn-vivo" title="Conectar al servidor de la escuela (v)">En vivo</button>
+      <button id="btn-reiniciar" title="Sesión nueva: borra la corrida actual (r)">Reiniciar</button>
+      <button id="btn-guardar" title="Descargar la corrida actual como JSON">Guardar corrida</button>
+      <span class="sep"></span>
+      <button id="btn-tema" title="Tema claro / oscuro (t)">Claro</button>
     </div>
   </div>
 </div>
 
 <script type="module">
-import { crearNormalizador } from './normalizar.js';
-import { crearOficina, SALAS, W, H, CARTELES, MARTINA } from './oficina.js';
-import { COLOR, MODELOS, cara } from './personajes.js';
+import { crearOficina, W, H, CARTELES, MARTINA } from './oficina.js';
+import { MODELOS, cara, aplicarColores } from './personajes.js';
 import { crearHilo, trozos, bloques, primeraLinea } from './chat.js';
-
-// Conexión fija: comunidad de Escuela Futura, canal #coordinacion.
-const RELAY = 'wss://escuelafutura.communities.buzz.xyz';
-const CANAL = 'e1343f4a-82ac-4627-846f-3b460f886466';
+import { completarHerramienta } from './herramientas.js';
 
 const $ = (id) => document.getElementById(id);
-const mundo = $('mundo'), escenario = $('escenario');
+const mundo = $('mundo'), mapa = $('mapa');
 const params = new URLSearchParams(location.search);
-const K = 1200 / W;   // píxeles del escenario (1920×1080) por píxel lógico de la escuela: 3,75
+let K = 3;   // píxeles de pantalla por píxel lógico de la escuela (lo calcula escalar())
 
-let CONFIG = { agentes: [], personas: { casa: 'direccion', nombrePorDefecto: 'Dirección' } };
+let CONFIG = { agentes: [], personas: { nombre: 'Dirección', casa: 'direccion' } };
 let ofi = null, fichas = null;
 let eventos = [], indice = 0, reloj = 0, reproduciendo = false, velocidad = 1, ultimoFrame = 0;
-let temporizadores = [], decisionPendiente = null, modoVivo = false, ws = null;
+let temporizadores = [], decisionPendiente = false, modoVivo = false, silencioso = false;
 const programar = (ms, fn) => { const t = { t: reloj + ms, fn }; temporizadores.push(t); return t; };
 
+// ── Tema ─────────────────────────────────────────────────────────────────────
+let tema = document.documentElement.dataset.tema === 'claro' ? 'claro' : 'oscuro';
+function aplicarTema(t) {
+  tema = t === 'claro' ? 'claro' : 'oscuro';
+  document.documentElement.dataset.tema = tema; aplicarColores(tema);
+  if (ofi) ofi.tema(tema);
+  try { localStorage.setItem('tema', tema); } catch {}
+  $('btn-tema').textContent = tema === 'oscuro' ? 'Claro' : 'Oscuro';
+  const f = $('org'); if (f.getAttribute('src') && f.contentWindow) f.contentWindow.postMessage({ tipo: 'tema', tema }, '*');
+}
+aplicarTema(tema);
 
 // ── Chat del canal (columna izquierda) ───────────────────────────────────────
 const caraUrl = {};   // la cara de cada personaje (la misma de la escuela) como imagen, para el chat
@@ -193,20 +212,21 @@ const RIEL = 4;   // mensajes ya leídos que quedan arriba, de a una línea
 function chatLimpiar() { hilo.limpiar(); $('msgs').innerHTML = VACIO; }
 function cara_(id) { const av = document.createElement('div'); av.className = 'av px'; const im = document.createElement('img'); im.src = urlDeCara(id); im.alt = ''; av.appendChild(im); return av; }
 function conMenciones(el, linea) { for (const t of trozos(linea)) { if (t.mencion) { const a = document.createElement('span'); a.className = 'a'; a.textContent = t.texto; el.appendChild(a); } else el.appendChild(document.createTextNode(t.texto)); } return el; }
+const colorDe = (id) => `var(--ag-${id || 'persona'})`;   // el color sale de las variables del tema, así cambia sin redibujar
 function chatDibujar(animar = true) {
   const cont = $('msgs'); const ms = hilo.mensajes;
   if (!ms.length) { cont.innerHTML = VACIO; cont.classList.remove('recortado'); return; }
   const ultimo = ms[ms.length - 1];
-  const idDe = (m) => agenteDe(m.autor);
+  const idDe = (m) => (m.persona ? null : agenteDe(m.autor));
   const riel = document.createElement('div'); riel.id = 'riel';
   for (const m of ms.slice(Math.max(0, ms.length - 1 - RIEL), -1)) {
-    const id = idDe(m); const r = document.createElement('div'); r.className = 'r'; r.style.setProperty('--c', COLOR[id] || COLOR.persona);
+    const id = idDe(m); const r = document.createElement('div'); r.className = 'r'; r.style.setProperty('--c', colorDe(id));
     const nom = document.createElement('b'); nom.textContent = m.autor || 'Alguien';
     const resumen = document.createElement('span'); resumen.textContent = primeraLinea(m.texto);
     r.append(cara_(id), nom, resumen); riel.appendChild(r);
   }
   const id = idDe(ultimo);
-  const f = document.createElement('div'); f.className = 'f' + (id ? '' : ' persona'); f.style.setProperty('--c', COLOR[id] || COLOR.persona);
+  const f = document.createElement('div'); f.className = 'f' + (id ? '' : ' persona') + (ultimo.decision ? ' decision' : ''); f.style.setProperty('--c', colorDe(id));
   const nom = document.createElement('div'); nom.className = 'nom'; nom.textContent = ultimo.autor || 'Alguien';
   if (ultimo.hora) { const h = document.createElement('small'); h.textContent = ultimo.hora; nom.appendChild(h); }
   const cuerpo = document.createElement('div'); cuerpo.className = 'cuerpo';
@@ -222,20 +242,21 @@ function chatDibujar(animar = true) {
   cont.replaceChildren(riel, foco);
   ajustarFoco();
 }
-// El último mensaje se muestra completo: se achica la letra (hasta 21 px) hasta que entre; si aun así no entra, se desvanece y se avisa.
+// El último mensaje se muestra completo: se achica la letra (hasta el 62 %) hasta que entre; si aun así no entra, se desvanece y se avisa.
 function ajustarFoco() {
   const cont = $('msgs'), foco = $('foco'), f = foco && foco.firstElementChild; if (!f) return;
-  let t = 34; f.style.setProperty('--t', t + 'px');
-  while (f.scrollHeight > foco.clientHeight && t > 21) { t -= 1; f.style.setProperty('--t', t + 'px'); }
+  const esc = Number(getComputedStyle(document.documentElement).getPropertyValue('--esc')) || 1;
+  let t = 34 * esc; const min = 21 * esc; f.style.setProperty('--t', t + 'px');
+  while (f.scrollHeight > foco.clientHeight && t > min) { t -= 1; f.style.setProperty('--t', t + 'px'); }
   const corto = f.scrollHeight > foco.clientHeight; foco.classList.toggle('recortado', corto); cont.classList.toggle('recortado', corto);
 }
 new ResizeObserver(() => ajustarFoco()).observe($('msgs'));   // cambia el alto disponible (p. ej. al aparecer "Trabajando: …")
-function chatAgregar({ clave, autor, texto, hora, t }) { if (hilo.agregar({ clave, autor, texto, hora, t })) chatDibujar(); }
+function chatAgregar({ clave, autor, texto, hora, t, persona, decision }) { if (hilo.agregar({ clave, autor, texto, hora, t, persona, decision }) && !silencioso) chatDibujar(); }
 let ultimoTrabajando = '', avisoHasta = 0;
 function aviso(t) { const el = $('trabajando'); el.textContent = t; el.classList.add('on'); avisoHasta = performance.now() + 5000; ultimoTrabajando = '\0'; }
 function actualizarTrabajando() {
   if (!fichas || performance.now() < avisoHasta) return;
-  const ts = [...fichas.values()].filter((f) => !f.persona && f.trabajando).map((f) => f.nombre);
+  const ts = [...fichas.values()].filter((f) => f.trabajando).map((f) => f.nombre);
   const txt = ts.length ? 'Trabajando: ' + ts.join(', ') : 'La escuela está en calma.';
   if (txt === ultimoTrabajando) return; ultimoTrabajando = txt;
   const el = $('trabajando'); el.textContent = txt; el.classList.toggle('on', !!ts.length);
@@ -246,12 +267,11 @@ const etiquetas = new Map();
 function etiqueta(p) {
   let e = etiquetas.get(p);
   if (e) return e;
-  const el = document.createElement('div'); el.className = 'pj' + (p.persona ? ' persona' : '');
+  const el = document.createElement('div'); el.className = 'pj';
   const bub = document.createElement('div'); bub.className = 'bub'; const sp = document.createElement('span'); const tx = document.createElement('i'); sp.appendChild(tx); bub.appendChild(sp);
   const tag = document.createElement('div'); tag.className = 'tag px'; tag.textContent = p.nombre;
-  const espera = document.createElement('div'); espera.className = 'espera px'; espera.textContent = 'Esperando decisión';
-  el.append(bub, tag, espera); $('capa').appendChild(el);
-  e = { el, bub, sp: tx, tag, espera }; etiquetas.set(p, e); return e;
+  el.append(bub, tag); $('capa').appendChild(el);
+  e = { el, bub, sp: tx, tag }; etiquetas.set(p, e); return e;
 }
 
 // Cada personaje tiene una cola de globos: lo que dice se lee de a uno, sin pisarse.
@@ -265,7 +285,7 @@ const MAX_GLOBOS = 3;           // como mucho 3 globos a la vez; el resto espera
 let pendientes = [];
 const visibles = () => { let n = 0; for (const f of fichas.values()) if (f.actual) n++; return n; };
 function decir(f, texto, tipo = 'msg') {
-  if (tipo === 'decision') { f.cola = []; mostrar(f, { texto: corto(texto), tipo, ms: 6500 }); return; }   // la decisión no espera turno
+  if (silencioso) return;   // al reponer una corrida de golpe no se habla: el chat ya tiene todo
   const item = { texto: tipo === 'msg' ? corto(texto) : limpiar(texto), tipo };
   item.ms = tipo === 'tool' ? 4800 : Math.max(3800, Math.min(10000, 1800 + item.texto.length * 52));
   f.cola = f.cola || [];
@@ -278,54 +298,39 @@ function intentar(f) {
   if (visibles() >= MAX_GLOBOS) { if (!pendientes.includes(f)) pendientes.push(f); return; }
   mostrar(f, f.cola.shift());
 }
-function mostrar(f, item) { f.actual = item; f.hasta = reloj + item.ms; f.textoVisible = true; const e = etiqueta(f); e.sp.textContent = item.texto; e.bub.classList.toggle('decision', item.tipo === 'decision'); e.bub.classList.add('visible'); }
+function mostrar(f, item) { f.actual = item; f.hasta = reloj + item.ms; f.textoVisible = true; const e = etiqueta(f); e.sp.textContent = item.texto; e.bub.classList.add('visible'); }
 function cerrar(f) { f.actual = null; f.textoVisible = false; etiqueta(f).bub.classList.remove('visible'); if (f.cola && f.cola.length && !pendientes.includes(f)) pendientes.push(f); }
 function tickGlobos() {
   for (const f of fichas.values()) if (f.actual && reloj >= f.hasta) cerrar(f);
   while (pendientes.length && visibles() < MAX_GLOBOS) { const f = pendientes.shift(); if (!f.actual) intentar(f); }
 }
+const esAgente = (d) => fichas.has(d);
+const esPersona = (d) => String(d || '').startsWith('persona:');
 
-const alias = new Map();
-function personaFicha(id, nombre) {
-  if (fichas.has(id)) return fichas.get(id);
-  if (alias.has(id)) return alias.get(id);
-  const base = fichas.get('persona:direccion');
-  if (base && ![...alias.values()].includes(base)) { alias.set(id, base); if (nombre) { base.nombre = nombre; etiqueta(base).tag.textContent = nombre; } return base; }
-  return ofi.agregar(id, { nombre: nombre || CONFIG.personas.nombrePorDefecto, casa: CONFIG.personas.casa, persona: true });
-}
-const esAgente = (d) => fichas.has(d) && !fichas.get(d).persona;
-
-// Foco en la persona que decide: la escuela se atenúa alrededor un rato.
-let enfocado = null;
-function enfocar(p, ms) {
-  enfocado = p; mundo.classList.add('enfoque');
-  programar(ms, () => { if (enfocado === p) { enfocado = null; mundo.classList.remove('enfoque'); } });
-}
+// La decisión: mientras una propuesta espera, la caja de chat lo dice y la pantalla de Dirección se enciende.
+function esperarDecision(on) { decisionPendiente = on; ofi.esperandoDecision = on; $('redactar').classList.toggle('esperando', on); }
 
 function aplicar(ev) {
   if (ev.tipo === 'persona') {
-    const p = personaFicha(ev.quien, ev.nombre);
-    const decide = !!decisionPendiente;
-    decir(p, ev.texto, decide ? 'decision' : 'msg');
-    if (decide) enfocar(p, 6500);
-    if (!modoVivo) chatAgregar({ autor: p.nombre, texto: ev.texto });
-    if (decisionPendiente) { p.esperando = false; decisionPendiente = null; }
+    // La persona que decide es quien mira la pantalla: no tiene sprite, habla por el chat.
+    chatAgregar({ clave: ev.id, autor: CONFIG.personas.nombre, texto: ev.texto, hora: ev.hora, t: ev.t, persona: true, decision: decisionPendiente });
+    esperarDecision(false);
     return;
   }
   const f = fichas.get(ev.quien) || ofi.agregar(ev.quien, { nombre: ev.quien.replace('agente:', 'Agente '), casa: 'pasillo' });
   if (ev.tipo === 'inicio') { f.trabajando = true; return; }
-  if (ev.tipo === 'fin') { f.trabajando = false; programar(2800, () => { if (!f.trabajando) ofi.ir(f, f.casa); }); return; }
-  if (ev.tipo === 'herramienta') { if (ev.lugar) ofi.ir(f, ev.lugar); decir(f, ev.texto, 'tool'); return; }
+  if (ev.tipo === 'fin') { f.trabajando = false; if (silencioso) ofi.ir(f, f.casa); else programar(2800, () => { if (!f.trabajando) ofi.ir(f, f.casa); }); return; }
+  if (ev.tipo === 'herramienta') { const h = completarHerramienta(ev); if (h.lugar) ofi.ir(f, h.lugar); decir(f, h.texto, 'tool'); return; }
   if (ev.tipo === 'piensa') { decir(f, ev.texto, 'tool'); return; }
   if (ev.tipo === 'dice') {
     const destinos = ev.a || [];
-    const agentes = destinos.filter(esAgente), personas = destinos.filter((d) => d.startsWith('persona:'));
+    const agentes = destinos.filter(esAgente), personas = destinos.filter(esPersona);
     const esPropuesta = /^\W*propuesta|para decidir|¿aprob|aprobás, editás/i.test(limpiar(ev.texto));
     decir(f, ev.texto);
-    if (!modoVivo) chatAgregar({ autor: f.nombre, texto: ev.texto });
+    chatAgregar({ clave: ev.id, autor: f.nombre, texto: ev.texto, hora: ev.hora, t: ev.t });
     if (personas.length) {
-      const p = personaFicha(personas[0]); ofi.ir(f, p.casa);
-      if (esPropuesta) { p.esperando = true; decisionPendiente = p; }
+      ofi.ir(f, CONFIG.personas.casa);   // va a presentar al despacho de Dirección
+      if (esPropuesta) esperarDecision(true);
     } else if (agentes.length) {
       const hermanos = eventos.filter((e) => e.tipo === 'dice' && e.quien === ev.quien && Math.abs(e.t - ev.t) < 1500);
       const todos = [...new Set(hermanos.flatMap((e) => (e.a || []).filter(esAgente)))];
@@ -339,9 +344,8 @@ function reiniciar() {
   if (ofi) ofi.quitarTodos();
   chatLimpiar();
   $('capa').querySelectorAll('.pj').forEach((n) => n.remove()); etiquetas.clear();
-  fichas = ofi.personajes; pendientes = []; temporizadores = []; decisionPendiente = null; indice = 0; reloj = 0; alias.clear();
-  enfocado = null; mundo.classList.remove('enfoque');
-  personaFicha('persona:direccion', CONFIG.personas.nombrePorDefecto);
+  fichas = ofi.personajes; pendientes = []; temporizadores = []; indice = 0; reloj = 0;
+  esperarDecision(false);
   for (const a of CONFIG.agentes) ofi.agregar(a.id, { nombre: a.nombre, casa: a.casa });
   actualizarEstado();
 }
@@ -365,6 +369,7 @@ function actualizarEstado() {
   const t = textoEstado || (modoVivo ? 'En vivo' : 'Grabación');
   { const c = $('chat-estado'); c.className = modoVivo && !textoEstado ? 'vivo' : ''; c.textContent = t; }
   $('btn-vivo').classList.toggle('on', modoVivo); $('btn-grab').classList.toggle('on', !modoVivo);
+  for (const id of ['btn-prev', 'btn-play', 'btn-next', 'velocidad']) $(id).disabled = modoVivo;
   $('texto').disabled = !enviarMensaje; $('texto').placeholder = enviarMensaje ? '@Coordinación …' : 'Sin conexión';
 }
 
@@ -378,8 +383,6 @@ function posicionar() {
     const x = Math.round(p.x) * K, y = (Math.round(p.y) + (sentado ? 3 : 0)) * K;
     e.el.style.transform = `translate(${x}px, ${y}px)`;
     e.el.style.zIndex = String(Math.round(p.y) + 1000);
-    e.espera.classList.toggle('on', !!p.esperando);
-    if (p === enfocado) { mundo.style.setProperty('--fx', x.toFixed(0) + 'px'); mundo.style.setProperty('--fy', (y - 14 * K).toFixed(0) + 'px'); }
     if (!e.bub.classList.contains('visible')) continue;
     const w = e.bub.offsetWidth, h = e.bub.offsetHeight;
     const cx0 = Math.max(w / 2 + 8, Math.min(W * K - w / 2 - 8, x));
@@ -419,12 +422,23 @@ function comprimir(lista, maxHueco = 7000) {
 // ── Controles (se muestran al mover el mouse) ────────────────────────────────
 const setPlay = (on) => { reproduciendo = on; $('btn-play').textContent = on ? 'Pausa' : 'Play'; };
 $('btn-play').onclick = () => { if (modoVivo) return; if (indice >= eventos.length) irAlPaso(-1); setPlay(!reproduciendo); };
-$('btn-next').onclick = () => { setPlay(false); if (indice < eventos.length) avanzarHasta(eventos[indice].t); };
-$('btn-prev').onclick = () => { setPlay(false); irAlPaso(indice - 2); };
+$('btn-next').onclick = () => { if (modoVivo) return; setPlay(false); if (indice < eventos.length) avanzarHasta(eventos[indice].t); };
+$('btn-prev').onclick = () => { if (modoVivo) return; setPlay(false); irAlPaso(indice - 2); };
 $('velocidad').onchange = (e) => { velocidad = Number(e.target.value); };
-$('btn-vivo').onclick = () => $('clave').classList.toggle('abierto');
+$('btn-tema').onclick = () => aplicarTema(tema === 'oscuro' ? 'claro' : 'oscuro');
+$('btn-reiniciar').onclick = async () => {
+  if (!modoVivo) { irAlPaso(-1); return; }
+  if (!confirm('¿Sesión nueva? Se borra la corrida actual y los agentes arrancan de cero.')) return;
+  try { const r = await fetch('/api/reiniciar', { method: 'POST', headers: { 'Content-Type': 'application/json' } }); if (!r.ok) throw new Error(); } catch { aviso('No se pudo reiniciar.'); }
+};
+$('btn-guardar').onclick = async () => {
+  let data;
+  try { data = modoVivo ? await (await fetch('/api/corrida')).json() : { origen: 'grabacion', generado: new Date().toISOString(), eventos }; } catch { aviso('No se pudo bajar la corrida.'); return; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+  a.download = new Date().toISOString().slice(0, 10) + '-corrida.eventos.json'; a.click(); URL.revokeObjectURL(a.href);
+};
 const cajaTexto = $('texto');
-const ajustarCaja = () => { cajaTexto.style.height = '64px'; cajaTexto.style.height = Math.min(230, Math.max(64, cajaTexto.scrollHeight + 6)) + 'px'; };   // crece con el texto y se ve completo
+const ajustarCaja = () => { cajaTexto.style.height = '0'; const base = parseFloat(getComputedStyle(cajaTexto).maxHeight); cajaTexto.style.height = Math.min(base, Math.max(base * 64 / 230, cajaTexto.scrollHeight + 6)) + 'px'; };   // crece con el texto y se ve completo
 cajaTexto.addEventListener('input', ajustarCaja);
 cajaTexto.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('redactar').requestSubmit(); } });   // Shift+Enter = salto de línea
 $('redactar').onsubmit = (e) => {
@@ -434,164 +448,130 @@ $('redactar').onsubmit = (e) => {
   cajaTexto.value = ''; ajustarCaja();
 };
 
-// Ancho del chat: se arrastra la manija del borde (o [ y ]); la escuela queda centrada en el resto.
-let anchoActual = 720, factor = 1;
-function anchoChat(w) { anchoActual = Math.max(420, Math.min(720, Math.round(w))); $('chat').style.setProperty('--cw', anchoActual + 'px'); chatDibujar(false); try { localStorage.setItem('chatAncho', String(anchoActual)); } catch {} }
-try { const g = Number(localStorage.getItem('chatAncho')); if (g) anchoActual = Math.max(420, Math.min(720, g)); } catch {}
-$('chat').style.setProperty('--cw', anchoActual + 'px');
+// Ancho del chat: se arrastra la manija del borde (o [ y ]); la escuela ocupa el resto.
+let anchoActual = 0;
+function anchoChat(w) { anchoActual = Math.max(360, Math.min(innerWidth * 0.55, Math.round(w))); $('chat').style.setProperty('--cw', anchoActual + 'px'); escalar(); chatDibujar(false); try { localStorage.setItem('chatAncho', String(anchoActual)); } catch {} }
+try { const g = Number(localStorage.getItem('chatAncho')); if (g) { anchoActual = g; $('chat').style.setProperty('--cw', g + 'px'); } } catch {}
 $('manija').addEventListener('pointerdown', (e) => {
   e.preventDefault(); $('manija').setPointerCapture(e.pointerId); $('manija').classList.add('arrastrando');
-  const mover = (ev) => anchoChat((ev.clientX - escenario.getBoundingClientRect().left) / factor);
+  const mover = (ev) => anchoChat(ev.clientX);
   const soltar = () => { $('manija').classList.remove('arrastrando'); $('manija').removeEventListener('pointermove', mover); $('manija').removeEventListener('pointerup', soltar); };
   $('manija').addEventListener('pointermove', mover); $('manija').addEventListener('pointerup', soltar);
 });
+// Escuela ↔ Organigrama: el organigrama vive en un iframe encima; cambiar de vista no corta la conexión.
 function organigrama(abrir) {
   const f = $('org'); const ab = abrir === undefined ? !f.classList.contains('abierto') : abrir;
-  if (ab && !f.getAttribute('src')) f.src = 'organigrama.html?embebido=1';
-  f.classList.toggle('abierto', ab); if (ab) f.focus(); else window.focus();
+  if (ab && !f.getAttribute('src')) f.src = 'organigrama.html?embebido=1&tema=' + tema;
+  f.classList.toggle('abierto', ab); $('v-org').classList.toggle('on', ab); $('v-escuela').classList.toggle('on', !ab);
+  if (ab) f.focus(); else window.focus();
 }
-$('btn-org').onclick = () => organigrama();
-$('ir-org').onclick = (e) => { e.preventDefault(); organigrama(true); };
+$('v-org').onclick = () => organigrama(true);
+$('v-escuela').onclick = () => organigrama(false);
 const porHash = () => { if (location.hash === '#organigrama') organigrama(true); };
 porHash(); addEventListener('hashchange', porHash);
-addEventListener('message', (e) => { if (e.data === 'cerrar-org') organigrama(false); });
+addEventListener('message', (e) => {
+  if (e.data === 'cerrar-org') organigrama(false);
+  else if (e.data && e.data.tipo === 'tema' && e.data.tema !== tema) aplicarTema(e.data.tema);
+});
 $('btn-grab').onclick = () => { desconectar(); cargarGrabacion(); };
-$('btn-cerrar').onclick = () => $('clave').classList.remove('abierto');
+$('btn-vivo').onclick = () => { huboConexion = true; conectar(); };
 let ocultar = null;
-addEventListener('mousemove', () => { $('barra').classList.add('visible'); document.body.style.cursor = 'default'; clearTimeout(ocultar); ocultar = setTimeout(() => { if (!$('clave').classList.contains('abierto')) { $('barra').classList.remove('visible'); document.body.style.cursor = 'none'; } }, 2500); });
+addEventListener('mousemove', () => { $('barra').classList.add('visible'); document.body.style.cursor = 'default'; clearTimeout(ocultar); ocultar = setTimeout(() => { $('barra').classList.remove('visible'); document.body.style.cursor = 'none'; }, 2500); });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) { e.preventDefault(); $('texto').focus(); return; }
   if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
-  if (e.key === '[') anchoChat(anchoActual - 20);
-  if (e.key === ']') anchoChat(anchoActual + 20);
+  if (e.key === '[') anchoChat((anchoActual || $('chat').offsetWidth) - 20);
+  if (e.key === ']') anchoChat((anchoActual || $('chat').offsetWidth) + 20);
   if (e.code === 'Space') { e.preventDefault(); $('btn-play').click(); }
   if (e.key === 'ArrowRight') $('btn-next').click();
   if (e.key === 'ArrowLeft') $('btn-prev').click();
-  if (e.key === 'r') irAlPaso(-1);
+  if (e.key === 'r') $('btn-reiniciar').click();
   if (e.key === 'v') $('btn-vivo').click();
   if (e.key === 'g') $('btn-grab').click();
+  if (e.key === 't') $('btn-tema').click();
   if (e.key === 'o') organigrama();
   if (e.key === 'Escape') organigrama(false);
   if (e.key === 'f') document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
 });
-// Arrastrar un JSON a la ventana: reproduce esa corrida (normalizada o export crudo de buzz-probe)
+// Arrastrar un JSON a la ventana: reproduce esa corrida (formato de stage/corridas/*.eventos.json)
 addEventListener('dragover', (e) => e.preventDefault());
 addEventListener('drop', async (e) => {
   e.preventDefault(); const file = e.dataTransfer.files[0]; if (!file) return;
   let data; try { data = JSON.parse(await file.text()); } catch { aviso('Ese archivo no es una corrida válida.'); return; }
-  if (Array.isArray(data)) { const linea = crearNormalizador({ agentes: CONFIG.agentes, canal: CANAL })(data); const t0 = linea.length ? linea[0].t : 0; cargarEventos(linea.map((ev) => ({ ...ev, t: ev.t - t0 }))); }
-  else cargarEventos(data.eventos || []);
+  if (!data || !Array.isArray(data.eventos)) { aviso('Ese archivo no es una corrida válida.'); return; }
+  desconectar(); cargarEventos(data.eventos);
 });
 function cargarEventos(lista) { modoVivo = false; eventos = comprimir(lista); irAlPaso(-1); setPlay(false); }
 
 function escalar() {
-  // El escenario es 16:9 (1920×1080). En proyectores más cuadrados (16:10, 4:3) se angosta el chat y, si hace falta, se alarga hacia abajo, para que el texto escale más.
-  const asp = innerWidth / innerHeight, SW = Math.round(Math.min(1920, Math.max(1620, 1080 * asp))), SH = Math.max(1080, Math.round(SW / asp));
-  escenario.style.width = SW + 'px'; escenario.style.height = SH + 'px'; $('chat').style.setProperty('--cwmax', (SW - 1200) + 'px');
-  const f = factor = Math.min(innerWidth / SW, innerHeight / SH);
-  escenario.style.transform = `translate(${(innerWidth - SW * f) / 2}px, ${(innerHeight - SH * f) / 2}px) scale(${f})`;
-  if (ofi) ofi.resolucion(Math.max(1, Math.ceil(K * f * (devicePixelRatio || 1))));   // el lienzo se dibuja en alta resolución y se achica sin deformar el pixel-art
+  // La escuela se escala por aspecto al espacio que deja el chat; las letras bajan con la pantalla (--esc) para que entren.
+  const esc = Math.max(0.55, Math.min(1.1, Math.min(innerWidth / 1920, innerHeight / 1080)));
+  document.documentElement.style.setProperty('--esc', esc.toFixed(3));
+  const mw = mundo.clientWidth, mh = mundo.clientHeight;
+  K = Math.max(0.5, Math.min(mw / W, mh / H));
+  const w = Math.round(W * K), h = Math.round(H * K);
+  Object.assign(mapa.style, { width: w + 'px', height: h + 'px', left: Math.round((mw - w) / 2) + 'px', top: Math.round((mh - h) / 2) + 'px' });
+  mapa.style.setProperty('--u', (K / 3).toFixed(3));
+  if (ofi) ofi.resolucion(Math.max(1, Math.ceil(K * (devicePixelRatio || 1))));   // el lienzo se dibuja en alta resolución y se achica sin deformar el pixel-art
   for (const c of document.querySelectorAll('.sala-cartel')) { c.style.left = (+c.dataset.x) * K + 'px'; c.style.top = (+c.dataset.y) * K + 'px'; }
   const m = document.getElementById('martina'); if (m && MARTINA) { m.style.left = MARTINA.x * K + 'px'; m.style.top = (MARTINA.y + 4) * K + 'px'; }
 }
 addEventListener('resize', () => { escalar(); chatDibujar(false); }); escalar(); chatDibujar(false);
 if (document.fonts) document.fonts.ready.then(() => chatDibujar(false));   // con las fuentes cargadas el texto mide distinto
 
-// ── En vivo: relay de Buzz, canal #coordinacion ──────────────────────────────
-let nsecActual = null, deseaVivo = false, huboConexion = false, reconectar = null;
-const estadoVivo = (t) => { $('estado-vivo').textContent = t; };
-function desconectar() { deseaVivo = false; enviarMensaje = null; clearTimeout(reconectar); if (ws) { const w = ws; ws = null; w.close(); } textoEstado = ''; }
+// ── En vivo: el servidor de la escuela (servidor/), por SSE ──────────────────
+// GET /api/eventos manda `estado`, `snapshot` (la corrida hasta ahora) y después `eventos` (un array por frame).
+let es = null, deseaVivo = false, huboConexion = false;
+function desconectar() { deseaVivo = false; enviarMensaje = null; if (es) { const s = es; es = null; s.close(); } textoEstado = ''; }
 
-async function conectar(valor) {
-  clearTimeout(reconectar);
-  try {
-    const nt = await import('https://cdn.jsdelivr.net/npm/nostr-tools@2.7.0/+esm');
-    const { getPublicKey, finalizeEvent, nip19, nip44 } = nt;
-    const N44 = nip44.v2 || nip44;
-    const convKey = (sk, pub) => (N44.utils && N44.utils.getConversationKey ? N44.utils.getConversationKey(sk, pub) : N44.getConversationKey(sk, pub));
-    const v = String(valor || '').replace(/[\s"'`]/g, '').replace(/^0x/i, '');
-    let sk;
-    if (/^nsec1/i.test(v)) { const d = nip19.decode(v.toLowerCase()); if (d.type !== 'nsec') throw new Error('La clave no es un nsec válido.'); sk = d.data; }
-    else if (/^npub1/i.test(v)) throw new Error('Eso es una clave pública (npub). Necesito la privada, la que empieza con nsec1…');
-    else if (/^[0-9a-f]{64}$/i.test(v)) sk = Uint8Array.from(v.match(/../g).map((h) => parseInt(h, 16)));
-    else throw new Error(`No reconozco la clave (empieza con "${v.slice(0, 5)}", ${v.length} caracteres). Tiene que ser un nsec1… o 64 caracteres hexadecimales.`);
-    const myPub = getPublicKey(sk);
-    const procesar = crearNormalizador({ agentes: CONFIG.agentes, canal: CANAL });
-    const perfiles = {};
-    const nombreDe = (pk) => (perfiles[pk] && perfiles[pk].nombre) || 'Alguien';
-    const hora = (t) => new Date(t * 1000).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
-    const textoPlano = (c) => String(c || '').replace(/nostr:(npub1[a-z0-9]+|nprofile1[a-z0-9]+)/g, (m, id) => { try { const d = nip19.decode(id); const pk = typeof d.data === 'string' ? d.data : d.data.pubkey; return '@' + nombreDe(pk); } catch { return '@…'; } });
-
-    enviarMensaje = null;
-    nsecActual = valor; deseaVivo = true;
-    if (ws) { const w = ws; ws = null; w.close(); }
-    setPlay(false); eventos = []; reiniciar(); modoVivo = true; reloj = 0;
-    textoEstado = 'Conectando…'; actualizarEstado();
-    $('btn-play').textContent = 'En vivo';
-    const sock = ws = new WebSocket(RELAY);
-    const send = (m) => sock.readyState === 1 && sock.send(JSON.stringify(m));
-    let tBase = null, historia = [], conectado = false;
-    const limite = setTimeout(() => { if (!conectado && ws === sock) { sock.close(); falla('No se pudo conectar al relay.'); } }, 9000);
-    sock.onopen = () => estadoVivo('Conectado. Esperando autenticación…');
-    sock.onclose = () => { clearTimeout(limite); if (ws === sock) { ws = null; enviarMensaje = null; if (conectado) { textoEstado = 'Reconectando…'; actualizarEstado(); reconectar = setTimeout(() => deseaVivo && conectar(nsecActual), 3000); } else falla('No se pudo conectar al relay.'); } };
-    sock.onerror = () => estadoVivo('No se pudo conectar al relay.');
-    sock.onmessage = (m) => {
-      let msg; try { msg = JSON.parse(m.data); } catch { return; }
-      const [type, a, b] = msg;
-      if (type === 'AUTH') send(['AUTH', finalizeEvent({ kind: 22242, created_at: Math.floor(Date.now() / 1000), tags: [['relay', RELAY], ['challenge', a]], content: '' }, sk)]);
-      else if (type === 'OK' && b === true && !conectado) {   // el OK de la autenticación; los OK de los mensajes enviados no vuelven a suscribir
-        conectado = huboConexion = true; clearTimeout(limite); textoEstado = '';
-        enviarMensaje = (texto) => {   // un mensaje de la persona al canal, con p-tags para quien se @mencione
-          const agentes = CONFIG.agentes.map((x) => x.nombre);
-          const pubDe = (nombre) => { let mejor = null; for (const [pk, p] of Object.entries(perfiles)) if (sinTildes(p.nombre) === sinTildes(nombre) && (!mejor || p.t >= perfiles[mejor].t)) mejor = pk; return mejor; };   // si hay agentes viejos con el mismo nombre, el más reciente
-          const nombres = new Set();
-          for (const mm of texto.matchAll(/@([A-Za-zÁÉÍÓÚáéíóúñÑ]+)/g)) {
-            const n = sinTildes(mm[1]);
-            if (n === 'todos' || n === 'equipo') agentes.forEach((x) => nombres.add(x));
-            else { const ag = agentes.find((x) => sinTildes(x) === n); if (ag) nombres.add(ag); }
-          }
-          let contenido = texto;
-          if (!nombres.size) { nombres.add('Coordinación'); contenido = '@Coordinación ' + texto; }   // sin @mención, le habla a Coordinación (solo contestan los mencionados)
-          const tags = [['h', CANAL]];
-          for (const nombre of nombres) { const pk = pubDe(nombre); if (pk) tags.push(['p', pk]); }
-          return send(['EVENT', finalizeEvent({ kind: 9, created_at: Math.floor(Date.now() / 1000), tags, content: contenido }, sk)]);
-        };
-        actualizarEstado();
-        estadoVivo('Conectado a #coordinacion. Escuchando a los agentes.'); $('clave').classList.remove('abierto');
-        const since = Math.floor(Date.now() / 1000) - 120;
-        send(['REQ', 'vivo-obs', { kinds: [24200], '#p': [myPub], since, limit: 500 }]);
-        send(['REQ', 'vivo-perfiles', { kinds: [0], limit: 200 }]);
-        send(['REQ', 'vivo-canal', { '#h': [CANAL], since, limit: 200 }]);
-        send(['REQ', 'chat-hist', { kinds: [9, 40002], '#h': [CANAL], limit: 30 }]);   // el chat arranca con lo último que se habló
-      } else if (type === 'OK' && b === false) { aviso('El relay rechazó el mensaje: ' + (msg[3] || ''));
-      } else if (type === 'EOSE' && a === 'chat-hist') {
-        historia.sort((x, y) => x.created_at - y.created_at).forEach((e) => chatAgregar({ clave: e.id, autor: nombreDe(e.pubkey), texto: textoPlano(e.content), hora: hora(e.created_at), t: e.created_at }));
-        historia = null;
-      } else if (type === 'EVENT') {
-        const ev = b;
-        if (ev.kind === 0) { try { const p = JSON.parse(ev.content); perfiles[ev.pubkey] = { nombre: p.display_name || p.name || (perfiles[ev.pubkey] || {}).nombre, t: ev.created_at }; } catch {} }
-        if (ev.kind === 9 || ev.kind === 40002) {
-          const h = (ev.tags.find((t) => t[0] === 'h') || [])[1];
-          if (h === CANAL) { if (a === 'chat-hist' && historia) historia.push(ev); else chatAgregar({ clave: ev.id, autor: nombreDe(ev.pubkey), texto: textoPlano(ev.content), hora: hora(ev.created_at), t: ev.created_at }); }
-          if (a === 'chat-hist') return;      // la historia solo llena el chat; no mueve a nadie
-        }
-        if (ev.kind === 24200) { try { ev._descifrado = JSON.parse(N44.decrypt(ev.content, convKey(sk, ev.pubkey))); } catch { return; } }
-        const nuevos = procesar([ev]); if (!nuevos.length) return;
-        if (tBase == null) tBase = nuevos[0].t;
-        for (const n of nuevos) { n.t = n.t - tBase; eventos.push(n); }
-        eventos.sort((x, y) => x.t - y.t);
-        for (const n of nuevos) { aplicar(n); indice = eventos.length; }
-      } else if (type === 'CLOSED') estadoVivo('El relay cerró una suscripción: ' + b);
-    };
-  } catch (e) { estadoVivo('Error: ' + e.message); falla(e.message); }
+function enviarAlServidor(texto) {
+  fetch('/api/mensaje', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ texto }) })
+    .then(async (r) => { if (!r.ok) { let m = 'No se pudo enviar.'; try { m = (await r.json()).error || m; } catch {} aviso(m); } })
+    .catch(() => aviso('No se pudo enviar. ¿Está el servidor?'));
+  return true;
 }
-// Si nunca se pudo conectar, la vista cae sola a la corrida grabada (plan B); si ya conectó una vez, reintenta.
+// Repone de golpe lo que ya pasó: posiciones y chat, sin globos ni caminatas.
+function cargarSnapshot(lista) {
+  reiniciar(); eventos = lista.map(completarHerramienta).sort((a, b) => a.t - b.t);
+  silencioso = true; ofi.instantaneo = true;
+  for (const ev of eventos) { reloj = ev.t; aplicar(ev); }
+  ofi.instantaneo = false; silencioso = false; indice = eventos.length;
+  chatDibujar(false);
+}
+function recibir(lista) {
+  const nuevos = (Array.isArray(lista) ? lista : [lista]).map(completarHerramienta);
+  for (const n of nuevos) eventos.push(n);
+  eventos.sort((x, y) => x.t - y.t);
+  for (const n of nuevos.sort((x, y) => x.t - y.t)) aplicar(n);
+  indice = eventos.length;
+}
+function conectar() {
+  desconectar(); deseaVivo = true;
+  setPlay(false); eventos = []; reiniciar(); modoVivo = true; reloj = 0;
+  textoEstado = 'Conectando…'; actualizarEstado();
+  $('btn-play').textContent = 'En vivo';
+  const s = es = new EventSource('/api/eventos');
+  let abierto = false;
+  s.addEventListener('estado', (e) => {
+    let d = {}; try { d = JSON.parse(e.data); } catch {}
+    abierto = huboConexion = true; textoEstado = '';
+    if (d.persona) CONFIG.personas.nombre = d.persona;
+    enviarMensaje = enviarAlServidor; actualizarEstado();
+  });
+  s.addEventListener('snapshot', (e) => { try { cargarSnapshot(JSON.parse(e.data).eventos || []); } catch (err) { console.error(err); } });
+  s.addEventListener('eventos', (e) => { try { recibir(JSON.parse(e.data)); } catch (err) { console.error(err); } });
+  s.addEventListener('reinicio', () => { eventos = []; reiniciar(); aviso('Sesión nueva.'); });
+  s.onerror = () => {
+    if (es !== s) return;
+    if (!abierto && !huboConexion) { s.close(); es = null; falla('No hay servidor: se reproduce la grabación.'); return; }
+    textoEstado = 'Reconectando…'; enviarMensaje = null; actualizarEstado();   // EventSource reintenta solo; al volver llega `estado` de nuevo
+  };
+}
+// Si nunca se pudo conectar, la vista cae sola a la corrida grabada (plan B).
 function falla(motivo) {
   console.warn('En vivo:', motivo);
-  if (huboConexion && deseaVivo) { textoEstado = 'Reconectando…'; actualizarEstado(); reconectar = setTimeout(() => conectar(nsecActual), 3000); return; }
-  desconectar(); cargarGrabacion(); estadoVivo(motivo);
+  desconectar(); cargarGrabacion(); aviso(motivo);
 }
-$('btn-conectar').onclick = () => { huboConexion = true; conectar($('nsec').value); };
 
 async function cargarGrabacion() {
   const q = params.get('corrida') || 'corridas/2026-10-12-primer-anio-en-riesgo.eventos.json';
@@ -602,19 +582,17 @@ async function cargarGrabacion() {
 }
 
 // ── Arranque ─────────────────────────────────────────────────────────────────
-// Por defecto se conecta sola al canal con la clave de stage/conexion.local.js (no se sube al repo).
-// Sin ese archivo, o con ?grabacion=1, ?corrida=… o ?paso=N, arranca con la corrida grabada.
+// Por defecto se conecta al servidor de la escuela (./escenario). Sin servidor, o con ?grabacion=1,
+// ?corrida=… o ?paso=N, arranca con la corrida grabada.
 try {
   CONFIG = await (await fetch('agentes.json')).json();
-  ofi = await crearOficina($('lienzo'));
+  ofi = await crearOficina($('lienzo')); ofi.tema(tema);
   for (const t of CARTELES) { const c = document.createElement('div'); c.className = 'sala-cartel'; c.textContent = t.texto; c.dataset.x = t.x; c.dataset.y = t.y; $('capa').appendChild(c); }
-  const m = document.createElement('div'); m.id = 'martina'; m.className = 'tag px'; m.textContent = 'Martina'; m.style.cssText = 'background:#ff7a3d;color:#1a1a2e'; $('capa').appendChild(m);
+  const m = document.createElement('div'); m.id = 'martina'; m.className = 'tag martina px'; m.textContent = 'Martina'; $('capa').appendChild(m);
   escalar();
   reiniciar();
   const forzarGrabacion = params.get('grabacion') === '1' || params.has('corrida') || params.has('paso');
-  let nsecLocal = null;
-  if (!forzarGrabacion) { try { nsecLocal = (await import('./conexion.local.js')).NSEC; } catch { /* sin archivo: modo grabación */ } }
-  if (nsecLocal) conectar(nsecLocal); else await cargarGrabacion();
+  if (forzarGrabacion) await cargarGrabacion(); else conectar();
 } catch (e) { console.error(e); if (!ofi) document.body.insertAdjacentText('afterbegin', 'Abrí esta página con "./escenario" (ver README).'); }
 requestAnimationFrame(loop);
 </script>

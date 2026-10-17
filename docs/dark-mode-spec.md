@@ -1,6 +1,6 @@
 # Spec: modo claro / oscuro en la vista de escenario
 
-Estado: **propuesta, sin implementar.** Alcance: `stage/index.html`, `stage/oficina.js` (y docs). No toca Buzz ni los agentes.
+Estado: **implementado el 16/10/2026** (fases 0 a 3; tecla `t`, botón Claro/Oscuro, `?tema=`, `data-tema`, `TEMAS` en `oficina.js`, paletas de autor por tema en `personajes.js`). Decisiones sobre las preguntas abiertas: paleta clara crema cálida; globos sin invertir (contraste borde/pared 11:1); sin modo automático. Queda como referencia del diseño. Alcance: `stage/index.html`, `stage/oficina.js`, `stage/personajes.js`, `stage/organigrama.html`.
 
 ## 1. Objetivo
 

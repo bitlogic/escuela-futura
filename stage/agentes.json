@@ -8,7 +8,7 @@
     { "id": "academia", "nombre": "Academia", "iniciales": "AC", "casa": "academia", "color": "verde" }
   ],
   "personas": {
-    "casa": "direccion",
-    "nombrePorDefecto": "Dirección"
+    "nombre": "Dirección",
+    "casa": "direccion"
   }
 }

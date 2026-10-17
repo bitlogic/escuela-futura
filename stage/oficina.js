@@ -1,31 +1,42 @@
 // La escuela vista desde arriba, en pixel-art (como Pixel Agents).
-// Mundo lógico de 320×288 px (panel compacto) que la página muestra ×N sin suavizar.
+// Mundo lógico de 400×288 px (panel apaisado) que la página muestra ×N sin suavizar.
 // Los personajes son las hojas de Pixel Agents (assets/personajes/char_N.png: 7 cuadros de 16×32,
 // filas abajo / arriba / derecha). Muebles y pisos se dibujan por código.
 //
 // Cuatro salas físicas con varios escritorios cada una:
 //   Dirección + Coordinación · Secretaría + Admisiones · Aula de Biología 1 · Bienestar + Biblioteca
-// Los "lugares" (los ids que usa normalizar.js: direccion, coordinacion, secretaria, admisiones,
-// aula-bio1, bienestar, biblioteca) son puestos dentro de esas salas.
+// Los "lugares" (los ids que usa herramientas.js: direccion, coordinacion, secretaria, admisiones,
+// aula-bio1, bienestar, biblioteca) son puestos dentro de esas salas. El escritorio de Dirección
+// queda vacío: la persona que decide es quien mira la pantalla.
 
 import { MODELOS, teñir, cargarHojas } from './personajes.js';
 
-export const W = 320, H = 288;
+export const W = 400, H = 288;
 
-const PAL = {
-  fuera: '#14141f', pared: '#3b3f55', paredClara: '#4d526d', paredOsc: '#262a3b', zocalo: '#1d2030',
-  madera: '#c79a63', maderaClara: '#dbb27d', maderaOsc: '#9e7544', maderaSombra: '#6e4f2c',
-  papel: '#f4efe2', ink: '#1a1a2e', naranja: '#ff7a3d', azul: '#6fa3ff', verde: '#5fae6a', verdeOsc: '#3d7a48',
+// Paleta del marco (paredes, zócalos) por tema. Pisos, muebles y sprites no cambian: en el claro
+// las paredes pasan a un crema cálido y los personajes siguen destacando sobre los pisos de color.
+export const TEMAS = {
+  oscuro: {
+    pared: '#3b3f55', paredClara: '#4d526d', paredOsc: '#262a3b', zocalo: '#1d2030', junta: 'rgba(255,255,255,.05)',
+    madera: '#c79a63', maderaClara: '#dbb27d', maderaOsc: '#9e7544', maderaSombra: '#6e4f2c',
+    papel: '#f4efe2', ink: '#1a1a2e', naranja: '#ff7a3d', azul: '#6fa3ff', verde: '#5fae6a', verdeOsc: '#3d7a48',
+  },
+  claro: {
+    pared: '#d9cfbb', paredClara: '#ebe3d2', paredOsc: '#bfb39b', zocalo: '#8f8268', junta: 'rgba(0,0,0,.06)',
+    madera: '#c79a63', maderaClara: '#dbb27d', maderaOsc: '#9e7544', maderaSombra: '#6e4f2c',
+    papel: '#f4efe2', ink: '#1a1a2e', naranja: '#ff7a3d', azul: '#6fa3ff', verde: '#5fae6a', verdeOsc: '#3d7a48',
+  },
 };
+const PAL = { ...TEMAS.oscuro };   // la paleta activa; of.tema() la rellena con la del tema elegido
 
 // ── Salas físicas ────────────────────────────────────────────────────────────
 // Arriba: cara de pared 0..32, piso 32..116, pared fina 116..124 (con la puerta).
 // Abajo: cara de pared 164..196 (con la puerta), piso 196..280, pared 280..288.
 const FISICAS = {
-  p1: { id: 'p1', nombre: 'Dirección y Coord.', x0: 8,   ancho: 142, arriba: true,  puertaX: 79,  piso: ['#a8694f', '#a1634a'] },
-  p2: { id: 'p2', nombre: 'Secretaría y Admis.',  x0: 166, ancho: 146, arriba: true,  puertaX: 239, piso: ['#6b7fa8', '#647a9f'] },
-  p3: { id: 'p3', nombre: 'Aula · Biología 1',        x0: 8,   ancho: 170, arriba: false, puertaX: 104, piso: ['#4f8f8a', '#498882'] },
-  p4: { id: 'p4', nombre: 'Bienestar y Biblioteca', x0: 194, ancho: 118, arriba: false, puertaX: 253, piso: ['#a85f80', '#a05878'] },
+  p1: { id: 'p1', nombre: 'Dirección y Coord.', x0: 8,   ancho: 174, arriba: true,  puertaX: 95,  piso: ['#a8694f', '#a1634a'] },
+  p2: { id: 'p2', nombre: 'Secretaría y Admis.',  x0: 198, ancho: 194, arriba: true,  puertaX: 295, piso: ['#6b7fa8', '#647a9f'] },
+  p3: { id: 'p3', nombre: 'Aula · Biología 1',        x0: 8,   ancho: 206, arriba: false, puertaX: 120, piso: ['#4f8f8a', '#498882'] },
+  p4: { id: 'p4', nombre: 'Bienestar y Biblioteca', x0: 230, ancho: 162, arriba: false, puertaX: 311, piso: ['#a85f80', '#a05878'] },
 };
 const CARRIL = 144;                                   // y (pies) del pasillo (hall: 124..164)
 for (const f of Object.values(FISICAS)) {
@@ -47,18 +58,18 @@ const lugar = (fisica, cx, arriba, { visitas: vis, ...extra } = {}) => {
   };
 };
 export const SALAS = {
-  direccion:    lugar('p1', 44,  true,  { nombre: 'Dirección' }),
-  coordinacion: lugar('p1', 114, true,  { nombre: 'Coordinación' }),
-  secretaria:   lugar('p2', 200, true,  { nombre: 'Secretaría' }),
-  admisiones:   lugar('p2', 276, true,  { nombre: 'Admisiones' }),
-  'aula-bio1':  lugar('p3', 146, false, { nombre: 'Aula · Biología 1', visitas: [[-34, 0], [-14, -2], [-42, 14]] }),
-  bienestar:    lugar('p4', 218, false, { nombre: 'Bienestar', visitas: [[-17, -2], [14, -2], [0, -8]] }),
-  academia:     lugar('p4', 282, false, { nombre: 'Academia', visitas: [[-14, -4], [14, -4], [0, -10]] }),
-  biblioteca:   { fisica: FISICAS.p4, arriba: false, nombre: 'Biblioteca', escritorio: false, asiento: null, visitas: [[262, 212], [302, 212], [248, 222]].map(([x, y]) => ({ x, y, ocupado: null })) },
+  direccion:    lugar('p1', 50,  true,  { nombre: 'Dirección', visitas: [[-18, 2], [18, 2], [0, 10], [36, 4]] }),   // el escritorio vacío de quien decide: los agentes vienen a presentar
+  coordinacion: lugar('p1', 140, true,  { nombre: 'Coordinación' }),
+  secretaria:   lugar('p2', 240, true,  { nombre: 'Secretaría' }),
+  admisiones:   lugar('p2', 350, true,  { nombre: 'Admisiones' }),
+  'aula-bio1':  lugar('p3', 176, false, { nombre: 'Aula · Biología 1', visitas: [[-34, 0], [-14, -2], [-42, 14]] }),
+  bienestar:    lugar('p4', 258, false, { nombre: 'Bienestar', visitas: [[-17, -2], [14, -2], [0, -8]] }),
+  academia:     lugar('p4', 352, false, { nombre: 'Academia', visitas: [[-14, -4], [14, -4], [0, -10]] }),
+  biblioteca:   { fisica: FISICAS.p4, arriba: false, nombre: 'Biblioteca', escritorio: false, asiento: null, visitas: [[296, 212], [322, 212], [309, 222]].map(([x, y]) => ({ x, y, ocupado: null })) },
 };
-{ // El aula tiene su visita central dentro de la puerta; el pasillo tiene seis puntos
+{ // El aula tiene su visita central dentro de la puerta; el pasillo tiene siete puntos
   const p = { id: 'pasillo', fisica: null, nombre: 'Pasillo', asiento: null, visitas: [] };
-  for (let i = 0; i < 6; i++) p.visitas.push({ x: 30 + i * 52, y: CARRIL, ocupado: null });
+  for (let i = 0; i < 7; i++) p.visitas.push({ x: 30 + i * 56, y: CARRIL, ocupado: null });
   SALAS.pasillo = p;
 }
 export const CARTELES = Object.values(FISICAS).map((f) => ({ texto: f.nombre, x: f.x0 + 4, y: f.arriba ? 117 : 281 }));
@@ -69,7 +80,7 @@ const dentroDe = (x, y) => Object.values(FISICAS).find((f) => x >= f.x0 && x <= 
 const ESTUDIANTES = [];
 {
   const f = FISICAS.p3;
-  const cols = [24, 50, 76], filas = [238, 270];
+  const cols = [26, 56, 86], filas = [238, 270];
   const modelos = [[3, 0], [4, 90], [5, 200], [2, 150], [1, 40], [3, 260]];
   let k = 0;
   for (const y of filas) for (const c of cols) { const [m, h] = modelos[k]; ESTUDIANTES.push({ x: f.x0 + c, y, modelo: m, tono: h, foco: y === filas[1] && c === cols[2] }); k++; }
@@ -92,7 +103,7 @@ function dibujarFondo(c) {
   r(c, 8, 124, W - 16, 2, 'rgba(0,0,0,.16)');
   // casilleros contra la pared de arriba (sin tapar las puertas)
   const cols = ['#4f7fbf', '#3f9a8f'];
-  for (const [a, b] of [[10, 60], [98, 220], [258, 310]]) for (let x = a, i = 0; x + 13 <= b; x += 14, i++) {
+  for (const [a, b] of [[10, 75], [116, 276], [318, 390]]) for (let x = a, i = 0; x + 13 <= b; x += 14, i++) {
     r(c, x, 126, 13, 22, cols[i % 2]); r(c, x, 126, 13, 2, 'rgba(255,255,255,.25)'); r(c, x + 9, 135, 2, 4, '#e8e0cf'); r(c, x + 2, 131, 7, 1, 'rgba(0,0,0,.25)'); r(c, x, 148, 13, 2, 'rgba(0,0,0,.18)');
   }
   for (const f of Object.values(FISICAS)) {
@@ -104,7 +115,7 @@ function dibujarFondo(c) {
     const fy = f.arriba ? 0 : 164;                    // cara de pared del fondo (2 baldosas de alto)
     r(c, f.x0, fy, f.ancho, 32, PAL.pared); r(c, f.x0, fy, f.ancho, 2, PAL.paredClara);
     r(c, f.x0, fy + 28, f.ancho, 4, PAL.zocalo); r(c, f.x0, fy + 26, f.ancho, 2, PAL.paredOsc);
-    for (let x = f.x0 + 8; x < f.x0 + f.ancho; x += 24) r(c, x, fy + 6, 1, 20, 'rgba(255,255,255,.05)');
+    for (let x = f.x0 + 8; x < f.x0 + f.ancho; x += 24) r(c, x, fy + 6, 1, 20, PAL.junta);
     if (f.arriba) {                                    // pared fina hacia el pasillo, con hueco de puerta
       r(c, f.x0, 116, f.ancho, 8, PAL.pared); r(c, f.x0, 116, f.ancho, 2, PAL.paredClara); r(c, f.x0, 122, f.ancho, 2, PAL.zocalo);
       r(c, f.puertaX - 16, 116, 32, 8, hp[0]); r(c, f.puertaX - 18, 116, 2, 8, PAL.maderaOsc); r(c, f.puertaX + 16, 116, 2, 8, PAL.maderaOsc);
@@ -160,20 +171,20 @@ function muebles(e) {
     add(s.mesaY - 1, (c) => silla(c, s.cx, s.mesaY - 5, silCol));
   };
   // Dirección + Coordinación
-  add(0, (c) => { ventana(c, 14, 6, 24); cuadro(c, 44, 8); pizarron(c, 82, 6, 60, 22); });
-  mesa('direccion', e.persona, '#8a2f1a'); mesa('coordinacion', e.coordinacion, '#5b7fe0');
-  add(58, (c) => estante(c, 10, 33, 24, 24)); add(112, (c) => planta(c, 144, 112));
+  add(0, (c) => { ventana(c, 14, 6, 24); cuadro(c, 48, 8); pizarron(c, 96, 6, 78, 22); });
+  mesa('direccion', e.direccion, '#8a2f1a'); mesa('coordinacion', e.coordinacion, '#5b7fe0');
+  add(58, (c) => estante(c, 10, 33, 24, 24)); add(112, (c) => planta(c, 176, 112));
   // Secretaría + Admisiones
-  add(0, (c) => { ventana(c, 172, 6, 24); reloj(c, 204, 8); ventana(c, 222, 6, 24); r(c, 270, 6, 30, 20, PAL.papel); r(c, 274, 10, 22, 1, '#999'); r(c, 274, 14, 16, 1, '#999'); r(c, 274, 18, 19, 1, '#999'); });
+  add(0, (c) => { ventana(c, 204, 6, 24); reloj(c, 236, 8); ventana(c, 254, 6, 24); r(c, 320, 6, 30, 20, PAL.papel); r(c, 324, 10, 22, 1, '#999'); r(c, 324, 14, 16, 1, '#999'); r(c, 324, 18, 19, 1, '#999'); ventana(c, 362, 6, 24); });
   mesa('secretaria', e.advisor, '#2b9a8a'); mesa('admisiones', undefined, '#a8861f', 'mostrador');
-  add(58, (c) => estante(c, 172, 33, 24, 24)); add(112, (c) => planta(c, 306, 112));
+  add(58, (c) => estante(c, 204, 33, 24, 24)); add(112, (c) => planta(c, 386, 112));
   // Aula
-  add(164, (c) => { pizarron(c, 14, 170, 70, 20); ventana(c, 128, 172, 26); reloj(c, 160, 174); });
+  add(164, (c) => { pizarron(c, 14, 170, 90, 20); ventana(c, 150, 172, 26); reloj(c, 190, 174); });
   ESTUDIANTES.forEach((st) => add(st.y - 8, (c) => pupitre(c, st.x - 11, st.y - 30)));
-  mesa('aula-bio1', e.tutor, '#d6a82b'); add(280, (c) => planta(c, 168, 274));
+  mesa('aula-bio1', e.tutor, '#d6a82b'); add(280, (c) => planta(c, 206, 274));
   // Bienestar + Biblioteca
-  add(164, (c) => { cruz(c, 200, 172); ventana(c, 214, 170, 20); estante(c, 272, 164, 18, 30); estante(c, 292, 164, 18, 30); });
-  mesa('bienestar', e.bienestar, '#a8527f'); mesa('academia', e.academia, '#3f9a52'); add(262, (c) => globo(c, 200, 262)); add(278, (c) => planta(c, 304, 274));
+  add(164, (c) => { cruz(c, 236, 172); ventana(c, 250, 170, 20); estante(c, 296, 164, 18, 30); estante(c, 316, 164, 18, 30); estante(c, 336, 164, 18, 30); ventana(c, 362, 170, 24); });
+  mesa('bienestar', e.bienestar, '#a8527f'); mesa('academia', e.academia, '#3f9a52'); add(262, (c) => globo(c, 236, 262)); add(278, (c) => planta(c, 384, 274));
   return L;
 }
 
@@ -207,7 +218,9 @@ export async function crearOficina(canvas) {
   const hojasTeñidas = ESTUDIANTES.map((e) => (e.tono ? teñir(hojas[e.modelo], e.tono) : hojas[e.modelo]));
 
   const personajes = new Map();
-  const of = { personajes, hojas, instantaneo: false, velocidad: 1, SALAS, W, H, resolucion: (s) => { if (s !== S) armar(s); } };
+  // esperandoDecision: hay una propuesta sin responder; se enciende la pantalla del escritorio de Dirección.
+  const of = { personajes, hojas, instantaneo: false, velocidad: 1, esperandoDecision: false, SALAS, W, H, resolucion: (s) => { if (s !== S) armar(s); } };
+  of.tema = (nombre) => { Object.assign(PAL, TEMAS[nombre] || TEMAS.oscuro); if (S) armar(S); };   // repinta el fondo cacheado; los muebles se redibujan solos
   const VEL = 58; // px lógicos por segundo
 
   of.agregar = (id, { nombre, casa, persona = false }) => {
@@ -264,8 +277,8 @@ export async function crearOficina(canvas) {
       p.moviendo = p.ruta.length > 0;
       if (!p.moviendo) { p.x = p.spot.x; p.y = p.spot.y; p.sentado = !!p.spot.sentado; p.dir = 'abajo'; }
     }
-    // pantallas encendidas: solo si el dueño está trabajando en su escritorio
-    const estado = { persona: true };
+    // pantallas encendidas: solo si el dueño está trabajando en su escritorio; la de Dirección, mientras hay una decisión pendiente
+    const estado = { direccion: of.esperandoDecision };
     for (const id of ['advisor', 'bienestar', 'coordinacion', 'tutor', 'academia']) { const p = personajes.get(id); estado[id] = !!(p && p.trabajando && p.sentado && !p.moviendo); }
     c.clearRect(0, 0, W, H); c.drawImage(fondo, 0, 0, W, H);
     const cosas = muebles(estado);
