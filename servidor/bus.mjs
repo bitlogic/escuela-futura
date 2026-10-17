@@ -4,8 +4,10 @@
 // así los tests no esperan ni tocan la red.
 //
 // Reglas (ver docs/bus.md): un estado por agente; el servidor sabe a quién espera cada uno (pendientes);
-// un despertar provocado por agentes no arranca hasta que los que deben respuesta callan; si alguien
-// termina sin contestar, al que esperaba se le avisa; topes de saltos, turnos y mensajes.
+// un despertar provocado por agentes no arranca hasta que los que deben respuesta callan, ni mientras
+// alguno de los que X mandó a trabajar en su último turno siga activo (aunque ya haya contestado: puede
+// estar ajustando por un aviso de otro); si alguien termina sin contestar, al que esperaba se le avisa;
+// topes de saltos, turnos y mensajes.
 
 export const LIMITES = {
   espera: 1500,          // ms que se juntan mensajes antes de arrancar un turno
@@ -38,7 +40,7 @@ export function crearBus({ agentes, persona, resolver, correrTurno, programar = 
     const epoca = S ? S.epoca : 0;
     S = { epoca, inicio: ahora(), chat: [], linea: [], seq: 0, mensajesAgentes: 0, frame: [], frameProgramado: false };
     ag.clear();
-    for (const a of agentes) ag.set(a.id, { id: a.id, nombre: a.nombre, estado: 'inactivo', cola: [], turnos: 0, pendientes: new Set(), sinRespuesta: [], temporizador: null, retenidoDesde: null, promesa: Promise.resolve(), turno: null });
+    for (const a of agentes) ag.set(a.id, { id: a.id, nombre: a.nombre, estado: 'inactivo', cola: [], turnos: 0, pendientes: new Set(), equipo: new Set(), sinRespuesta: [], temporizador: null, retenidoDesde: null, promesa: Promise.resolve(), turno: null });
   }
   reiniciar();
 
@@ -55,13 +57,13 @@ export function crearBus({ agentes, persona, resolver, correrTurno, programar = 
   const topeTurnos = (a) => a.turnos >= (L.turnos[a.id] ?? L.turnos.otros);
 
   // ── Publicar: chat + evento + despertar a los mencionados ──
-  function publicar({ de, texto, a, salto = 0 }) {
+  function publicar({ de, texto, a, salto = 0, decision = null }) {
     const t = ahora();
     const m = { id: 's' + S.seq + '-' + t, de, nombre: nombreDe.get(de) || de, texto, a, hora: hora(t), t: t - S.inicio, salto };
     S.chat.push(m);
     const esPersona = de === persona.id;
     if (!esPersona) S.mensajesAgentes++;
-    emitir(esPersona ? { tipo: 'persona', quien: de, nombre: m.nombre, a, texto, hora: m.hora, id: m.id }
+    emitir(esPersona ? { tipo: 'persona', quien: de, nombre: m.nombre, a, texto, hora: m.hora, id: m.id, ...(decision ? { decision } : {}) }
                      : { tipo: 'dice', quien: de, a, texto, hora: m.hora, id: m.id });
     const emisor = ag.get(de);
     const despertados = [], noDespiertan = [];
@@ -72,7 +74,7 @@ export function crearBus({ agentes, persona, resolver, correrTurno, programar = 
       const despierta = esPersona || (salto <= L.saltoMax && !topeTurnos(x) && S.mensajesAgentes <= L.mensajes);
       x.cola.push({ ...m, despierta });
       // Espera respuesta solo si le escribe a alguien que no le había escrito: contestar no crea expectativa
-      if (despierta) { despertados.push(id); if (emisor && emisor.turno && !emisor.turno.remitentes.includes(id)) emisor.pendientes.add(id); if (x.estado !== 'corriendo') programarArranque(x, esPersona); }
+      if (despierta) { despertados.push(id); if (emisor && emisor.turno && !emisor.turno.remitentes.includes(id)) { emisor.pendientes.add(id); emisor.turno.equipo.add(id); } if (x.estado !== 'corriendo') programarArranque(x, esPersona); }
       else noDespiertan.push(id);
     }
     log('msg', m.nombre, '→', a.join(','), despertados.length ? '' : '(no despierta)');
@@ -93,7 +95,8 @@ export function crearBus({ agentes, persona, resolver, correrTurno, programar = 
     if (!x.cola.some((m) => m.despierta) && !x.sinRespuesta.length && !x.urgente) { x.estado = 'inactivo'; x.retenidoDesde = null; return; }
     const humano = x.urgente || x.cola.some((m) => m.de === persona.id);
     const vencido = ahora() - x.retenidoDesde >= L.retencionMax;
-    const hablando = [...x.pendientes].filter((id) => { const p = ag.get(id); return p && (p.estado === 'corriendo' || p.estado === 'esperando'); });
+    // Retiene mientras alguno de los que X espera, o de los que mandó a trabajar, siga corriendo o por correr
+    const hablando = [...new Set([...x.pendientes, ...x.equipo])].filter((id) => { const p = ag.get(id); return p && (p.estado === 'corriendo' || p.estado === 'esperando'); });
     if (hablando.length && !humano && !vencido) { x.temporizador = programar(L.reintento, () => { x.temporizador = null; intentarArranque(x); }); return; }
     arrancarTurno(x, { vencido: vencido && hablando.length > 0 });
   }
@@ -104,7 +107,7 @@ export function crearBus({ agentes, persona, resolver, correrTurno, programar = 
     const terminaronSin = x.sinRespuesta.splice(0);
     const remitentes = [...new Set(mensajes.map((m) => m.de))];
     const salto = Math.max(0, ...mensajes.map((m) => m.salto)) + 1;
-    const turno = { hablo: new Set(), remitentes, salto, epoca: S.epoca };
+    const turno = { hablo: new Set(), equipo: new Set(), remitentes, salto, epoca: S.epoca };
     x.turno = turno;
     const lote = { mensajes, faltan, terminaronSin };
     emitir({ tipo: 'inicio', quien: x.id });
@@ -140,7 +143,7 @@ export function crearBus({ agentes, persona, resolver, correrTurno, programar = 
   }
   function finTurno(x, turno) {
     if (turno.epoca !== S.epoca) return;
-    x.turno = null;
+    x.turno = null; x.equipo = turno.equipo;   // a quiénes mandó a trabajar: los espera aunque ya le hayan contestado
     emitir({ tipo: 'fin', quien: x.id });
     // R4: a quien lo esperaba y no le escribió, se le avisa. Se lo despierta solo si ya estaba por arrancar
     // (retenido o con mensajes); si está quieto, el aviso espera a su próximo turno: no vale un turno por sí solo.
@@ -155,13 +158,15 @@ export function crearBus({ agentes, persona, resolver, correrTurno, programar = 
 
   return {
     /** Mensaje de la persona (desde el navegador). Sin mención, le habla a Coordinación. */
-    mensajePersona(texto) {
+    mensajePersona(texto, { decision = null } = {}) {
       const r = resolver(texto, { de: persona.id, porDefecto: ['coordinacion'] });
       if (r.invalidas.length) return { a: [], despertados: [], invalidas: r.invalidas, nombres: r.nombres };   // no se manda: un dedazo no debe ir a Coordinación
-      const { despertados } = publicar({ de: persona.id, texto, a: r.a, salto: 0 });
+      const { despertados } = publicar({ de: persona.id, texto, a: r.a, salto: 0, decision });   // `decision`: la de la tarjeta, estructurada; va en el evento y queda en la grabación
       return { a: r.a, despertados, invalidas: [] };
     },
     reiniciar,
+    /** Un evento que no es un mensaje (p. ej. del Tablero): va a la vista y a la grabación. */
+    emitir: (ev) => emitir(ev),
     suscribir(fn) { oyentes.add(fn); return () => oyentes.delete(fn); },
     snapshot: () => ({ eventos: S.linea.slice() }),
     chat: () => S.chat.slice(),

@@ -1,11 +1,9 @@
 #!/bin/sh
-# Levanta Escuela Futura en segundo plano y deja el PID en .escuela.pid y la salida en escuela.log.
+# Levanta Escuela Futura en segundo plano; deja el PID en .escuela-<puerto>.pid y la salida en escuela-<puerto>.log.
 # Uso: ./start.sh [--puerto N] [--sin-navegador]   (los flags van directo a ./escenario)
 # Para cortarlo: ./stop.sh
 
 cd "$(dirname "$0")" || exit 1
-PIDFILE=.escuela.pid
-LOG=escuela.log
 
 # Puerto: flag --puerto, si no ESCUELA_PUERTO (entorno o .env), si no 8080.
 PUERTO=""
@@ -19,6 +17,9 @@ if [ -z "$PUERTO" ]; then
   PUERTO=${PUERTO:-8080}
 fi
 URL="http://localhost:$PUERTO/stage/"
+PIDFILE=.escuela-$PUERTO.pid
+LOG=escuela-$PUERTO.log
+
 
 # ¿Ya está corriendo?
 if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
@@ -42,7 +43,7 @@ i=0
 while [ $i -lt 30 ]; do
   if curl -fs "http://127.0.0.1:$PUERTO/api/estado" >/dev/null 2>&1; then
     echo "Escuela Futura corriendo (PID $PID) → $URL"
-    echo "Log: $LOG · cortar con ./stop.sh"
+    echo "Log: $LOG · cortar con ./stop.sh$( [ "$PUERTO" != 8080 ] && echo " --puerto $PUERTO")"
     exit 0
   fi
   if ! kill -0 "$PID" 2>/dev/null; then

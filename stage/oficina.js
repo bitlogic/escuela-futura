@@ -87,6 +87,8 @@ const ESTUDIANTES = [];
   for (const y of filas) for (const c of cols) { const [m, h] = modelos[k]; ESTUDIANTES.push({ x: f.x0 + c, y, modelo: m, tono: h, foco: y === filas[1] && c === cols[2] }); k++; }
 }
 export const MARTINA = ESTUDIANTES.find((e) => e.foco);
+// Dónde va el cartel "Esperando tu decisión": centrado en la pared del fondo del despacho de Dirección y Coordinación.
+export const DECISION = { x: FISICAS.p1.x0 + FISICAS.p1.ancho / 2, y: 7 };
 
 // ── Utilidades ───────────────────────────────────────────────────────────────
 const r = (c, x, y, w, h, col) => { c.fillStyle = col; c.fillRect(Math.round(x), Math.round(y), w, h); };
@@ -102,11 +104,20 @@ function dibujarFondo(c) {
     if (ruido(x, y) > 0.7) r(c, x + 4 + (ruido(y, x) * 8 | 0), y + 6, 2, 1, 'rgba(0,0,0,.08)');
   }
   r(c, 8, 124, W - 16, 2, 'rgba(0,0,0,.16)');
-  // casilleros contra la pared de arriba (sin tapar las puertas)
-  const cols = ['#4f7fbf', '#3f9a8f'];
-  for (const [a, b] of [[10, 75], [116, 276], [318, 390]]) for (let x = a, i = 0; x + 13 <= b; x += 14, i++) {
-    r(c, x, 126, 13, 22, cols[i % 2]); r(c, x, 126, 13, 2, 'rgba(255,255,255,.25)'); r(c, x + 9, 135, 2, 4, '#e8e0cf'); r(c, x + 2, 131, 7, 1, 'rgba(0,0,0,.25)'); r(c, x, 148, 13, 2, 'rgba(0,0,0,.18)');
+  // casilleros parados contra la pared fina de arriba (sin tapar las puertas): tapa, frente con rendijas, manija y sombra en el piso
+  const cols = [['#4f7fbf', '#6d9ad6', '#3a5f94'], ['#3f9a8f', '#62b7ab', '#2e736a']];
+  for (const [a, b] of [[12, 74], [118, 182], [204, 274], [318, 388]]) for (let x = a, i = 0; x + 12 <= b; x += 13, i++) {
+    const [cuerpo, claro, osc] = cols[i % 2];
+    r(c, x, 123, 12, 3, claro);                                   // tapa (se ve desde arriba)
+    r(c, x, 126, 12, 20, cuerpo); r(c, x + 11, 126, 1, 20, osc);  // frente y canto
+    r(c, x + 2, 129, 7, 1, osc); r(c, x + 2, 131, 7, 1, osc);     // rendijas de ventilación
+    r(c, x + 8, 136, 2, 3, '#f1ead8'); r(c, x + 1, 143, 10, 1, osc);
+    r(c, x, 146, 12, 1, osc); r(c, x - 1, 147, 14, 2, 'rgba(0,0,0,.2)');   // base y sombra
   }
+  // banco, dispensador de agua y tacho a lo largo del pasillo (lejos de las puertas)
+  r(c, 230, 150, 36, 4, PAL.maderaClara); r(c, 230, 154, 36, 6, PAL.madera); r(c, 231, 160, 3, 3, PAL.maderaSombra); r(c, 262, 160, 3, 3, PAL.maderaSombra);
+  r(c, 184, 134, 8, 14, '#d8dde6'); r(c, 185, 127, 6, 8, '#9fd0ff'); r(c, 185, 148, 6, 2, '#6a7080'); r(c, 187, 140, 2, 1, '#4f95c9');   // en el hueco entre las dos salas de arriba
+  r(c, 195, 139, 7, 9, '#5a6070'); r(c, 194, 138, 9, 2, '#7a8090');
   for (const f of Object.values(FISICAS)) {
     for (let y = f.y0; y < f.y1; y += 16) for (let x = f.x0; x < f.x0 + f.ancho; x += 16) {
       const w = Math.min(16, f.x0 + f.ancho - x), h = Math.min(16, f.y1 - y);
@@ -119,9 +130,14 @@ function dibujarFondo(c) {
     for (let x = f.x0 + 8; x < f.x0 + f.ancho; x += 24) r(c, x, fy + 6, 1, 20, PAL.junta);
     if (f.arriba) {                                    // pared fina hacia el pasillo, con hueco de puerta
       r(c, f.x0, 116, f.ancho, 8, PAL.pared); r(c, f.x0, 116, f.ancho, 2, PAL.paredClara); r(c, f.x0, 122, f.ancho, 2, PAL.zocalo);
-      r(c, f.puertaX - 16, 116, 32, 8, hp[0]); r(c, f.puertaX - 18, 116, 2, 8, PAL.maderaOsc); r(c, f.puertaX + 16, 116, 2, 8, PAL.maderaOsc);
+      r(c, f.puertaX - 16, 116, 32, 8, hp[0]); r(c, f.puertaX - 16, 116, 32, 1, 'rgba(0,0,0,.22)');
+      r(c, f.puertaX - 19, 113, 3, 13, PAL.maderaOsc); r(c, f.puertaX + 16, 113, 3, 13, PAL.maderaOsc);   // jambas
+      r(c, f.puertaX - 19, 113, 3, 1, PAL.madera); r(c, f.puertaX + 16, 113, 3, 1, PAL.madera);
+      r(c, f.puertaX - 14, 125, 28, 3, 'rgba(0,0,0,.14)');                                               // felpudo del lado del pasillo
     } else {
-      r(c, f.puertaX - 16, fy, 32, 32, hp[1]); r(c, f.puertaX - 18, fy, 2, 32, PAL.maderaOsc); r(c, f.puertaX + 16, fy, 2, 32, PAL.maderaOsc); r(c, f.puertaX - 18, fy, 36, 2, PAL.maderaOsc);
+      r(c, f.puertaX - 16, fy, 32, 32, hp[1]); r(c, f.puertaX - 16, fy, 32, 6, 'rgba(0,0,0,.22)');       // hueco con fondo en penumbra
+      r(c, f.puertaX - 19, fy - 2, 3, 35, PAL.maderaOsc); r(c, f.puertaX + 16, fy - 2, 3, 35, PAL.maderaOsc); r(c, f.puertaX - 19, fy - 2, 38, 3, PAL.maderaOsc); r(c, f.puertaX - 18, fy - 1, 36, 1, PAL.madera);
+      r(c, f.puertaX - 14, fy - 6, 28, 3, 'rgba(0,0,0,.14)');                                            // felpudo del lado del pasillo
       r(c, f.x0, 280, f.ancho, 2, PAL.paredClara);
     }
   }
@@ -149,10 +165,24 @@ function estante(c, x, y, w, alto = 30) {
 }
 function planta(c, x, y) { r(c, x - 4, y, 8, 7, '#b5653a'); r(c, x - 4, y, 8, 1, '#d28a5a'); r(c, x - 6, y - 8, 12, 9, PAL.verde); r(c, x - 4, y - 13, 8, 7, PAL.verdeOsc); r(c, x - 1, y - 16, 3, 5, PAL.verde); r(c, x - 7, y - 4, 3, 3, PAL.verdeOsc); r(c, x + 4, y - 5, 3, 3, PAL.verdeOsc); }
 function ventana(c, x, y, w = 28) { r(c, x, y, w, 18, '#e8f2ff'); r(c, x + 1, y + 1, w - 2, 16, '#9fd0ff'); r(c, x + w / 2 - 1, y, 2, 18, '#e8f2ff'); r(c, x, y + 8, w, 2, '#e8f2ff'); r(c, x + 3, y + 3, 5, 2, '#fff'); r(c, x - 1, y + 18, w + 2, 2, PAL.maderaOsc); }
-function pizarron(c, x, y, w, h = 20, trazos = true) {
-  r(c, x, y, w, h, '#8a6a3e'); r(c, x + 1, y + 1, w - 2, h - 2, '#1f4d3a');
-  if (trazos) { r(c, x + 4, y + 4, w * 0.45 | 0, 1, '#e8f0e8'); r(c, x + 4, y + 8, w * 0.6 | 0, 1, '#e8f0e8'); r(c, x + 4, y + 12, w * 0.3 | 0, 1, '#f4e9a6'); }
-  r(c, x + 3, y + h - 3, 8, 1, '#e8e0cf');
+function pizarron(c, x, y, w, h = 24, trazos = true) {
+  r(c, x, y, w, h, '#8a6a3e'); r(c, x, y, w, 1, '#a88552'); r(c, x, y + h - 1, w, 1, '#5e4526');
+  r(c, x + 2, y + 2, w - 4, h - 4, '#1f4d3a'); r(c, x + 2, y + 2, w - 4, 1, '#163a2b');
+  const tiza = '#e8f0e8', ama = '#f4e9a6';
+  if (trazos) {   // "palabras" de tiza de ancho fijo, un título subrayado y un dibujo de célula a la derecha
+    const linea = (ly, col, partes) => { let cx = x + 5; for (const a of partes) { if (cx + a > x + w - 30) break; r(c, cx, ly, a, 1, col); cx += a + 3; } };
+    linea(y + 5, tiza, [9, 5, 7]); r(c, x + 5, y + 7, 21, 1, ama);
+    linea(y + 10, tiza, [4, 8, 6, 5, 7]); linea(y + 13, tiza, [7, 4, 9, 6]); linea(y + 16, ama, [5, 6, 4, 8]);
+    const dx = x + w - 20, dy = y + 5;
+    r(c, dx, dy + 2, 14, 10, tiza); r(c, dx + 1, dy + 3, 12, 8, '#1f4d3a'); r(c, dx + 5, dy + 5, 4, 4, tiza); r(c, dx + 6, dy + 6, 2, 2, '#1f4d3a'); r(c, dx + 2, dy + 8, 2, 1, ama); r(c, dx + 10, dy + 4, 2, 1, ama);
+  }
+  r(c, x + 1, y + h - 1, w - 2, 2, '#a88552'); r(c, x + 1, y + h + 1, w - 2, 1, '#5e4526');   // repisa
+  r(c, x + 5, y + h - 2, 6, 1, '#f1ead8'); r(c, x + 13, y + h - 2, 4, 1, ama); r(c, x + w - 14, y + h - 2, 8, 2, '#3b3f55');   // tizas y borrador
+}
+function corcho(c, x, y, w, h = 22) {   // cartelera con papeles clavados
+  r(c, x, y, w, h, '#6b4a2a'); r(c, x + 2, y + 2, w - 4, h - 4, '#c9a06a');
+  const papeles = [[4, 4, 12, 9, PAL.papel], [19, 5, 10, 8, '#f4e9a6'], [32, 3, 11, 10, PAL.papel], [46, 6, 9, 7, '#bfe3f0'], [58, 4, 12, 9, PAL.papel]];
+  for (const [px, py, pw, ph, col] of papeles) { if (px + pw > w - 3) break; r(c, x + px, y + py, pw, ph, col); r(c, x + px + 2, y + py + 3, pw - 4, 1, '#999'); r(c, x + px + 2, y + py + 5, pw - 6, 1, '#999'); r(c, x + px + pw / 2 - 1 | 0, y + py - 1, 2, 2, '#d9604c'); }
 }
 function mostrador(c, x, y, w) { r(c, x, y, w, 6, PAL.maderaClara); r(c, x, y + 6, w, 14, PAL.maderaOsc); r(c, x, y + 6, w, 2, PAL.madera); r(c, x + w - 18, y - 6, 12, 7, PAL.papel); r(c, x + w - 16, y - 4, 8, 1, '#999'); r(c, x + 4, y - 4, 7, 4, '#d9604c'); }
 function mesaLectura(c, x, y) { r(c, x, y, 48, 5, PAL.maderaClara); r(c, x, y + 5, 48, 11, PAL.madera); r(c, x, y + 14, 48, 2, PAL.maderaOsc); r(c, x + 5, y + 1, 9, 4, '#d9604c'); r(c, x + 19, y, 10, 5, '#4f95c9'); r(c, x + 34, y + 1, 9, 4, PAL.papel); }
@@ -172,7 +202,7 @@ function muebles(e) {
     add(s.mesaY - 1, (c) => silla(c, s.cx, s.mesaY - 5, silCol));
   };
   // Dirección + Coordinación
-  add(0, (c) => { ventana(c, 14, 6, 24); cuadro(c, 48, 8); pizarron(c, 96, 6, 78, 22); });
+  add(0, (c) => { ventana(c, 14, 6, 24); cuadro(c, 48, 8); corcho(c, 96, 4, 76, 22); });
   mesa('direccion', e.direccion, '#8a2f1a'); mesa('coordinacion', e.coordinacion, '#5b7fe0');
   add(58, (c) => estante(c, 10, 33, 24, 24)); add(112, (c) => planta(c, 176, 112));
   // Secretaría + Admisiones
@@ -180,11 +210,11 @@ function muebles(e) {
   mesa('secretaria', e.advisor, '#2b9a8a'); mesa('admisiones', undefined, '#a8861f', 'mostrador');
   add(58, (c) => estante(c, 204, 33, 24, 24)); add(112, (c) => planta(c, 386, 112));
   // Aula
-  add(164, (c) => { pizarron(c, 14, 170, 90, 20); ventana(c, 150, 172, 26); reloj(c, 190, 174); });
+  add(164, (c) => { pizarron(c, 12, 166, 92, 24); ventana(c, 150, 170, 26); reloj(c, 190, 172); });
   ESTUDIANTES.forEach((st) => add(st.y - 8, (c) => pupitre(c, st.x - 11, st.y - 30)));
   mesa('aula-bio1', e.tutor, '#d6a82b'); add(280, (c) => planta(c, 206, 274));
   // Bienestar + Biblioteca
-  add(164, (c) => { cruz(c, 236, 172); ventana(c, 250, 170, 20); estante(c, 296, 164, 18, 30); estante(c, 316, 164, 18, 30); estante(c, 336, 164, 18, 30); ventana(c, 362, 170, 24); });
+  add(164, (c) => { cruz(c, 238, 172); ventana(c, 254, 170, 24); estante(c, 334, 164, 18, 30); estante(c, 353, 164, 18, 30); estante(c, 372, 164, 18, 30); });   // la puerta queda en 295..327: nada encima
   mesa('bienestar', e.bienestar, '#a8527f'); mesa('academia', e.academia, '#3f9a52'); add(262, (c) => globo(c, 236, 262)); add(278, (c) => planta(c, 384, 274));
   return L;
 }

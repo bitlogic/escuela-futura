@@ -183,390 +183,6 @@
       "anio": 1,
       "asistencia": {
         "resumen": {
-          "presentes": 25,
-          "clases": 26,
-          "porcentaje": 96,
-          "ultimas_5_semanas": {
-            "presentes": 9,
-            "clases": 10
-          }
-        },
-        "semanas": [
-          {
-            "semana": "2026-08-03",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-08-10",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-08-17",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-08-24",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-08-31",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-09-07",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-09-14",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-09-21",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-09-28",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-10-05",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-10-12",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-10-19",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-10-26",
-            "presentes": 1,
-            "clases": 2
-          }
-        ]
-      },
-      "campus": {
-        "ultimo_ingreso": "2026-10-29",
-        "ingresos_ultimos_30_dias": 22,
-        "entregas_pendientes": 0
-      },
-      "alertas_previas": [],
-      "tutor": {
-        "consultas": [
-          {
-            "tema": "Genética mendeliana: cruzamientos",
-            "consultas": 2,
-            "ejercicios_resueltos": 1,
-            "ejercicios_totales": 10
-          }
-        ],
-        "ultima_consulta": "2026-09-30"
-      },
-      "notas": [
-        {
-          "evaluacion": "TP 1",
-          "fecha": "2026-08-28",
-          "nota": 6
-        },
-        {
-          "evaluacion": "Parcial 1",
-          "fecha": "2026-09-22",
-          "nota": 4
-        },
-        {
-          "evaluacion": "TP 2 (cruzamientos)",
-          "fecha": "2026-10-16",
-          "nota": 3
-        }
-      ],
-      "administrativo": {
-        "inscripcion_parcial_2": "habilitada",
-        "cuotas_impagas": [],
-        "beca": null,
-        "tramites_abiertos": []
-      },
-      "ingreso": {
-        "curso_de_ingreso": true,
-        "expectativa_declarada": "Me gusta la biología pero me cuesta la matemática.",
-        "pidio_ayuda_economica": false
-      }
-    },
-    {
-      "id": "e03",
-      "nombre": "Lucía P.",
-      "curso": "bio1",
-      "anio": 1,
-      "asistencia": {
-        "resumen": {
-          "presentes": 18,
-          "clases": 26,
-          "porcentaje": 69,
-          "ultimas_5_semanas": {
-            "presentes": 5,
-            "clases": 10
-          }
-        },
-        "semanas": [
-          {
-            "semana": "2026-08-03",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-08-10",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-08-17",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-08-24",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-08-31",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-09-07",
-            "presentes": 1,
-            "clases": 2
-          },
-          {
-            "semana": "2026-09-14",
-            "presentes": 1,
-            "clases": 2
-          },
-          {
-            "semana": "2026-09-21",
-            "presentes": 1,
-            "clases": 2
-          },
-          {
-            "semana": "2026-09-28",
-            "presentes": 1,
-            "clases": 2
-          },
-          {
-            "semana": "2026-10-05",
-            "presentes": 1,
-            "clases": 2
-          },
-          {
-            "semana": "2026-10-12",
-            "presentes": 1,
-            "clases": 2
-          },
-          {
-            "semana": "2026-10-19",
-            "presentes": 1,
-            "clases": 2
-          },
-          {
-            "semana": "2026-10-26",
-            "presentes": 1,
-            "clases": 2
-          }
-        ]
-      },
-      "asistencia_nota": "Desde el 7/9 falta a la clase de los jueves 14 h; asiste a la de los martes 9 h.",
-      "campus": {
-        "ultimo_ingreso": "2026-10-29",
-        "ingresos_ultimos_30_dias": 18,
-        "entregas_pendientes": 0,
-        "horario_habitual": "entre las 22 y la 1"
-      },
-      "alertas_previas": [],
-      "tutor": {
-        "consultas": [
-          {
-            "tema": "Genética mendeliana: cruzamientos",
-            "consultas": 6,
-            "ejercicios_resueltos": 9,
-            "ejercicios_totales": 10
-          }
-        ],
-        "ultima_consulta": "2026-10-27"
-      },
-      "notas": [
-        {
-          "evaluacion": "TP 1",
-          "fecha": "2026-08-28",
-          "nota": 8
-        },
-        {
-          "evaluacion": "Parcial 1",
-          "fecha": "2026-09-22",
-          "nota": 7
-        }
-      ],
-      "administrativo": {
-        "inscripcion_parcial_2": "habilitada",
-        "cuotas_impagas": [],
-        "beca": null,
-        "tramites_abiertos": [
-          {
-            "tramite": "Cambio de comisión (de jueves 14 h a jueves 19 h)",
-            "iniciado": "2026-10-06",
-            "estado": "sin respuesta"
-          }
-        ]
-      },
-      "ingreso": {
-        "curso_de_ingreso": false,
-        "expectativa_declarada": "Necesito horarios compatibles con trabajar.",
-        "pidio_ayuda_economica": false
-      }
-    },
-    {
-      "id": "e04",
-      "nombre": "Joaquín M.",
-      "curso": "bio1",
-      "anio": 1,
-      "asistencia": {
-        "resumen": {
-          "presentes": 12,
-          "clases": 26,
-          "porcentaje": 46,
-          "ultimas_5_semanas": {
-            "presentes": 1,
-            "clases": 10
-          }
-        },
-        "semanas": [
-          {
-            "semana": "2026-08-03",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-08-10",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-08-17",
-            "presentes": 2,
-            "clases": 2
-          },
-          {
-            "semana": "2026-08-24",
-            "presentes": 1,
-            "clases": 2
-          },
-          {
-            "semana": "2026-08-31",
-            "presentes": 1,
-            "clases": 2
-          },
-          {
-            "semana": "2026-09-07",
-            "presentes": 1,
-            "clases": 2
-          },
-          {
-            "semana": "2026-09-14",
-            "presentes": 1,
-            "clases": 2
-          },
-          {
-            "semana": "2026-09-21",
-            "presentes": 1,
-            "clases": 2
-          },
-          {
-            "semana": "2026-09-28",
-            "presentes": 1,
-            "clases": 2
-          },
-          {
-            "semana": "2026-10-05",
-            "presentes": 0,
-            "clases": 2
-          },
-          {
-            "semana": "2026-10-12",
-            "presentes": 0,
-            "clases": 2
-          },
-          {
-            "semana": "2026-10-19",
-            "presentes": 0,
-            "clases": 2
-          },
-          {
-            "semana": "2026-10-26",
-            "presentes": 0,
-            "clases": 2
-          }
-        ]
-      },
-      "asistencia_nota": "No asiste desde el 28/9.",
-      "campus": {
-        "ultimo_ingreso": "2026-09-26",
-        "ingresos_ultimos_30_dias": 0,
-        "entregas_pendientes": 3
-      },
-      "alertas_previas": [
-        {
-          "fecha": "2025-06-15",
-          "detalle": "Alerta por inasistencias en el curso de ingreso; se resolvió con una llamada."
-        }
-      ],
-      "tutor": {
-        "consultas": [],
-        "ultima_consulta": "2026-08-20"
-      },
-      "notas": [
-        {
-          "evaluacion": "TP 1",
-          "fecha": "2026-08-28",
-          "nota": 6
-        },
-        {
-          "evaluacion": "Parcial 1",
-          "fecha": "2026-09-22",
-          "nota": 6
-        }
-      ],
-      "administrativo": {
-        "inscripcion_parcial_2": "habilitada",
-        "cuotas_impagas": [],
-        "beca": "beca parcial 30%",
-        "tramites_abiertos": []
-      },
-      "ingreso": {
-        "curso_de_ingreso": true,
-        "expectativa_declarada": "Primero de mi familia en estudiar en la universidad.",
-        "pidio_ayuda_economica": true
-      }
-    },
-    {
-      "id": "e05",
-      "nombre": "Sofía A.",
-      "curso": "bio1",
-      "anio": 1,
-      "asistencia": {
-        "resumen": {
           "presentes": 24,
           "clases": 26,
           "porcentaje": 92,
@@ -685,8 +301,8 @@
       }
     },
     {
-      "id": "e06",
-      "nombre": "Benjamín C.",
+      "id": "e03",
+      "nombre": "Lucía P.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -809,8 +425,8 @@
       }
     },
     {
-      "id": "e07",
-      "nombre": "Valentina D.",
+      "id": "e04",
+      "nombre": "Joaquín M.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -933,8 +549,8 @@
       }
     },
     {
-      "id": "e08",
-      "nombre": "Mateo E.",
+      "id": "e05",
+      "nombre": "Sofía A.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -1057,8 +673,8 @@
       }
     },
     {
-      "id": "e09",
-      "nombre": "Catalina F.",
+      "id": "e06",
+      "nombre": "Benjamín C.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -1181,8 +797,8 @@
       }
     },
     {
-      "id": "e10",
-      "nombre": "Santiago H.",
+      "id": "e07",
+      "nombre": "Valentina D.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -1305,8 +921,8 @@
       }
     },
     {
-      "id": "e11",
-      "nombre": "Emilia I.",
+      "id": "e08",
+      "nombre": "Mateo E.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -1429,8 +1045,8 @@
       }
     },
     {
-      "id": "e12",
-      "nombre": "Thiago J.",
+      "id": "e09",
+      "nombre": "Catalina F.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -1553,8 +1169,8 @@
       }
     },
     {
-      "id": "e13",
-      "nombre": "Isabella K.",
+      "id": "e10",
+      "nombre": "Santiago H.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -1677,8 +1293,8 @@
       }
     },
     {
-      "id": "e14",
-      "nombre": "Lautaro L.",
+      "id": "e11",
+      "nombre": "Emilia I.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -1801,8 +1417,8 @@
       }
     },
     {
-      "id": "e15",
-      "nombre": "Renata N.",
+      "id": "e12",
+      "nombre": "Thiago J.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -1925,8 +1541,8 @@
       }
     },
     {
-      "id": "e16",
-      "nombre": "Agustín O.",
+      "id": "e13",
+      "nombre": "Isabella K.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -2049,8 +1665,8 @@
       }
     },
     {
-      "id": "e17",
-      "nombre": "Julieta Q.",
+      "id": "e14",
+      "nombre": "Lautaro L.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -2173,8 +1789,8 @@
       }
     },
     {
-      "id": "e18",
-      "nombre": "Felipe S.",
+      "id": "e15",
+      "nombre": "Renata N.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -2297,8 +1913,8 @@
       }
     },
     {
-      "id": "e19",
-      "nombre": "Camila T.",
+      "id": "e16",
+      "nombre": "Agustín O.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -2421,8 +2037,8 @@
       }
     },
     {
-      "id": "e20",
-      "nombre": "Bautista U.",
+      "id": "e17",
+      "nombre": "Julieta Q.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -2545,8 +2161,8 @@
       }
     },
     {
-      "id": "e21",
-      "nombre": "Abril V.",
+      "id": "e18",
+      "nombre": "Felipe S.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -2669,8 +2285,8 @@
       }
     },
     {
-      "id": "e22",
-      "nombre": "Facundo Y.",
+      "id": "e19",
+      "nombre": "Camila T.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -2793,8 +2409,8 @@
       }
     },
     {
-      "id": "e23",
-      "nombre": "Delfina Z.",
+      "id": "e20",
+      "nombre": "Bautista U.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -2917,8 +2533,8 @@
       }
     },
     {
-      "id": "e24",
-      "nombre": "Nicolás W.",
+      "id": "e21",
+      "nombre": "Abril V.",
       "curso": "bio1",
       "anio": 1,
       "asistencia": {
@@ -3021,6 +2637,378 @@
           "evaluacion": "TP 1",
           "fecha": "2026-08-28",
           "nota": 9
+        },
+        {
+          "evaluacion": "Parcial 1",
+          "fecha": "2026-09-22",
+          "nota": 8
+        }
+      ],
+      "administrativo": {
+        "inscripcion_parcial_2": "habilitada",
+        "cuotas_impagas": [],
+        "beca": null,
+        "tramites_abiertos": []
+      },
+      "ingreso": {
+        "curso_de_ingreso": true,
+        "expectativa_declarada": null,
+        "pidio_ayuda_economica": false
+      }
+    },
+    {
+      "id": "e22",
+      "nombre": "Facundo Y.",
+      "curso": "bio1",
+      "anio": 1,
+      "asistencia": {
+        "resumen": {
+          "presentes": 26,
+          "clases": 26,
+          "porcentaje": 100,
+          "ultimas_5_semanas": {
+            "presentes": 10,
+            "clases": 10
+          }
+        },
+        "semanas": [
+          {
+            "semana": "2026-08-03",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-08-10",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-08-17",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-08-24",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-08-31",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-09-07",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-09-14",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-09-21",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-09-28",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-10-05",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-10-12",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-10-19",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-10-26",
+            "presentes": 2,
+            "clases": 2
+          }
+        ]
+      },
+      "campus": {
+        "ultimo_ingreso": "2026-10-26",
+        "ingresos_ultimos_30_dias": 18,
+        "entregas_pendientes": 0
+      },
+      "alertas_previas": [],
+      "tutor": {
+        "consultas": [
+          {
+            "tema": "Metabolismo energético",
+            "consultas": 3,
+            "ejercicios_resueltos": 8,
+            "ejercicios_totales": 10
+          }
+        ],
+        "ultima_consulta": "2026-10-21"
+      },
+      "notas": [
+        {
+          "evaluacion": "TP 1",
+          "fecha": "2026-08-28",
+          "nota": 6
+        },
+        {
+          "evaluacion": "Parcial 1",
+          "fecha": "2026-09-22",
+          "nota": 8
+        }
+      ],
+      "administrativo": {
+        "inscripcion_parcial_2": "habilitada",
+        "cuotas_impagas": [],
+        "beca": null,
+        "tramites_abiertos": []
+      },
+      "ingreso": {
+        "curso_de_ingreso": true,
+        "expectativa_declarada": null,
+        "pidio_ayuda_economica": false
+      }
+    },
+    {
+      "id": "e23",
+      "nombre": "Delfina Z.",
+      "curso": "bio1",
+      "anio": 1,
+      "asistencia": {
+        "resumen": {
+          "presentes": 26,
+          "clases": 26,
+          "porcentaje": 100,
+          "ultimas_5_semanas": {
+            "presentes": 10,
+            "clases": 10
+          }
+        },
+        "semanas": [
+          {
+            "semana": "2026-08-03",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-08-10",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-08-17",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-08-24",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-08-31",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-09-07",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-09-14",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-09-21",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-09-28",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-10-05",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-10-12",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-10-19",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-10-26",
+            "presentes": 2,
+            "clases": 2
+          }
+        ]
+      },
+      "campus": {
+        "ultimo_ingreso": "2026-10-30",
+        "ingresos_ultimos_30_dias": 22,
+        "entregas_pendientes": 0
+      },
+      "alertas_previas": [],
+      "tutor": {
+        "consultas": [
+          {
+            "tema": "Célula y organelas",
+            "consultas": 5,
+            "ejercicios_resueltos": 8,
+            "ejercicios_totales": 10
+          }
+        ],
+        "ultima_consulta": "2026-10-21"
+      },
+      "notas": [
+        {
+          "evaluacion": "TP 1",
+          "fecha": "2026-08-28",
+          "nota": 8
+        },
+        {
+          "evaluacion": "Parcial 1",
+          "fecha": "2026-09-22",
+          "nota": 8
+        }
+      ],
+      "administrativo": {
+        "inscripcion_parcial_2": "habilitada",
+        "cuotas_impagas": [],
+        "beca": null,
+        "tramites_abiertos": []
+      },
+      "ingreso": {
+        "curso_de_ingreso": true,
+        "expectativa_declarada": null,
+        "pidio_ayuda_economica": false
+      }
+    },
+    {
+      "id": "e24",
+      "nombre": "Nicolás W.",
+      "curso": "bio1",
+      "anio": 1,
+      "asistencia": {
+        "resumen": {
+          "presentes": 26,
+          "clases": 26,
+          "porcentaje": 100,
+          "ultimas_5_semanas": {
+            "presentes": 10,
+            "clases": 10
+          }
+        },
+        "semanas": [
+          {
+            "semana": "2026-08-03",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-08-10",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-08-17",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-08-24",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-08-31",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-09-07",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-09-14",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-09-21",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-09-28",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-10-05",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-10-12",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-10-19",
+            "presentes": 2,
+            "clases": 2
+          },
+          {
+            "semana": "2026-10-26",
+            "presentes": 2,
+            "clases": 2
+          }
+        ]
+      },
+      "campus": {
+        "ultimo_ingreso": "2026-10-28",
+        "ingresos_ultimos_30_dias": 12,
+        "entregas_pendientes": 0
+      },
+      "alertas_previas": [],
+      "tutor": {
+        "consultas": [
+          {
+            "tema": "Herencia ligada al sexo",
+            "consultas": 1,
+            "ejercicios_resueltos": 8,
+            "ejercicios_totales": 10
+          }
+        ],
+        "ultima_consulta": "2026-10-28"
+      },
+      "notas": [
+        {
+          "evaluacion": "TP 1",
+          "fecha": "2026-08-28",
+          "nota": 7
         },
         {
           "evaluacion": "Parcial 1",

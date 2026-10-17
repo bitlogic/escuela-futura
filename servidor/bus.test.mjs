@@ -81,6 +81,28 @@ test('espera a que callen: Coordinación recibe las tres respuestas en un solo t
   assert.deepEqual(lote.faltan, []); assert.deepEqual(lote.terminaronSin, []);
 });
 
+test('espera a los delegados activos: si Bienestar ajusta por un aviso de Advisor, Coordinación lo recibe antes de proponer', async () => {
+  const guion = {
+    coordinacion: [async (ctx) => { ctx.enviar('@Bienestar a.'); ctx.enviar('@Tutor b.'); ctx.enviar('@Advisor c.'); }],
+    bienestar: [async (ctx) => ctx.enviar('@Coordinación listo bienestar'), 'abierto'],
+    tutor: [async (ctx) => ctx.enviar('@Coordinación listo tutor')],
+    advisor: [async (ctx) => { ctx.enviar('@Coordinación listo advisor'); ctx.enviar('@Bienestar la deuda arranca el 10/8'); }],
+  };
+  const { bus, r, turnos, cerrar, tipos } = armar({ guion });
+  bus.mensajePersona('objetivo');
+  await r.avanzar(4500);      // los tres contestaron; Advisor además le avisó a Bienestar, que arranca otro turno
+  assert.equal(tipos('bienestar').filter((t) => t === 'inicio').length, 2, 'Bienestar arranca un segundo turno por el aviso');
+  await r.avanzar(5000);
+  assert.equal(tipos('coordinacion').filter((t) => t === 'inicio').length, 1, 'Coordinación no arranca mientras Bienestar sigue trabajando, aunque ya le haya contestado');
+  turnos.filter((t) => t.id === 'bienestar')[1].ctx.enviar('@Coordinación con lo de Advisor, cambio');
+  await cerrar('bienestar');
+  await r.avanzar(1500);
+  assert.equal(tipos('coordinacion').filter((t) => t === 'inicio').length, 2);
+  const lote = turnos.filter((t) => t.id === 'coordinacion')[1].lote;
+  assert.deepEqual(lote.mensajes.map((m) => m.texto), ['@Coordinación listo bienestar', '@Coordinación listo tutor', '@Coordinación listo advisor', '@Coordinación con lo de Advisor, cambio']);
+  assert.deepEqual(lote.faltan, []);
+});
+
 test('fin sin respuesta y retención vencida avisan quién falta', async () => {
   const guion = {
     coordinacion: [async (ctx) => { ctx.enviar('@Bienestar a.'); ctx.enviar('@Advisor c.'); }],
@@ -185,4 +207,12 @@ test('reiniciar en medio de un turno descarta su resultado', async () => {
   await cerrar('tutor');
   assert.deepEqual(bus.snapshot().eventos, []);
   assert.equal(eventos.filter((e) => e.tipo === 'fin').length, 0);
+});
+
+test('la decisión estructurada de la persona viaja en el evento persona', async () => {
+  const { bus, eventos } = armar();
+  bus.mensajePersona('Plan de pagos, sí.', { decision: { acciones: [{ texto: 'plan de pagos', quien: 'Secretaría', estado: 'si' }], nota: '' } }); await respirar();
+  assert.deepEqual(eventos[0].decision, { acciones: [{ texto: 'plan de pagos', quien: 'Secretaría', estado: 'si' }], nota: '' });
+  bus.mensajePersona('hola'); await respirar();
+  assert.equal('decision' in eventos[1], false);
 });

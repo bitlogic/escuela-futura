@@ -18,7 +18,7 @@
   /* Colores por función, no por tono. El oscuro es el tema original; el claro usa el papel crema del brand kit. */
   :root { color-scheme: dark;
     --fondo-pagina: #0b0b12; --panel: #10101b; --panel-borde: #2c2f48; --texto: #f4efe2; --texto-suave: #9a9eba; --texto-tenue: #8f93b0; --texto-apagado: #6b6f8a; --hora: #a7abc9;
-    --acento: #ff7a3d; --ok: #5fae6a; --azul: #3e6be8; --sobre-azul: #f4efe2; --mencion: #ffb48a;
+    --acento: #ff7a3d; --ok: #5fae6a; --azul: #3e6be8; --sobre-azul: #f4efe2; --mencion: #ffb48a; --rechazo: #d9604c; --medio: #e0b84a;
     --campo: #1b1b2b; --manija: #4a4f78; --boton: #2c2f48; --boton-hover: #3c4066; --boton-texto: #f4efe2;
     --globo-fondo: #f4efe2; --globo-texto: #1a1a2e; --globo-borde: #1a1a2e; --etiqueta-fondo: #1a1a2e; --etiqueta-texto: #f4efe2; --cartel-fondo: #1a1a2e; --cartel-texto: #dfe2f5;
     --ink: #1a1a2e;
@@ -27,7 +27,7 @@
     --sans: "Plain", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
   :root[data-tema="claro"] { color-scheme: light;
     --fondo-pagina: #e9e2d3; --panel: #f9f4ea; --panel-borde: #d6cdb9; --texto: #121212; --texto-suave: #5c5f73; --texto-tenue: #585c72; --texto-apagado: #6f738a; --hora: #5c5f73;
-    --acento: #c2410c; --ok: #2f7a3b; --azul: #2f54c8; --sobre-azul: #f9f4ea; --mencion: #b4431a;
+    --acento: #c2410c; --ok: #2f7a3b; --azul: #2f54c8; --sobre-azul: #f9f4ea; --mencion: #b4431a; --rechazo: #c2452f; --medio: #c9a02e;
     --campo: #ffffff; --manija: #b9af9a; --boton: #e6dfcd; --boton-hover: #d8cfb9; --boton-texto: #121212;
     --globo-fondo: #f4efe2; --globo-texto: #1a1a2e; --globo-borde: #1a1a2e; --etiqueta-fondo: #1a1a2e; --etiqueta-texto: #f4efe2; --cartel-fondo: #1a1a2e; --cartel-texto: #f4efe2; }
   * { box-sizing: border-box; }
@@ -42,62 +42,172 @@
 
   /* Chat del canal */
   #chat { position: relative; flex: none; width: clamp(360px, var(--cw, 31vw), 55vw); display: flex; flex-direction: column; background: var(--panel); border-right: 4px solid var(--panel-borde); color: var(--texto); }
-  #chat { container-type: inline-size; }
+  #chat { container-type: inline-size; font-family: var(--sans); }
+  #chat-cab .canal { font-family: var(--mono); }
+  #escenario.decidiendo #chat { width: clamp(360px, max(var(--cw, 31vw), 48vw), 55vw); }
+  /* Chat colapsado: la escuela ocupa todo; la pestaña del borde lo vuelve a abrir (azul si hay una decisión esperando) */
+  #escenario.sin-chat #chat, #escenario.sin-chat #manija { display: none; }
+  #pestana { position: fixed; left: 0; top: 50%; transform: translateY(-50%); z-index: 60; display: none; writing-mode: vertical-rl; transform-origin: center; padding: 14px 8px; background: var(--ink); color: #f4efe2; border: 0; font: 700 16px var(--sans); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; opacity: .55; transition: opacity .15s; }
+  #escenario.sin-chat ~ #pestana { display: block; }
+  #pestana:hover, #pestana.espera { opacity: 1; }
+  #pestana.espera { background: var(--azul); color: var(--sobre-azul); animation: parpadeo 1.2s steps(2) infinite; }
+  #pestana kbd { font: inherit; opacity: .6; margin-top: 8px; }   /* mientras hay una propuesta sin responder, la tarjeta de decisión toma la escena */
   @container (max-width: 560px) { #chat-cab { font-size: calc(24px * var(--esc)); padding: calc(18px * var(--esc)) calc(20px * var(--esc)); gap: 6px 12px; flex-wrap: wrap; letter-spacing: 0; } #chat-cab .canal { min-width: 0; white-space: nowrap; } .r { display: grid; grid-template-columns: calc(40px * var(--esc)) minmax(0, 1fr); column-gap: 12px; row-gap: 0; } .r .av { grid-row: 1 / 3; } .r b { font-size: calc(17px * var(--esc)); } #riel .r:nth-last-child(n+4) { display: none; } #chat-estado { white-space: nowrap; font-size: calc(16px * var(--esc)); } #msgs, #trabajando { padding-left: calc(20px * var(--esc)); padding-right: calc(20px * var(--esc)); } #redactar { padding-left: calc(20px * var(--esc)); padding-right: calc(20px * var(--esc)); } #texto { font-size: calc(24px * var(--esc)); text-overflow: ellipsis; } }
   #chat-cab { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: calc(22px * var(--esc)) calc(28px * var(--esc)); border-bottom: 4px solid var(--panel-borde); font-weight: 700; font-size: calc(24px * var(--esc)); letter-spacing: 0; }
   #chat-cab .canal { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #chat-cab .canal b { color: var(--acento); }
-  #chat-estado { flex: none; white-space: nowrap; display: flex; align-items: center; gap: 10px; font-size: calc(16px * var(--esc)); letter-spacing: .1em; text-transform: uppercase; color: var(--texto-tenue); }
+  #chat-estado { flex: none; white-space: nowrap; display: flex; align-items: center; gap: 10px; font-size: calc(16px * var(--esc)); letter-spacing: .06em; text-transform: uppercase; color: var(--texto-tenue); }
   #chat-estado::before { content: ''; width: 12px; height: 12px; background: var(--texto-apagado); }
   #chat-estado.vivo { color: var(--ok); } #chat-estado.vivo::before { background: var(--ok); animation: parpadeo 1.2s steps(2) infinite; }
-  #msgs { position: relative; flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: calc(26px * var(--esc)) calc(28px * var(--esc)); }
-  #msgs .vacio { color: var(--texto-suave); font: 600 calc(24px * var(--esc))/1.4 var(--sans); text-align: center; margin: auto 0; }
-  /* Riel: los mensajes ya leídos, de a una línea. Foco: el último, completo. */
-  #riel { flex: none; display: flex; flex-direction: column; gap: calc(10px * var(--esc)); }
-  #riel:not(:empty) { padding-bottom: calc(20px * var(--esc)); margin-bottom: calc(22px * var(--esc)); border-bottom: 3px solid var(--panel-borde); }
-  .r { display: flex; align-items: center; gap: 14px; min-width: 0; color: var(--c); }
-  .r .av { flex: none; width: calc(40px * var(--esc)); height: calc(40px * var(--esc)); background: var(--c); overflow: hidden; }
-  .r .av img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
-  .r b { flex: none; font-size: calc(19px * var(--esc)); letter-spacing: .08em; text-transform: uppercase; }
-  .r span { min-width: 0; flex: 1; font: 600 calc(22px * var(--esc))/1.2 var(--sans); color: var(--texto-suave); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #foco { flex: 1; min-height: 0; overflow-y: auto; position: relative; scrollbar-width: none; }
-  #foco::-webkit-scrollbar { display: none; }
-  #msgs.fijado #riel { display: none; }   /* con la propuesta fijada, todo el panel es para leerla */
-  .f { --t: 34px; display: grid; grid-template-columns: calc(56px * var(--esc)) minmax(0, 1fr); column-gap: calc(18px * var(--esc)); row-gap: 6px; animation: entra .4s steps(6) both; }
-  .f .av { grid-row: 1 / 3; width: calc(56px * var(--esc)); height: calc(56px * var(--esc)); background: var(--c); overflow: hidden; }
+  /* La franja del objetivo: una línea con lo que pidió la persona, su estado, y una sola línea viva con lo que pasa ahora */
+  #objetivo { flex: none; padding: calc(12px * var(--esc)) calc(28px * var(--esc)); border-bottom: 4px solid var(--panel-borde); display: flex; flex-direction: column; gap: calc(6px * var(--esc)); }
+  #objetivo .cab { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  #objetivo .rot { flex: none; font: 700 calc(15px * var(--esc)) var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--texto-tenue); }
+  #objetivo .txt { flex: 1; min-width: 0; font: 700 calc(21px * var(--esc))/1.25 var(--sans); color: var(--texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #objetivo.vacio .txt { white-space: normal; font-weight: 600; color: var(--texto-suave); }
+  #objetivo .badge { flex: none; display: inline-flex; align-items: center; gap: 8px; font: 700 calc(15px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 4px 10px; background: var(--panel-borde); color: var(--texto); white-space: nowrap; }
+  #objetivo .badge.espera { background: var(--azul); color: var(--sobre-azul); } #objetivo .badge.ok { background: var(--ok); color: var(--ink); }
+  #objetivo .badge.curso::before, #objetivo .badge.espera::before { content: ''; width: 10px; height: 10px; background: currentColor; animation: parpadeo 1.2s steps(2) infinite; }
+  #objetivo .viva { display: flex; align-items: center; gap: 10px; min-width: 0; font: 600 calc(19px * var(--esc))/1.3 var(--sans); color: var(--texto-suave); }
+  #objetivo .viva::before { content: ''; flex: none; width: 12px; height: 12px; background: var(--panel-borde); }
+  #objetivo .viva .lin { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #objetivo .viva.on { color: var(--texto); } #objetivo .viva.on::before { background: var(--acento); animation: parpadeo .9s steps(2) infinite; }
+  #objetivo .viva.on .lin { animation: brillo 1.6s ease-in-out infinite; }
+  @keyframes brillo { 50% { opacity: .55; } }
+  #objetivo .viva.espera { color: var(--sobre-azul); background: var(--azul); padding: 6px 12px; font-weight: 700; } #objetivo .viva.espera::before { background: var(--sobre-azul); animation: parpadeo 1.2s steps(2) infinite; }
+  #objetivo .viva.ok { color: var(--texto); } #objetivo .viva.ok::before { background: var(--ok); clip-path: polygon(0 55%, 15% 40%, 40% 65%, 85% 10%, 100% 25%, 40% 95%); width: 14px; height: 14px; }
+  #objetivo .accion { flex: none; font: 700 calc(15px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 7px 11px; background: var(--acento); color: var(--ink); border: 0; cursor: pointer; }
+  #objetivo .accion:disabled { opacity: .45; cursor: default; }
+  /* El cierre, al final del stream: objetivo cumplido y el plan de acción que dejó la decisión (lo marca la persona) */
+  .fin { border: 3px solid var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); padding: calc(12px * var(--esc)) calc(16px * var(--esc)); display: flex; flex-direction: column; gap: calc(8px * var(--esc)); }
+  .fin .cab { display: flex; align-items: center; gap: 10px; font: 700 calc(20px * var(--esc)) var(--sans); color: var(--texto); }
+  .fin .cab::before { content: ''; flex: none; width: 16px; height: 16px; background: var(--ok); clip-path: polygon(0 55%, 15% 40%, 40% 65%, 85% 10%, 100% 25%, 40% 95%); }
+  .fin .cab small { font-weight: 600; color: var(--texto-suave); font-size: calc(17px * var(--esc)); margin-left: auto; }
+  .fin .plan { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: calc(4px * var(--esc)); }
+  .fin .plan .fila { display: flex; align-items: center; gap: 10px; font: 600 calc(19px * var(--esc))/1.3 var(--sans); color: var(--texto); }
+  .fin .plan .fila .ok { flex: none; width: calc(24px * var(--esc)); height: calc(24px * var(--esc)); border: 2px solid var(--texto-suave); background: transparent; color: var(--ink); font: 700 calc(16px * var(--esc)) var(--sans); cursor: pointer; display: grid; place-items: center; }
+  .fin .plan .fila.hecha .ok { background: var(--ok); border-color: var(--ok); }
+  .fin .plan .fila .que { flex: none; } .fin .plan .fila .quien { flex: 1; min-width: 0; color: var(--texto-suave); }
+  .fin .plan .fila .est { margin-left: auto; font: 700 calc(13px * var(--esc)) var(--sans); letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; background: var(--panel-borde); color: var(--texto-suave); }
+  .fin .plan .fila.hecha { color: var(--texto-suave); } .fin .plan .fila.hecha .que { text-decoration: line-through; } .fin .plan .fila.hecha .est { background: var(--ok); color: var(--ink); }
+  .fin .plan .fila.descartada { opacity: .5; } .fin .plan .fila.descartada .que { text-decoration: line-through; }
+  .fin .nota { font: 600 calc(16px * var(--esc))/1.3 var(--sans); color: var(--texto-suave); }
+  #trabajando:empty { display: none; }
+  #msgs { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  #msgs .vacio { color: var(--texto-suave); font: 600 calc(24px * var(--esc))/1.4 var(--sans); text-align: center; margin: auto calc(28px * var(--esc)); }
+  /* El stream: todos los mensajes, en orden, con desplazamiento; el último se ve más grande */
+  #flujo { flex: 1; min-height: 0; overflow-y: auto; padding: calc(18px * var(--esc)) calc(28px * var(--esc)) calc(14px * var(--esc)); display: flex; flex-direction: column; gap: calc(16px * var(--esc)); scrollbar-width: thin; }
+  #nuevo { position: absolute; right: calc(28px * var(--esc)); bottom: calc(14px * var(--esc)); display: none; padding: 8px 12px; background: var(--acento); color: var(--ink); border: 0; font: 700 calc(16px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; cursor: pointer; }
+  #nuevo.visible { display: block; }
+  .f { --t: calc(25px * var(--esc)); scroll-margin-top: calc(14px * var(--esc)); display: grid; grid-template-columns: calc(44px * var(--esc)) minmax(0, 1fr); column-gap: calc(14px * var(--esc)); row-gap: 4px; }
+  .f.nuevo { animation: entra .4s steps(6) both; }
+  .f .av { grid-row: 1 / 3; width: calc(44px * var(--esc)); height: calc(44px * var(--esc)); background: var(--c); overflow: hidden; align-self: start; }
   .f .av img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
-  .f .nom { font-weight: 700; font-size: calc(21px * var(--esc)); letter-spacing: .08em; text-transform: uppercase; color: var(--c); align-self: end; }
-  .f .nom small { font-size: calc(16px * var(--esc)); color: var(--hora); margin-left: 12px; letter-spacing: .04em; }
+  .f .nom { font-weight: 700; font-size: calc(18px * var(--esc)); letter-spacing: .05em; text-transform: uppercase; color: var(--c); align-self: end; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .f .nom small { font-size: calc(15px * var(--esc)); color: var(--hora); letter-spacing: .04em; }
+  .f .nom .chip { font-size: calc(13px * var(--esc)); letter-spacing: .05em; padding: 2px 8px; background: var(--acento); color: var(--ink); }
   .f .cuerpo { font: 600 var(--t)/1.36 var(--sans); color: var(--texto); overflow-wrap: anywhere; }
-  .f .cuerpo p { margin: 0 0 .5em; }
-  .f .cuerpo .it { margin: .9em 0 .1em; font-weight: 700; }
+  .f .cuerpo p { margin: 0 0 .4em; } .f .cuerpo > :last-child { margin-bottom: 0; }
+  .f .cuerpo .it { margin: .7em 0 .1em; font-weight: 700; }
   .f .cuerpo .it i { font-style: normal; color: var(--c); margin-right: .45em; }
   .f .cuerpo .de { margin: 0 0 .1em; padding-left: 1.35em; color: var(--texto-suave); font-weight: 600; }
   .f .a { color: var(--mencion); }
-  #foco.recortado:not(.al-final) { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent); }
-  #msgs.recortado.al-final::after { display: none; }
-  #msgs.recortado::after { content: 'sigue abajo ↓'; position: absolute; right: calc(28px * var(--esc)); bottom: calc(26px * var(--esc)); padding: 4px 10px; background: var(--panel); color: var(--acento); font: 700 calc(17px * var(--esc))/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
-  .f.persona .cuerpo { padding: 12px 14px; margin: 6px -14px 0; background: color-mix(in srgb, var(--c) 12%, transparent); }
+  .f .nom .para { font-size: calc(15px * var(--esc)); color: var(--texto-suave); letter-spacing: .04em; text-transform: none; font-weight: 600; }
+  .f .nom .para b { color: var(--mencion); font-weight: 700; }
+  /* Fichas: una fila por estudiante, con el nombre en rótulo y el riesgo como badge; rótulos: "Traducción", "Pendiente" */
+  .f .cuerpo .fi, .f .cuerpo .ro { margin: 0 0 .55em; }
+  .f .cuerpo .fi .enc { display: flex; align-items: center; gap: .5em; flex-wrap: wrap; margin-bottom: .12em; }
+  .f .cuerpo .fi .enc b { font: 700 calc(var(--t) * .72) var(--sans); letter-spacing: .04em; text-transform: uppercase; color: var(--c); }
+  .f .cuerpo .ro .enc { display: inline-block; font: 700 calc(var(--t) * .5) var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--texto); background: var(--panel-borde); padding: 3px 9px; margin: 0 .5em .2em 0; vertical-align: middle; }
+  .riesgo { display: inline-block; font: 700 calc(var(--t) * .5) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 3px 8px; color: var(--ink); vertical-align: middle; }
+  .riesgo.alto { background: var(--rechazo); } .riesgo.medio { background: var(--medio); } .riesgo.bajo { background: var(--ok); }
+  /* Tarjeta de decisión: la propuesta como tarjeta de aprobación, caso por caso */
+  .tarjeta { border: 3px solid var(--azul); background: color-mix(in srgb, var(--azul) 9%, transparent); padding: calc(12px * var(--esc)) calc(16px * var(--esc)); display: flex; flex-direction: column; gap: calc(10px * var(--esc)); font-size: calc(var(--t) * .88); line-height: 1.3; margin-top: .2em; }
+  .tarjeta .cab { display: flex; align-items: center; gap: 12px; }
+  .tarjeta .cab .ico { flex: none; width: calc(28px * var(--esc)); height: calc(28px * var(--esc)); background: var(--azul); color: var(--sobre-azul); display: grid; place-items: center; font: 700 calc(18px * var(--esc)) var(--sans); }
+  .tarjeta .cab h3 { flex: 1; min-width: 0; margin: 0; font: 700 calc(var(--t) * .7) var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--texto); }
+  .tarjeta .estado { flex: none; font: 700 calc(16px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 5px 10px; background: var(--azul); color: var(--sobre-azul); }
+  .tarjeta .estado.ok { background: var(--ok); color: var(--ink); } .tarjeta .estado.gris { background: var(--panel-borde); color: var(--texto); }
+  .tarjeta .desc { color: var(--texto-suave); font-weight: 600; }
+  .caso { border-top: 2px solid var(--panel-borde); padding-top: calc(9px * var(--esc)); display: flex; flex-direction: column; gap: calc(6px * var(--esc)); }
+  .caso .enc { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .caso .enc .acciones { margin-left: auto; }
+  .caso .enc .n { font: 700 calc(var(--t) * .7) var(--sans); color: var(--azul); }
+  .caso .enc .nombre { font-weight: 700; color: var(--texto); }
+  .caso .txt { font-weight: 600; color: var(--texto); }
+  .caso .evid { font-weight: 600; color: var(--texto-suave); font-size: calc(var(--t) * .78); }
+  .caso .evid .enc, .caso .props { display: inline-block; font: 700 calc(var(--t) * .5) var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--texto); background: var(--panel-borde); padding: 3px 9px; margin: 0 .5em .2em 0; vertical-align: middle; }
+  .caso .props { display: block; width: max-content; margin-top: calc(4px * var(--esc)); }
+  .acc { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: calc(6px * var(--esc)) 0; border-top: 1px solid var(--panel-borde); }
+  .acc .que { flex: 1 1 220px; min-width: 0; font-weight: 700; color: var(--texto); }
+  .acc .que .quien { font-weight: 600; color: var(--texto-suave); margin-left: .4em; }
+  .acc .acciones { margin-left: auto; }
+  .acc .acciones button.on.si { background: var(--ok); border-color: var(--ok); color: var(--ink); }
+  .acc .acciones button.on.yo { background: var(--acento); border-color: var(--acento); color: var(--ink); }
+  .acc .acciones button.on.no { background: var(--rechazo); border-color: var(--rechazo); color: var(--ink); }
+  .caso.con-acciones .nota { display: block; }
+  .caso .acciones { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .caso .acciones button { font: 700 calc(16px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 6px 10px; border: 2px solid var(--panel-borde); background: transparent; color: var(--texto); cursor: pointer; }
+  .caso .acciones button:hover:not(:disabled) { border-color: var(--texto-suave); }
+  .caso .acciones button:disabled { opacity: .45; cursor: default; }
+  .caso .acciones button.on.aprobado { background: var(--ok); border-color: var(--ok); color: var(--ink); }
+  .caso .acciones button.on.editado { background: var(--azul); border-color: var(--azul); color: var(--sobre-azul); }
+  .caso .acciones button.on.rechazado { background: var(--rechazo); border-color: var(--rechazo); color: var(--ink); }
+  .caso .nota { display: none; width: 100%; font: 600 calc(var(--t) * .72)/1.3 var(--sans); background: var(--campo); color: var(--texto); border: 2px solid var(--panel-borde); padding: 8px 10px; outline: none; border-radius: 0; }
+  .caso .nota:focus { border-color: var(--azul); }
+  .caso.editado .nota, .caso.rechazado .nota { display: block; }
+  .tarjeta .pie { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; border-top: 2px solid var(--panel-borde); padding-top: calc(12px * var(--esc)); }
+  .tarjeta .pie .pendiente { flex: 1 1 100%; color: var(--texto-suave); font-weight: 600; font-size: calc(var(--t) * .7); }
+  .tarjeta .pie .pendiente .enc { display: inline-block; font: 700 calc(var(--t) * .46) var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--texto); background: var(--panel-borde); padding: 3px 9px; margin-right: .5em; vertical-align: middle; }
+  .tarjeta .pie button { font: 700 calc(17px * var(--esc)) var(--sans); letter-spacing: .06em; text-transform: uppercase; padding: 10px 16px; cursor: pointer; border: 2px solid transparent; }
+  .tarjeta .pie .enviar { background: var(--azul); border-color: var(--azul); color: var(--sobre-azul); }
+  .tarjeta .pie .enviar:disabled { opacity: .45; cursor: default; }
+  .tarjeta .pie .mano { background: transparent; border-color: var(--panel-borde); color: var(--texto-suave); }
+  .tarjeta .pie .mano:hover { color: var(--texto); border-color: var(--texto-suave); }
+  .tarjeta .pie .resultado { flex: 1; color: var(--texto-suave); font-weight: 600; }
+  .tarjeta .pie .pregunta { flex: 1 1 100%; color: var(--texto); font-weight: 700; }
+  .f.persona .cuerpo { padding: 10px 14px; background: color-mix(in srgb, var(--c) 12%, transparent); }
   /* La decisión de la persona: el mensaje que cierra la propuesta, en azul */
-  .f.decision .cuerpo { background: var(--azul); color: var(--sobre-azul); font-weight: 700; animation: sube .5s steps(5) both; }
+  .f.decision .cuerpo { background: var(--azul); color: var(--sobre-azul); font-weight: 700; } .f.decision.nuevo .cuerpo { animation: sube .5s steps(5) both; }
   @keyframes entra { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
   @keyframes sube { from { transform: translateY(16px); } to { transform: none; } }
-  #trabajando { flex: none; min-height: calc(74px * var(--esc)); padding: calc(18px * var(--esc)) calc(28px * var(--esc)); border-top: 4px solid var(--panel-borde); font-size: calc(21px * var(--esc)); letter-spacing: .06em; text-transform: uppercase; color: var(--texto-tenue); display: flex; align-items: center; gap: 12px; }
+  #trabajando { flex: none; min-height: calc(60px * var(--esc)); padding: calc(18px * var(--esc)) calc(28px * var(--esc)); border-top: 4px solid var(--panel-borde); font-size: calc(21px * var(--esc)); letter-spacing: .06em; text-transform: uppercase; color: var(--texto-tenue); display: flex; align-items: center; gap: 12px; }
   #trabajando.on { color: var(--texto); } #trabajando.on::before { content: ''; flex: none; width: 12px; height: 12px; background: var(--acento); animation: parpadeo .9s steps(2) infinite; }
 
   /* La caja para escribir. Mientras hay una propuesta sin responder, pide la decisión. */
-  #redactar { flex: none; display: flex; flex-direction: column; gap: 8px; padding: calc(14px * var(--esc)) calc(28px * var(--esc)) calc(22px * var(--esc)); }
-  #decidir { display: none; align-items: center; gap: 12px; color: var(--texto); font: 700 calc(22px * var(--esc))/1 var(--sans); }
-  #decidir::before { content: ''; width: 14px; height: 14px; background: var(--azul); animation: respiro 2.2s cubic-bezier(.25, 1, .5, 1) infinite; }
-  #redactar.esperando #decidir { display: flex; }
-  #redactar.esperando #texto { border-color: var(--azul); }
+  #redactar { flex: none; display: flex; flex-direction: column; gap: 8px; padding: calc(14px * var(--esc)) calc(28px * var(--esc)) calc(22px * var(--esc)); position: relative; z-index: 35; }   /* por encima del chat: el menú de atajos se abre hacia arriba */
+  #compositor { position: relative; display: flex; flex-direction: column; background: var(--campo); border: 3px solid var(--panel-borde); transition: border-color .15s; }
+  #compositor:focus-within { border-color: var(--acento); }
+  #redactar.esperando #compositor { border-color: var(--azul); }
+  #redactar.deshabilitado #texto, #redactar.deshabilitado #herr { opacity: .6; }   /* el menú de atajos no: se atenúa el compositor, no lo que se abre encima */
+  #herr { display: flex; align-items: center; gap: 8px; padding: 4px 10px 10px 10px; }
+  #herr > * { flex: none; }
+  #herr .hueco { flex: 1; }
+  #herr button, #herr select { font: 700 calc(16px * var(--esc)) var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--texto); background: transparent; border: 2px solid var(--panel-borde); cursor: pointer; }
+  #btn-mas { width: calc(38px * var(--esc)); height: calc(38px * var(--esc)); font-size: calc(22px * var(--esc)) !important; line-height: 1; display: grid; place-items: center; }
+  #btn-mas.abierto, #herr button:hover:not(:disabled) { border-color: var(--texto-suave); }
+  #para { height: calc(38px * var(--esc)); padding: 0 10px; max-width: 46%; text-overflow: ellipsis; }
+  #para option { background: var(--panel); color: var(--texto); }
+  #btn-enviar { width: calc(42px * var(--esc)); height: calc(38px * var(--esc)); background: var(--acento) !important; border-color: var(--acento) !important; color: var(--ink) !important; font-size: calc(22px * var(--esc)) !important; display: grid; place-items: center; }
+  #redactar.esperando #btn-enviar { background: var(--azul) !important; border-color: var(--azul) !important; color: var(--sobre-azul) !important; }
+  #herr button:disabled, #herr select:disabled { opacity: .45; cursor: default; }
+  #atajos { position: absolute; left: -3px; right: -3px; bottom: calc(100% + 8px); background: var(--panel); border: 3px solid var(--panel-borde); padding: 6px; display: none; flex-direction: column; gap: 2px; z-index: 40; max-height: 60vh; overflow-y: auto; }
+  #atajos.abierto { display: flex; }
+  #atajos .tit { font: 700 calc(14px * var(--esc)) var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--texto-apagado); padding: 6px 10px 4px; }
+  #atajos button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; width: 100%; padding: 10px 12px; border: 0; background: transparent; color: var(--texto); cursor: pointer; font: 700 calc(19px * var(--esc))/1.25 var(--sans); }
+  #atajos button small { font-weight: 600; font-size: calc(15px * var(--esc)); color: var(--texto-suave); }
+  #atajos button:hover, #atajos button:focus-visible { background: var(--boton); outline: none; }
+  #decidir { display: none; align-items: center; gap: 14px; color: var(--sobre-azul); background: var(--azul); padding: calc(10px * var(--esc)) calc(16px * var(--esc)); font: 700 calc(24px * var(--esc))/1.2 var(--sans); }
+  #decidir::before { content: ''; flex: none; width: 14px; height: 14px; background: var(--sobre-azul); animation: respiro 2.2s cubic-bezier(.25, 1, .5, 1) infinite; }
+  #decidir small { font-weight: 600; opacity: .85; font-size: calc(19px * var(--esc)); }
+  #redactar.esperando:not(.con-tarjeta) #decidir { display: flex; }   /* con la tarjeta de decisión en el chat, el aviso de abajo sobra */
+  #redactar.esperando.con-tarjeta #decidir { display: none; }
   @keyframes respiro { 50% { opacity: .25; } }
-  #texto { display: block; width: 100%; height: calc(64px * var(--esc)); max-height: calc(230px * var(--esc)); resize: none; overflow-y: auto; font: 600 calc(26px * var(--esc))/1.3 var(--sans); color: var(--texto); background: var(--campo); border: 3px solid var(--panel-borde); padding: 12px 16px; outline: none; border-radius: 0; }
+  #texto { display: block; width: 100%; height: calc(64px * var(--esc)); max-height: calc(230px * var(--esc)); resize: none; overflow-y: auto; font: 600 calc(26px * var(--esc))/1.3 var(--sans); color: var(--texto); background: transparent; border: 0; padding: 12px 16px 6px; outline: none; border-radius: 0; }
   #manija { position: absolute; top: 0; right: -10px; width: 20px; height: 100%; cursor: col-resize; z-index: 30; touch-action: none; }
   #manija::after { content: ''; position: absolute; left: 8px; top: 50%; width: 4px; height: 90px; margin-top: -45px; background: var(--manija); opacity: .0; transition: opacity .15s; }
   #manija:hover::after, #manija.arrastrando::after { opacity: 1; background: var(--acento); }
-  #texto:focus { border-color: var(--acento); }
-  #texto:disabled { opacity: .5; }
+  #texto:disabled { opacity: .6; }
   #texto::placeholder { color: var(--texto-suave); }
 
   /* Pantallas angostas: el chat pasa abajo, la escuela arriba. */
@@ -116,6 +226,11 @@
   .tag { position: absolute; left: 0; top: calc(10px * var(--u)); transform: translateX(-50%); background: var(--etiqueta-fondo); color: var(--etiqueta-texto); padding: calc(3px * var(--u)) calc(8px * var(--u)); font-size: calc(15px * var(--u)); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
   .pj.persona .tag { background: var(--acento); color: var(--ink); }   /* la persona que decide, en naranja como en el chat */
   .tag.martina { background: var(--acento); color: var(--ink); }
+  /* La decisión es el pico de la escena: cartel azul sobre el despacho de Dirección, el resto de los rótulos baja de intensidad */
+  #cartel-decision { position: absolute; transform: translateX(-50%); display: none; align-items: center; gap: 12px; background: var(--azul); color: var(--sobre-azul); padding: calc(10px * var(--esc)) calc(18px * var(--esc)); font: 700 calc(19px * var(--esc)) var(--mono); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; z-index: 5000; }
+  #cartel-decision::before { content: ''; width: 12px; height: 12px; background: var(--sobre-azul); animation: respiro 2.2s cubic-bezier(.25, 1, .5, 1) infinite; }
+  #capa.decision #cartel-decision { display: flex; }
+  #capa.decision .pj:not(.persona) .tag { opacity: .5; }
   /* Globos: sans legible, hasta 4 líneas; el texto completo está en el chat */
   .bub { position: absolute; left: 0; bottom: calc(112px * var(--u)); transform: translateX(-50%); width: max-content; max-width: calc(380px * var(--esc)); background: var(--globo-borde); padding: 4px; opacity: 0; transition: opacity 180ms steps(3); }
   .bub span { display: block; background: var(--globo-fondo); color: var(--globo-texto); padding: 12px 16px; font: 700 calc(25px * var(--esc))/1.3 var(--sans); clip-path: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px), 0 4px, 4px 4px); }
@@ -126,7 +241,8 @@
 
   /* Conmutador de vistas (arriba a la derecha) y controles (aparecen al mover el mouse) */
   /* Fijo a la ventana y por encima del organigrama: ocupa exactamente el mismo lugar en las dos vistas (mismo CSS en organigrama.html) */
-  #vistas { position: fixed; right: 14px; top: 10px; z-index: 60; display: flex; background: var(--ink); padding: 4px; gap: 4px; }
+  #vistas { position: fixed; right: 14px; top: 10px; z-index: 60; display: flex; background: var(--ink); padding: 4px; gap: 4px; opacity: 0; transition: opacity 200ms; pointer-events: none; }
+  #vistas.visible, #org.abierto ~ #vistas, #tab.abierto ~ #vistas { opacity: 1; pointer-events: auto; }
   #vistas button { font: 700 18px var(--mono); letter-spacing: .08em; text-transform: uppercase; background: transparent; color: #f4efe2; border: 0; padding: 8px 14px; cursor: pointer; }
   #vistas button.on { background: var(--acento); color: var(--ink); }
   #vistas button:hover:not(.on) { background: #2c2f48; }
@@ -140,21 +256,36 @@
   #barra button.on { background: var(--ok); color: var(--ink); }
   #barra button:disabled { opacity: .4; cursor: default; }
   @keyframes parpadeo { 50% { opacity: .2; } }
-  @media (prefers-reduced-motion: reduce) { .bub { transition: none; } .f { animation: none; } .f.decision .cuerpo { animation: none; } #decidir::before { animation: none; } #chat-estado.vivo::before, #trabajando.on::before { animation: none; } }
-  #org { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; z-index: 50; display: none; background: var(--fondo-pagina); }
-  #org.abierto { display: block; }
+  @media (prefers-reduced-motion: reduce) { .bub { transition: none; } .f.nuevo { animation: none; } .f.decision.nuevo .cuerpo { animation: none; } #decidir::before, #cartel-decision::before, #objetivo .badge::before, #objetivo .viva::before, #objetivo .viva .lin { animation: none; } #chat-estado.vivo::before, #trabajando.on::before { animation: none; } }
+  #org, #tab { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; z-index: 50; display: none; background: var(--fondo-pagina); }
+  #org.abierto, #tab.abierto { display: block; }
+  #vistas button.espera { background: var(--azul); color: var(--sobre-azul); animation: parpadeo 1.2s steps(2) infinite; }
 </style>
 </head>
 <body>
 <iframe id="org" title="Organigrama"></iframe>
-<div id="vistas" class="px"><button id="v-escuela" class="on">Escuela</button><button id="v-org">Organigrama <kbd>o</kbd></button></div>
+<iframe id="tab" title="Tablero"></iframe>
+<div id="vistas" class="px"><button id="v-escuela" class="on">Escuela</button><button id="v-org">Organigrama <kbd>o</kbd></button><button id="v-tab">Tablero <kbd>b</kbd></button></div>
 <div id="escenario">
   <aside id="chat">
     <div id="chat-cab"><span class="canal"><b>#</b>coordinacion</span><span id="chat-estado">Grabación</span></div>
+    <section id="objetivo" class="vacio" aria-live="polite"></section>
     <div id="msgs"><div class="vacio">Todavía no habló nadie. La escuela está en silencio.</div></div>
     <div id="trabajando"></div>
     <div id="manija" title="Arrastrá para mover el chat ( [ y ] )"></div>
-    <form id="redactar" autocomplete="off"><div id="decidir">Esperando tu decisión</div><textarea id="texto" rows="1" disabled placeholder="@Coordinación …" spellcheck="false"></textarea></form>
+    <form id="redactar" autocomplete="off">
+      <div id="decidir">Esperando tu decisión <small>· aprobá, editá o rechazá cada caso</small></div>
+      <div id="compositor">
+        <textarea id="texto" rows="1" disabled aria-label="Escribir en #coordinacion" spellcheck="false"></textarea>
+        <div id="herr">
+          <button type="button" id="btn-mas" title="Atajos del guion" aria-label="Atajos del guion" aria-expanded="false">+</button>
+          <select id="para" title="A quién le hablás (sin @mención, a Coordinación)"></select>
+          <span class="hueco"></span>
+          <button type="submit" id="btn-enviar" title="Enviar (Enter)" aria-label="Enviar">↑</button>
+        </div>
+        <div id="atajos" role="menu"></div>
+      </div>
+    </form>
   </aside>
   <div id="mundo">
     <div id="mapa">
@@ -174,15 +305,19 @@
       <button id="btn-guardar" title="Descargar la corrida actual como JSON">Guardar corrida</button>
       <span class="sep"></span>
       <button id="btn-tema" title="Tema claro / oscuro (t)">Claro</button>
+      <button id="btn-chat" title="Mostrar u ocultar el chat (c)">Chat</button>
     </div>
   </div>
 </div>
+<button id="pestana" class="px" title="Mostrar el chat (c)">Chat <kbd>c</kbd></button>
 
 <script type="module">
-import { crearOficina, W, H, CARTELES, MARTINA } from './oficina.js';
+import { crearOficina, W, H, CARTELES, MARTINA, DECISION } from './oficina.js';
 import { MODELOS, cara, aplicarColores } from './personajes.js';
-import { crearHilo, trozos, bloques, primeraLinea } from './chat.js';
+import { crearHilo, trozos, bloques, primeraLinea, destinatario, esPropuesta, propuesta, redactarDecision, cuerpoDeCaso } from './chat.js';
 import { completarHerramienta } from './herramientas.js';
+import { crearSeguimiento, actividadDe } from './seguimiento.js';
+import { crearTablero } from './tablero.js';
 
 const $ = (id) => document.getElementById(id);
 const mundo = $('mundo'), mapa = $('mapa');
@@ -203,7 +338,7 @@ function aplicarTema(t) {
   if (ofi) ofi.tema(tema);
   try { localStorage.setItem('tema', tema); } catch {}
   $('btn-tema').textContent = tema === 'oscuro' ? 'Claro' : 'Oscuro';
-  const f = $('org'); if (f.getAttribute('src') && f.contentWindow) f.contentWindow.postMessage({ tipo: 'tema', tema }, '*');
+  for (const id of ['org', 'tab']) { const f = $(id); if (f.getAttribute('src') && f.contentWindow) f.contentWindow.postMessage({ tipo: 'tema', tema }, '*'); }
 }
 aplicarTema(tema);
 
@@ -213,66 +348,192 @@ function urlDeCara(id) { const k = id || 'persona'; if (!caraUrl[k]) caraUrl[k] 
 const sinTildes = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
 const agenteDe = (nombre) => { const n = sinTildes(nombre); const a = CONFIG.agentes.find((x) => sinTildes(x.nombre) === n || x.id === n); return a ? a.id : null; };
 const hilo = crearHilo();
+const el_ = (tag, clase, texto) => { const e = document.createElement(tag); if (clase) e.className = clase; if (texto != null) e.textContent = texto; return e; };
 const VACIO = '<div class="vacio">Todavía no habló nadie. La escuela está en silencio.</div>';
-const RIEL = 4;   // mensajes ya leídos que quedan arriba, de a una línea
-function chatLimpiar() { hilo.limpiar(); $('msgs').innerHTML = VACIO; }
+function chatLimpiar() { hilo.limpiar(); vistos.clear(); enfocadas.clear(); $('msgs').innerHTML = VACIO; }
 function cara_(id) { const av = document.createElement('div'); av.className = 'av px'; const im = document.createElement('img'); im.src = urlDeCara(id); im.alt = ''; av.appendChild(im); return av; }
 function conMenciones(el, linea) { for (const t of trozos(linea)) { if (t.mencion) { const a = document.createElement('span'); a.className = 'a'; a.textContent = t.texto; el.appendChild(a); } else el.appendChild(document.createTextNode(t.texto)); } return el; }
 const colorDe = (id) => `var(--ag-${id || 'persona'})`;   // el color sale de las variables del tema, así cambia sin redibujar
 let fijado = null;   // la propuesta queda en foco mientras se espera la decisión, aunque sigan llegando mensajes
+
+// ── El objetivo: qué pidió la persona y en qué paso está (arriba del transcript, fijo) ───────────────────
+const seg = crearSeguimiento({ agenteDe, esPropuesta, accionesDe: (t) => propuesta(t).casos.flatMap((c) => c.acciones || []), nombrePersona: () => (CONFIG && CONFIG.personas && CONFIG.personas.nombre) || 'Dirección' });
+const nombreDe = (id) => (CONFIG.agentes.find((a) => a.id === id) || {}).nombre || id;
+function dibujarObjetivo() {
+  const el = $('objetivo'); const p = seg.actual; el.replaceChildren();
+  const cab = el_('div', 'cab');
+  if (!p) {
+    el.className = 'vacio';
+    cab.appendChild(el_('span', 'rot', 'Objetivo'));
+    cab.appendChild(el_('div', 'txt', 'Dale un objetivo a Coordinación: reparte el trabajo y vuelve con una propuesta.'));
+    const b = el_('button', 'accion px', 'Usar el del guion'); b.type = 'button'; b.disabled = !enviarMensaje || !ATAJOS.length;
+    b.onclick = () => { if (!ATAJOS.length) return; cajaTexto.value = ATAJOS[0].texto; ajustarCaja(); $('para').value = ''; cajaTexto.focus(); };
+    cab.appendChild(b); el.appendChild(cab); return;
+  }
+  el.className = p.estado === 'cerrado' ? 'cumplido' : p.estado === 'propuesta' ? 'esperando' : 'curso';
+  const { badge, items, plan } = actividadDe(p, { nombreDe, ahora: reloj });
+  cab.appendChild(el_('span', 'rot', p.objetivo ? 'Objetivo' : 'Pedido'));
+  const txt = conMenciones(el_('div', 'txt'), p.texto); txt.title = p.texto; cab.appendChild(txt);
+  if (badge) cab.appendChild(el_('span', 'badge px ' + badge.tono, badge.texto));
+  el.appendChild(cab);
+  // Una sola línea viva: qué está pasando ahora mismo
+  const vivos = items.filter((x) => x.estado === 'on'), espera = items.find((x) => x.estado === 'espera');
+  let viva;
+  if (p.estado === 'cerrado') {
+    const acciones = tablero.subtareas.filter((x) => x.estado !== 'descartada' && x.t >= p.t0).length;
+    viva = { clase: 'ok', texto: p.objetivo ? (acciones ? `Cumplido. ${acciones === 1 ? '1 acción' : acciones + ' acciones'} en el Tablero, en manos de personas.` : 'Cumplido. Podés dar otro objetivo o preguntarle a un agente por qué.') : 'Respondido.', tablero: acciones > 0 };
+  } else if (espera) viva = { clase: 'espera', texto: 'Esperando tu decisión: aprobá, reservate o rechazá cada acción.' };
+  else if (vivos.length) viva = { clase: 'on', texto: vivos.slice(0, 2).map((x) => x.texto).join('  ·  ') + (vivos.length > 2 ? `  ·  +${vivos.length - 2}` : '') };
+  else if (p.estado === 'decidido') viva = { clase: 'on', texto: 'Coordinación cierra…' };
+  else { const faltan = Object.entries(p.agentes).filter(([, e]) => e !== 'respondio').map(([id]) => nombreDe(id)); viva = { clase: '', texto: faltan.length ? 'Esperando a ' + faltan.join(', ') : 'En curso' }; }
+  const v = el_('div', 'viva ' + viva.clase); v.appendChild(el_('span', 'lin', viva.texto)); el.appendChild(v);
+  if (viva.tablero) { v.style.cursor = 'pointer'; v.title = 'Abrir el Tablero (b)'; v.onclick = () => vista('tab'); }
+}
+const vistos = new Set();   // mensajes ya dibujados: solo los nuevos entran con animación
+const enfocadas = new Set();   // propuestas a las que ya se desplazó el stream (una vez por propuesta)
 function chatDibujar(animar = true) {
   const cont = $('msgs'); const ms = hilo.mensajes;
-  if (!ms.length) { cont.innerHTML = VACIO; cont.classList.remove('recortado', 'fijado'); return; }
-  const fijo = decisionPendiente && fijado && ms.includes(fijado) ? fijado : null;
-  const ultimo = fijo || ms[ms.length - 1];
-  cont.classList.toggle('fijado', !!fijo);
+  const viejo = $('flujo');
+  const pegado = !viejo || viejo.scrollTop + viejo.clientHeight >= viejo.scrollHeight - 80;
+  const scrollAntes = viejo ? viejo.scrollTop : 0;
+  if (!ms.length) { cont.innerHTML = VACIO; vistos.clear(); return; }
   const idDe = (m) => (m.persona ? null : agenteDe(m.autor));
-  const riel = document.createElement('div'); riel.id = 'riel';
-  for (const m of ms.filter((m) => m !== ultimo).slice(-RIEL)) {
-    const id = idDe(m); const r = document.createElement('div'); r.className = 'r'; r.style.setProperty('--c', colorDe(id));
-    const nom = document.createElement('b'); nom.textContent = m.autor || 'Alguien';
-    const resumen = document.createElement('span'); resumen.textContent = primeraLinea(m.texto);
-    r.append(cara_(id), nom, resumen); riel.appendChild(r);
+  const entradas = ms.map((m) => ({ t: typeof m.t === 'number' ? m.t : 0, tipo: 'm', m }));
+  entradas.sort((a, b) => a.t - b.t);
+  const flujo = el_('div'); flujo.id = 'flujo';
+  let irA = null, hayNuevo = false;
+  const ultimoMsg = ms[ms.length - 1];
+  for (const e of entradas) {
+    const m = e.m, id = idDe(m), clave = m.clave || m.seq;
+    const nuevo = !vistos.has(clave); if (nuevo) { vistos.add(clave); hayNuevo = true; }
+    const f = el_('div', 'f' + (id ? '' : ' persona') + (m.decision ? ' decision' : '') + (m === ultimoMsg ? ' ultimo' : '') + (nuevo && animar ? ' nuevo' : '')); f.style.setProperty('--c', colorDe(id));
+    const nom = el_('div', 'nom'); nom.appendChild(el_('span', null, m.autor || 'Alguien'));
+    const { para, resto } = destinatario(m.texto);
+    if (para.length) { const pa = el_('span', 'para'); pa.append('→ '); para.forEach((n, k) => { const b = el_('b', null, /^direcci[oó]n$|^directora?$/i.test(n) ? CONFIG.personas.nombre : n); pa.append(k ? ', ' : '', b); }); nom.appendChild(pa); }
+    if (id && id !== 'coordinacion' && para.some((n) => { const a = agenteDe(n); return a && a !== 'coordinacion'; })) nom.appendChild(el_('span', 'chip px', 'le avisa sin que se lo pidan'));   // el aviso entre agentes
+    const cuerpo = el_('div', 'cuerpo');
+    const tarjeta = !m.persona && esPropuesta(m.texto) ? tarjetaDecision(m) : null;
+    if (tarjeta) { cuerpo.appendChild(tarjeta); if (decisionPendiente && fijado === m && !enfocadas.has(clave)) { enfocadas.add(clave); irA = f; } }
+    else for (const b of bloques(resto)) cuerpo.appendChild(bloque(b));
+    f.append(cara_(id), nom, cuerpo); flujo.appendChild(f);
   }
-  const id = idDe(ultimo);
-  const f = document.createElement('div'); f.className = 'f' + (id ? '' : ' persona') + (ultimo.decision ? ' decision' : ''); f.style.setProperty('--c', colorDe(id));
-  const nom = document.createElement('div'); nom.className = 'nom'; nom.textContent = ultimo.autor || 'Alguien';
-  if (ultimo.hora) { const h = document.createElement('small'); h.textContent = ultimo.hora; nom.appendChild(h); }
-  const cuerpo = document.createElement('div'); cuerpo.className = 'cuerpo';
-  for (const b of bloques(ultimo.texto)) {
-    const el = document.createElement('div');
-    if (b.tipo === 'item') { el.className = 'it'; const n = document.createElement('i'); n.textContent = b.n + '.'; el.appendChild(n); }
-    else el.className = b.tipo === 'detalle' ? 'de' : 'p';
-    cuerpo.appendChild(conMenciones(el, b.texto));
+  $('redactar').classList.toggle('con-tarjeta', decisionPendiente && !!fijado);
+  const pill = el_('button', 'px', '↓ Nuevo'); pill.id = 'nuevo'; pill.type = 'button'; pill.onclick = () => { flujo.scrollTo({ top: flujo.scrollHeight, behavior: 'smooth' }); pill.classList.remove('visible'); };
+  flujo.addEventListener('scroll', () => { if (flujo.scrollTop + flujo.clientHeight >= flujo.scrollHeight - 80) pill.classList.remove('visible'); }, { passive: true });
+  cont.replaceChildren(flujo, pill);
+  // Los saltos son instantáneos (con desplazamiento suave, dos redibujos seguidos leían una posición a mitad de camino)
+  if (irA) { const alinear = () => irA.scrollIntoView({ block: 'start', behavior: 'instant' }); alinear(); requestAnimationFrame(alinear); setTimeout(alinear, 250); }   // la propuesta se lee desde arriba; se realinea tras el reflow (el chat se ensancha al decidir)
+  else if (pegado || !decisionPendiente) flujo.scrollTo({ top: flujo.scrollHeight, behavior: 'instant' });   // el stream sigue lo último; solo mientras leés una propuesta no te mueve
+  else { flujo.scrollTo({ top: scrollAntes, behavior: 'instant' }); if (hayNuevo) pill.classList.add('visible'); }   // si subiste a leer, no te movemos
+}
+let ultimoDibujoObjetivo = 0, dibujarObjetivoPendiente = false;
+function latirObjetivo() {   // mientras alguien piensa, las palabras giran: se redibuja cada medio segundo
+  if (dibujarObjetivoPendiente) { dibujarObjetivoPendiente = false; dibujarObjetivo(); }
+  const p = seg.actual; if (!p || !Object.keys(p.vivos).length || performance.now() - ultimoDibujoObjetivo < 500) return;
+  ultimoDibujoObjetivo = performance.now(); dibujarObjetivo();
+}
+const badgeRiesgo = (r) => { const b = el_('span', 'riesgo px ' + r, 'riesgo ' + r); return b; };
+// Un bloque del mensaje como elemento: párrafo, ficha por estudiante (nombre + riesgo + texto), rótulo, caso numerado o detalle.
+function bloque(b) {
+  if (b.tipo === 'ficha') {
+    const d = el_('div', 'fi'); const enc = el_('div', 'enc'); enc.appendChild(el_('b', null, b.nombre)); if (b.riesgo) enc.appendChild(badgeRiesgo(b.riesgo));
+    d.append(enc, conMenciones(el_('div'), cuerpoDeCaso(b.texto, null))); return d;
   }
-  f.append(cara_(id), nom, cuerpo);
-  if (!animar) f.style.animation = 'none';   // al reacomodar (ancho, ventana) no se repite la entrada
-  const foco = document.createElement('div'); foco.id = 'foco'; foco.appendChild(f);
-  foco.addEventListener('scroll', () => alFinal(foco), { passive: true });
-  cont.replaceChildren(riel, foco);
-  ajustarFoco();
+  if (b.tipo === 'rotulo') { const d = el_('div', 'ro'); d.appendChild(el_('span', 'enc px', b.rotulo)); conMenciones(d, b.texto); return d; }
+  if (b.tipo === 'item') {
+    const d = el_('div', 'it'); d.appendChild(el_('i', null, b.n + '.'));
+    if (b.nombre) { d.appendChild(el_('b', null, b.nombre + ' ')); if (b.riesgo) { d.appendChild(badgeRiesgo(b.riesgo)); d.append(' '); } conMenciones(d, cuerpoDeCaso(b.texto, b.nombre)); }
+    else conMenciones(d, b.texto);
+    return d;
+  }
+  return conMenciones(el_('div', b.tipo === 'detalle' ? 'de' : 'p'), b.texto);
 }
-// El último mensaje se muestra completo: se achica la letra (hasta el 53 %) hasta que entre; si aun así no entra,
-// se desvanece abajo y se puede desplazar con la rueda (o ↓) para leer el resto.
-function ajustarFoco() {
-  const cont = $('msgs'), foco = $('foco'), f = foco && foco.firstElementChild; if (!f) return;
-  const esc = Number(getComputedStyle(document.documentElement).getPropertyValue('--esc')) || 1;
-  let t = 34 * esc; const min = 24 * esc; f.style.setProperty('--t', t + 'px');   // no baja de 24: desde el fondo del auditorio, mejor desplazar que achicar
-  while (f.scrollHeight > foco.clientHeight && t > min) { t -= 1; f.style.setProperty('--t', t + 'px'); }
-  const corto = f.scrollHeight > foco.clientHeight; foco.classList.toggle('recortado', corto); cont.classList.toggle('recortado', corto);
-  alFinal(foco);
+
+// ── La tarjeta de decisión: la propuesta de Coordinación con Aprobar / Editar / Rechazar por caso ────────
+const decisiones = new Map();   // mensaje → { [n]: { estado, nota } }; sobrevive a los redibujos
+let enviandoDecision = false;
+function tarjetaDecision(m) {
+  const p = propuesta(m.texto); if (!p.casos.length) return null;
+  const clave = m.clave || m; if (!decisiones.has(clave)) decisiones.set(clave, {}); const d = decisiones.get(clave);
+  const abierta = decisionPendiente && fijado === m;                      // todavía espera esta decisión
+  const puedo = abierta && !!enviarMensaje && !enviandoDecision;          // en vivo y con conexión se decide desde la tarjeta
+  const t = el_('div', 'tarjeta px');
+  const cab = el_('div', 'cab'); cab.appendChild(el_('div', 'ico px', '?')); cab.appendChild(el_('h3', null, 'Propuesta para decidir'));
+  const estado = el_('span', 'estado px'); 
+  if (!abierta) { estado.textContent = 'Decidido'; estado.classList.add('ok'); }
+  else if (enviandoDecision) estado.textContent = 'Enviando…';
+  else if (puedo) estado.textContent = 'Esperando tu decisión';
+  else { estado.textContent = modoVivo ? 'Esperando tu decisión' : 'Grabación'; if (!modoVivo) estado.classList.add('gris'); }
+  cab.appendChild(estado); t.appendChild(cab);
+  if (p.titulo) t.appendChild(conMenciones(el_('div', 'desc'), p.titulo.charAt(0).toUpperCase() + p.titulo.slice(1)));
+  for (const c of p.casos) {
+    const dc = d[c.n]; const conAcc = c.acciones && c.acciones.length > 0;
+    const caso = el_('div', 'caso' + (conAcc ? ' con-acciones' : dc ? ' ' + dc.estado : ''));
+    const enc = el_('div', 'enc'); enc.appendChild(el_('span', 'n', c.n + '.')); enc.appendChild(el_('span', 'nombre', c.nombre)); if (c.riesgo) enc.appendChild(badgeRiesgo(c.riesgo));
+    caso.appendChild(enc); caso.dataset.n = c.n;
+    if (conAcc) {
+      // Lo que encontraron (mudo) y, aparte, cada acción propuesta con quién la hace: eso es lo que se decide
+      const ev = el_('div', 'evid'); ev.appendChild(el_('span', 'enc px', 'Lo que encontraron')); conMenciones(ev, cuerpoDeCaso(c.evidencia, c.nombre)); caso.appendChild(ev);
+      caso.appendChild(el_('span', 'props px', 'Qué proponen'));
+      if (!dc || !dc.acciones) d[c.n] = { acciones: {}, nota: (dc && dc.nota) || '' };
+      c.acciones.forEach((a, i) => {
+        const fila = el_('div', 'acc'); const que = el_('div', 'que'); que.textContent = a.texto.charAt(0).toUpperCase() + a.texto.slice(1); if (a.quien) que.appendChild(el_('span', 'quien', '· ' + a.quien)); fila.appendChild(que);
+        const acc = el_('div', 'acciones'); const est = d[c.n].acciones[i];
+        for (const [v, rot] of [['si', 'Aprobar'], ['yo', 'Lo hago yo'], ['no', 'No']]) {
+          const b = el_('button', v + (est === v ? ' on' : ''), rot); b.type = 'button'; b.disabled = !puedo;
+          b.onclick = () => { if (d[c.n].acciones[i] === v) delete d[c.n].acciones[i]; else d[c.n].acciones[i] = v; chatDibujar(false); };
+          acc.appendChild(b);
+        }
+        fila.appendChild(acc); caso.appendChild(fila);
+      });
+    } else {
+      const acc = el_('div', 'acciones');
+      for (const [est, rot] of [['aprobado', 'Aprobar'], ['editado', 'Editar'], ['rechazado', 'Rechazar']]) {
+        const b = el_('button', est + (dc && dc.estado === est ? ' on' : ''), rot); b.type = 'button'; b.disabled = !puedo;
+        b.onclick = () => { d[c.n] = dc && dc.estado === est ? undefined : { estado: est, nota: (dc && dc.nota) || '' }; chatDibujar(false); if (est !== 'aprobado' && d[c.n]) { const n = $('msgs').querySelector(`.caso[data-n="${c.n}"] .nota`); if (n) n.focus(); } };
+        acc.appendChild(b);
+      }
+      enc.appendChild(acc); caso.appendChild(conMenciones(el_('div', 'txt'), cuerpoDeCaso(c.texto, c.nombre)));
+    }
+    const nota = el_('input', 'nota'); nota.type = 'text'; nota.value = (d[c.n] && d[c.n].nota) || ''; nota.disabled = !puedo;
+    nota.placeholder = conAcc ? 'Algo más para Coordinación (opcional)' : dc && dc.estado === 'rechazado' ? 'Quién lo toma, o por qué (“lo llamo yo”)' : 'Qué cambia (“refuerzo sí, pero con el docente”)';
+    nota.oninput = () => { if (d[c.n]) d[c.n].nota = nota.value; };
+    nota.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); enviarDecision(m, p, d); } };
+    caso.appendChild(nota); t.appendChild(caso);
+  }
+  const pie = el_('div', 'pie');
+  for (const n of p.notas || []) { const no = el_('div', 'pendiente'); no.appendChild(el_('span', 'enc px', 'Nota')); conMenciones(no, n); pie.appendChild(no); }   // lo que cambió por un aviso entre agentes
+  if (p.pendiente) { const pe = el_('div', 'pendiente'); pe.appendChild(el_('span', 'enc px', 'Pendiente')); conMenciones(pe, p.pendiente); pie.appendChild(pe); }
+  if (abierta) {
+    if (p.pregunta) pie.appendChild(el_('div', 'pregunta', p.pregunta));
+    const marcados = p.casos.filter((c) => d[c.n] && (d[c.n].acciones ? Object.keys(d[c.n].acciones).length : true)).length;
+    const env = el_('button', 'enviar px', enviandoDecision ? 'Enviando…' : marcados ? `Enviar decisión (${marcados} de ${p.casos.length})` : 'Enviar decisión'); env.type = 'button';
+    env.disabled = !puedo || !marcados; env.onclick = () => enviarDecision(m, p, d); pie.appendChild(env);
+    const mano = el_('button', 'mano px', 'Escribir a mano'); mano.type = 'button'; mano.disabled = !enviarMensaje; mano.onclick = () => { $('texto').focus(); }; pie.appendChild(mano);
+  } else { const r = el_('div', 'resultado', 'Lo aprobado está en el Tablero.'); r.style.cursor = 'pointer'; r.onclick = () => vista('tab'); pie.appendChild(r); }
+  t.appendChild(pie);
+  return t;
 }
-function alFinal(foco) { const fin = foco.scrollTop + foco.clientHeight >= foco.scrollHeight - 4; foco.classList.toggle('al-final', fin); $('msgs').classList.toggle('al-final', fin); }
-new ResizeObserver(() => ajustarFoco()).observe($('msgs'));   // cambia el alto disponible (p. ej. al aparecer "Trabajando: …")
+function enviarDecision(m, p, d) {
+  const texto = redactarDecision(p.casos, d); if (!texto || !enviarMensaje || enviandoDecision) return;
+  // La decisión viaja también estructurada (acción por acción) para que el seguimiento no la adivine del texto y quede en la grabación
+  const acciones = p.casos.flatMap((c) => (d[c.n] && d[c.n].acciones && c.acciones) ? c.acciones.map((a, i) => ({ texto: a.texto, quien: a.quien, estado: d[c.n].acciones[i] || 'si' })) : []);
+  const decision = acciones.length ? { acciones, nota: p.casos.map((c) => (d[c.n] && d[c.n].nota) || '').filter(Boolean).join(' '), caso: p.casos.map((c) => c.nombre).join(', '), objetivo: (seg.actual && seg.actual.texto) || '' } : null;
+  enviandoDecision = true; chatDibujar(false);
+  if (enviarMensaje(texto, decision) === false) { enviandoDecision = false; chatDibujar(false); aviso('No se pudo enviar. Reintentá en un momento.'); }
+}
+
+// Al cambiar el alto disponible (ventana, ancho del chat), si estabas al final seguís al final.
+new ResizeObserver(() => { const f = $('flujo'); if (f && f.scrollTop + f.clientHeight >= f.scrollHeight - 120) f.scrollTop = f.scrollHeight; }).observe($('msgs'));
 function chatAgregar({ clave, autor, texto, hora, t, persona, decision }) { if (hilo.agregar({ clave, autor, texto, hora, t, persona, decision }) && !silencioso) chatDibujar(); }
 let ultimoTrabajando = '', avisoHasta = 0;
 function aviso(t) { const el = $('trabajando'); el.textContent = t; el.classList.add('on'); avisoHasta = performance.now() + 5000; ultimoTrabajando = '\0'; }
 function actualizarTrabajando() {
   if (!fichas || performance.now() < avisoHasta) return;
   const ts = [...fichas.values()].filter((f) => f.trabajando).map((f) => f.nombre);
-  const txt = ts.length ? 'Trabajando: ' + ts.join(', ') : 'La escuela está en calma.';
+  const txt = '';   // quién trabaja se ve en el objetivo; esta línea queda para los avisos
   if (txt === ultimoTrabajando) return; ultimoTrabajando = txt;
-  const el = $('trabajando'); el.textContent = txt; el.classList.toggle('on', !!ts.length);
+  const el = $('trabajando'); el.textContent = txt; el.classList.remove('on');
 }
 
 // ── Textos sobre cada personaje ──────────────────────────────────────────────
@@ -290,7 +551,10 @@ function etiqueta(p) {
 // Cada personaje tiene una cola de globos: lo que dice se lee de a uno, sin pisarse.
 const limpiar = (t) => String(t).replace(/\*\*/g, '').replace(/\s+/g, ' ').trim();
 function corto(t) {
-  let x = limpiar(t).replace(/^@[^\s]+(?: [A-ZÁÉÍÓÚ][^\s]+)?\s*/, '');
+  // Se saca la @mención del principio y nada más (antes también se llevaba la primera palabra si iba en mayúscula: "@Tutor Biología 1" → "1").
+  let x = limpiar(t).replace(/^@[^\s]+\s*/, '');
+  const resto = String(CONFIG.personas.nombre || '').split(' ').slice(1).join(' ');   // "@Greyla Alvarez …": el apellido también sobra
+  if (resto && x.startsWith(resto)) x = x.slice(resto.length).trim();
   if (x.length > 140) { const corte = x.slice(0, 140); const punto = Math.max(corte.lastIndexOf('. '), corte.lastIndexOf('; ')); x = (punto > 70 ? corte.slice(0, punto + 1) : corte.replace(/\s+\S*$/, '')) + '…'; }
   return x;
 }
@@ -327,16 +591,23 @@ function nombrarPersona(nombre) {
 }
 function esperarDecision(on) {
   const cambio = decisionPendiente !== !!on;
-  decisionPendiente = !!on; ofi.esperandoDecision = !!on; $('redactar').classList.toggle('esperando', !!on);
-  if (!on) fijado = null;
-  if (cambio && !silencioso) chatDibujar(false);
+  decisionPendiente = !!on; ofi.esperandoDecision = !!on; $('redactar').classList.toggle('esperando', !!on); $('capa').classList.toggle('decision', !!on); $('pestana').classList.toggle('espera', !!on); $('v-escuela').classList.toggle('espera', !!on && vistaAbierta() !== 'escuela');
+  if (cambio) { $('escenario').classList.toggle('decidiendo', !!on); escalar(); actualizarEstado(); }
+  if (!on) { fijado = null; enviandoDecision = false; }
+  if ((cambio || on) && !silencioso) chatDibujar(false);   // con la propuesta ya fijada, la tarjeta se dibuja abierta
 }
 
+// Un solo reloj en toda la vista: minutos:segundos desde el primer mensaje de la corrida (el mismo que la tarjeta del objetivo).
+let tInicio = null;
+function transcurrido(t) { if (typeof t !== 'number') return ''; if (tInicio === null) tInicio = t; const s = Math.max(0, Math.round((t - tInicio) / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
+const tablero = crearTablero();   // copia local: para contar las acciones del chat y para el Tablero embebido
 function aplicar(ev) {
+  if (ev.tipo === 'tarea') { tablero.aplicar(ev); tabEventos.push(ev); if (!silencioso) tabPost({ tipo: 'tablero', eventos: [ev], vivo: modoVivo && !!enviarMensaje }); else dibujarObjetivoPendiente = true; return; }
+  { const antes = seg.actual && seg.actual.estado; seg.aplicar(ev.tipo === 'herramienta' ? completarHerramienta(ev) : ev); if (!silencioso) { dibujarObjetivo(); if ((seg.actual && seg.actual.estado) !== antes) actualizarEstado(); } }
   if (ev.tipo === 'persona') {
     // La persona que decide: habla por el chat y su personaje lo dice desde Dirección.
     const p = fichas.get('persona:direccion'); if (p) decir(p, ev.texto);
-    chatAgregar({ clave: ev.id, autor: CONFIG.personas.nombre, texto: ev.texto, hora: ev.hora, t: ev.t, persona: true, decision: decisionPendiente });
+    chatAgregar({ clave: ev.id, autor: CONFIG.personas.nombre, texto: ev.texto, hora: transcurrido(ev.t), t: ev.t, persona: true, decision: decisionPendiente });
     esperarDecision(false);
     return;
   }
@@ -348,12 +619,11 @@ function aplicar(ev) {
   if (ev.tipo === 'dice') {
     const destinos = ev.a || [];
     const agentes = destinos.filter(esAgente), personas = destinos.filter(esPersona);
-    const esPropuesta = /^\W*propuesta|para decidir|¿aprob|aprobás, editás/i.test(limpiar(ev.texto));
     decir(f, ev.texto);
-    chatAgregar({ clave: ev.id, autor: f.nombre, texto: ev.texto, hora: ev.hora, t: ev.t });
+    chatAgregar({ clave: ev.id, autor: f.nombre, texto: ev.texto, hora: transcurrido(ev.t), t: ev.t });
     if (personas.length) {
       ofi.ir(f, CONFIG.personas.casa);   // va a presentar al despacho de Dirección
-      if (esPropuesta) { fijado = hilo.mensajes[hilo.mensajes.length - 1]; esperarDecision(true); }
+      if (esPropuesta(ev.texto)) { fijado = hilo.mensajes[hilo.mensajes.length - 1]; esperarDecision(true); }
     } else if (agentes.length) {
       const hermanos = eventos.filter((e) => e.tipo === 'dice' && e.quien === ev.quien && Math.abs(e.t - ev.t) < 1500);
       const todos = [...new Set(hermanos.flatMap((e) => (e.a || []).filter(esAgente)))];
@@ -365,7 +635,7 @@ function aplicar(ev) {
 
 function reiniciar() {
   if (ofi) ofi.quitarTodos();
-  chatLimpiar();
+  chatLimpiar(); seg.reiniciar(); tInicio = null; tablero.reiniciar(); tabReiniciar(); dibujarObjetivo();
   $('capa').querySelectorAll('.pj').forEach((n) => n.remove()); etiquetas.clear();
   fichas = ofi.personajes; pendientes = []; temporizadores = []; indice = 0; reloj = 0;
   esperarDecision(false);
@@ -394,7 +664,11 @@ function actualizarEstado() {
   { const c = $('chat-estado'); c.className = modoVivo && !textoEstado ? 'vivo' : ''; c.textContent = t; }
   $('btn-vivo').classList.toggle('on', modoVivo); $('btn-grab').classList.toggle('on', !modoVivo);
   for (const id of ['btn-prev', 'btn-play', 'btn-next', 'velocidad']) $(id).disabled = modoVivo;
-  $('texto').disabled = !enviarMensaje; $('texto').placeholder = enviarMensaje ? '@Coordinación …' : (modoVivo ? 'Sin conexión' : 'Grabación · En vivo (v) para escribir');
+  const cerrado = seg.actual && seg.actual.estado === 'cerrado';
+  $('texto').disabled = !enviarMensaje; $('texto').placeholder = '';
+  for (const id of ['btn-mas', 'para', 'btn-enviar']) $(id).disabled = !enviarMensaje;
+  $('redactar').classList.toggle('deshabilitado', !enviarMensaje); if (!enviarMensaje) cerrarAtajos();
+  if (!seg.actual) dibujarObjetivo();
 }
 
 function posicionar() {
@@ -433,7 +707,7 @@ function loop(ts) {
     if (indice >= eventos.length && !temporizadores.length && ![...fichas.values()].some((f) => f.actual)) { reproduciendo = false; $('btn-play').textContent = 'Otra vez'; }
   }
   if (modoVivo) { reloj += dt; correrTemporizadores(); }
-  if (ofi) { ofi.velocidad = modoVivo ? 1 : velocidad; tickGlobos(); ofi.cuadro(ts); posicionar(); actualizarTrabajando(); }
+  if (ofi) { ofi.velocidad = modoVivo ? 1 : velocidad; tickGlobos(); ofi.cuadro(ts); posicionar(); actualizarTrabajando(); latirObjetivo(); }
   requestAnimationFrame(loop);
 }
 
@@ -476,12 +750,45 @@ const ajustarCaja = () => { cajaTexto.style.height = '0'; const base = parseFloa
 cajaTexto.addEventListener('input', ajustarCaja);
 cajaTexto.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('redactar').requestSubmit(); } });   // Shift+Enter = salto de línea
 $('redactar').onsubmit = (e) => {
-  e.preventDefault(); const t = cajaTexto.value.trim(); if (!t) return;
+  e.preventDefault(); let t = cajaTexto.value.trim(); if (!t) return;
   if (!enviarMensaje) return aviso('Sin conexión: no se puede escribir.');
+  const para = $('para').value; if (para && !t.startsWith('@')) t = '@' + para + ' ' + t;   // el destinatario elegido va como @mención
   if (enviarMensaje(t) === false) return aviso('No se pudo enviar. Reintentá en un momento.');
-  cajaTexto.value = ''; ajustarCaja();
+  cajaTexto.value = ''; ajustarCaja(); $('para').value = ''; cerrarAtajos();
 };
+// Destinatario: sin elegir nada se le habla a Coordinación (así funciona el bus); los demás agregan la @mención.
+function llenarPara() {
+  const s = $('para'); s.replaceChildren();
+  const op = (v, t) => { const o = document.createElement('option'); o.value = v; o.textContent = t; s.appendChild(o); };
+  op('', '@Coordinación');
+  for (const a of CONFIG.agentes) if (a.id !== 'coordinacion') op(a.nombre, '@' + a.nombre);
+  op('todos', '@todos');
+}
+// Atajos del guion (stage/atajos.json): llenan la caja, no envían; quien decide lee y aprieta Enter.
+let ATAJOS = [];
+async function cargarAtajos() {
+  try { ATAJOS = (await (await fetch('atajos.json', { cache: 'no-store' })).json()).atajos || []; } catch { ATAJOS = []; }
+  const m = $('atajos'); m.replaceChildren(); m.appendChild(el_('div', 'tit', 'Atajos del guion'));
+  if (!seg.actual) dibujarObjetivo();
+  for (const a of ATAJOS) {
+    const b = el_('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.append(a.titulo); if (a.detalle) b.appendChild(el_('small', null, a.detalle));
+    b.onclick = () => { cajaTexto.value = a.texto; ajustarCaja(); $('para').value = ''; cerrarAtajos(); cajaTexto.focus(); };
+    m.appendChild(b);
+  }
+}
+function cerrarAtajos() { $('atajos').classList.remove('abierto'); $('btn-mas').classList.remove('abierto'); $('btn-mas').textContent = '+'; $('btn-mas').setAttribute('aria-expanded', 'false'); }
+$('btn-mas').onclick = () => { const ab = !$('atajos').classList.contains('abierto'); if (ab) { $('atajos').classList.add('abierto'); $('btn-mas').classList.add('abierto'); $('btn-mas').textContent = '×'; $('btn-mas').setAttribute('aria-expanded', 'true'); const f = $('atajos').querySelector('button'); if (f) f.focus(); } else cerrarAtajos(); };
+document.addEventListener('pointerdown', (e) => { if (!$('compositor').contains(e.target)) cerrarAtajos(); });
 
+// El chat se puede esconder del todo (tecla c, botón Chat, ?chat=0): la escuela ocupa el 100 %. La pestaña del borde lo vuelve a abrir.
+function chatVisible(on) {
+  const esc = $('escenario'); esc.classList.toggle('sin-chat', !on);
+  $('btn-chat').classList.toggle('on', !!on);
+  try { localStorage.setItem('chatOculto', on ? '0' : '1'); } catch {}
+  escalar(); if (on) chatDibujar(false);
+}
+$('btn-chat').onclick = () => chatVisible($('escenario').classList.contains('sin-chat'));
+$('pestana').onclick = () => chatVisible(true);
 // Ancho del chat: se arrastra la manija del borde (o [ y ]); la escuela ocupa el resto.
 let anchoActual = 0;
 function anchoChat(w) { anchoActual = Math.max(360, Math.min(innerWidth * 0.55, Math.round(w))); $('chat').style.setProperty('--cw', anchoActual + 'px'); escalar(); chatDibujar(false); try { localStorage.setItem('chatAncho', String(anchoActual)); } catch {} }
@@ -492,41 +799,55 @@ $('manija').addEventListener('pointerdown', (e) => {
   const soltar = () => { $('manija').classList.remove('arrastrando'); $('manija').removeEventListener('pointermove', mover); $('manija').removeEventListener('pointerup', soltar); };
   $('manija').addEventListener('pointermove', mover); $('manija').addEventListener('pointerup', soltar);
 });
-// Escuela ↔ Organigrama: el organigrama vive en un iframe encima; cambiar de vista no corta la conexión.
-function organigrama(abrir) {
-  const f = $('org'); const ab = abrir === undefined ? !f.classList.contains('abierto') : abrir;
-  if (ab && !f.getAttribute('src')) f.src = 'organigrama.html?embebido=1&tema=' + tema;
-  f.classList.toggle('abierto', ab); $('v-org').classList.toggle('on', ab); $('v-escuela').classList.toggle('on', !ab);
-  if (ab) f.focus(); else window.focus();
+// Escuela ↔ Organigrama ↔ Tablero: las otras dos vistas viven en iframes encima; cambiar de vista no corta la conexión.
+const VISTAS = { org: { iframe: 'org', boton: 'v-org', src: () => 'organigrama.html?embebido=1&tema=' + tema + '&nombre=' + encodeURIComponent(CONFIG.personas.nombre || '') }, tab: { iframe: 'tab', boton: 'v-tab', src: () => 'tablero.html?embebido=1&tema=' + tema } };
+function vista(cual) {   // 'escuela' | 'org' | 'tab'
+  for (const [k, v] of Object.entries(VISTAS)) {
+    const f = $(v.iframe), ab = cual === k;
+    if (ab && !f.getAttribute('src')) f.src = v.src();
+    f.classList.toggle('abierto', ab); $(v.boton).classList.toggle('on', ab);
+    if (ab) f.focus();
+  }
+  $('v-escuela').classList.toggle('on', cual === 'escuela'); if (cual === 'escuela') window.focus();
 }
-$('v-org').onclick = () => organigrama(true);
-$('v-escuela').onclick = () => organigrama(false);
-const porHash = () => { if (location.hash === '#organigrama') organigrama(true); };
+const vistaAbierta = () => Object.entries(VISTAS).find(([, v]) => $(v.iframe).classList.contains('abierto'))?.[0] || 'escuela';
+$('v-org').onclick = () => vista('org'); $('v-tab').onclick = () => vista('tab'); $('v-escuela').onclick = () => vista('escuela');
+const porHash = () => { if (location.hash === '#organigrama') vista('org'); if (location.hash === '#tablero') vista('tab'); };
 porHash(); addEventListener('hashchange', porHash);
+// El Tablero recibe los eventos `tarea` (en vivo o de la grabación) y, al abrirse, todos los que ya pasaron
+const tabEventos = [];
+const tabPost = (msg) => { const f = $('tab'); if (f.getAttribute('src') && f.contentWindow) f.contentWindow.postMessage(msg, '*'); };
+function tabReiniciar() { tabEventos.length = 0; tabPost({ tipo: 'tablero', reiniciar: true, eventos: [], vivo: modoVivo && !!enviarMensaje }); }
 addEventListener('message', (e) => {
-  if (e.data === 'cerrar-org') organigrama(false);
-  else if (e.data && e.data.tipo === 'tema' && e.data.tema !== tema) aplicarTema(e.data.tema);
+  const d = e.data;
+  if (d === 'cerrar-org') vista('escuela');
+  else if (d && d.tipo === 'vista') vista(d.cual);
+  else if (d && d.tipo === 'tema' && d.tema !== tema) aplicarTema(d.tema);
+  else if (d && d.tipo === 'tablero-listo') tabPost({ tipo: 'tablero', reiniciar: true, eventos: tabEventos, vivo: modoVivo && !!enviarMensaje });
 });
 $('btn-grab').onclick = () => { desconectar(); cargarGrabacion(); };
 $('corridas').onchange = (e) => { desconectar(); cargarGrabacion(e.target.value); };
 $('btn-vivo').onclick = () => { huboConexion = true; conectar(); };
 let ocultar = null;
-addEventListener('mousemove', () => { $('barra').classList.add('visible'); document.body.style.cursor = 'default'; clearTimeout(ocultar); ocultar = setTimeout(() => { $('barra').classList.remove('visible'); document.body.style.cursor = 'none'; }, 2500); });
+addEventListener('mousemove', () => { $('barra').classList.add('visible'); $('vistas').classList.add('visible'); document.body.style.cursor = 'default'; clearTimeout(ocultar); ocultar = setTimeout(() => { $('barra').classList.remove('visible'); $('vistas').classList.remove('visible'); document.body.style.cursor = 'none'; }, 2500); });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) { e.preventDefault(); $('texto').focus(); return; }
-  if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+  if (e.key === 'Escape' && $('atajos').classList.contains('abierto')) { cerrarAtajos(); cajaTexto.focus(); return; }
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.closest('#atajos, .tarjeta')) return;
   if (e.key === '[') anchoChat((anchoActual || $('chat').offsetWidth) - 20);
   if (e.key === ']') anchoChat((anchoActual || $('chat').offsetWidth) + 20);
   if (e.code === 'Space') { e.preventDefault(); $('btn-play').click(); }
   if (e.key === 'ArrowRight') $('btn-next').click();
   if (e.key === 'ArrowLeft') $('btn-prev').click();
   if (e.key === 'r') $('btn-reiniciar').click();
-  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { const fo = $('foco'); if (fo) { e.preventDefault(); fo.scrollBy({ top: (e.key === 'ArrowDown' ? 1 : -1) * fo.clientHeight * 0.6, behavior: 'smooth' }); } }
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { const fo = $('flujo'); if (fo) { e.preventDefault(); fo.scrollBy({ top: (e.key === 'ArrowDown' ? 1 : -1) * fo.clientHeight * 0.6, behavior: 'smooth' }); } }
   if (e.key === 'v') $('btn-vivo').click();
   if (e.key === 'g') $('btn-grab').click();
   if (e.key === 't') $('btn-tema').click();
-  if (e.key === 'o') organigrama();
-  if (e.key === 'Escape') organigrama(false);
+  if (e.key === 'c') $('btn-chat').click();
+  if (e.key === 'o') vista(vistaAbierta() === 'org' ? 'escuela' : 'org');
+  if (e.key === 'b') vista(vistaAbierta() === 'tab' ? 'escuela' : 'tab');
+  if (e.key === 'Escape') vista('escuela');
   if (e.key === 'f') document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
 });
 // Arrastrar un JSON a la ventana: reproduce esa corrida (formato de stage/corridas/*.eventos.json)
@@ -551,6 +872,7 @@ function escalar() {
   if (ofi) ofi.resolucion(Math.max(1, Math.ceil(K * (devicePixelRatio || 1))));   // el lienzo se dibuja en alta resolución y se achica sin deformar el pixel-art
   for (const c of document.querySelectorAll('.sala-cartel')) { c.style.left = (+c.dataset.x) * K + 'px'; c.style.top = (+c.dataset.y) * K + 'px'; }
   const m = document.getElementById('martina'); if (m && MARTINA) { m.style.left = MARTINA.x * K + 'px'; m.style.top = (MARTINA.y + 4) * K + 'px'; }
+  const cd = document.getElementById('cartel-decision'); if (cd && DECISION) { cd.style.left = DECISION.x * K + 'px'; cd.style.top = DECISION.y * K + 'px'; }
 }
 addEventListener('resize', () => { escalar(); chatDibujar(false); }); escalar(); chatDibujar(false);
 if (document.fonts) document.fonts.ready.then(() => chatDibujar(false));   // con las fuentes cargadas el texto mide distinto
@@ -560,8 +882,8 @@ if (document.fonts) document.fonts.ready.then(() => chatDibujar(false));   // co
 let es = null, deseaVivo = false, huboConexion = false;
 function desconectar() { deseaVivo = false; enviarMensaje = null; if (es) { const s = es; es = null; s.close(); } textoEstado = ''; }
 
-function enviarAlServidor(texto) {
-  fetch('/api/mensaje', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ texto }) })
+function enviarAlServidor(texto, decision = null) {
+  fetch('/api/mensaje', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(decision ? { texto, decision } : { texto }) })
     .then(async (r) => { if (!r.ok) { let m = 'No se pudo enviar.'; try { m = (await r.json()).error || m; } catch {} aviso(m); if (!cajaTexto.value) { cajaTexto.value = texto; ajustarCaja(); } } })   // rechazado (p. ej. @mención inexistente): el texto vuelve a la caja
     .catch(() => aviso('No se pudo enviar. ¿Está el servidor?'));
   return true;
@@ -572,7 +894,7 @@ function cargarSnapshot(lista) {
   silencioso = true; ofi.instantaneo = true;
   for (const ev of eventos) { reloj = ev.t; aplicar(ev); }
   ofi.instantaneo = false; silencioso = false; indice = eventos.length;
-  chatDibujar(false);
+  chatDibujar(false); dibujarObjetivo(); tabPost({ tipo: 'tablero', reiniciar: true, eventos: tabEventos, vivo: modoVivo && !!enviarMensaje });
 }
 function recibir(lista) {
   const nuevos = (Array.isArray(lista) ? lista : [lista]).map(completarHerramienta);
@@ -632,10 +954,13 @@ async function cargarGrabacion(archivo) {
 try {
   CONFIG = await (await fetch('agentes.json')).json();
   if (params.get('nombre')) CONFIG.personas.nombre = params.get('nombre').trim().slice(0, 40);   // ?nombre=Greyla: quién es la persona que decide
+  llenarPara(); cargarAtajos();
   await cargarIndiceCorridas();
   ofi = await crearOficina($('lienzo')); ofi.tema(tema);
   for (const t of CARTELES) { const c = document.createElement('div'); c.className = 'sala-cartel'; c.textContent = t.texto; c.dataset.x = t.x; c.dataset.y = t.y; $('capa').appendChild(c); }
   const m = document.createElement('div'); m.id = 'martina'; m.className = 'tag martina px'; m.textContent = 'Martina'; $('capa').appendChild(m);
+  const cd = document.createElement('div'); cd.id = 'cartel-decision'; cd.className = 'px'; cd.textContent = 'Esperando tu decisión'; $('capa').appendChild(cd);
+  { let oculto = params.get('chat') === '0'; try { if (!params.has('chat') && localStorage.getItem('chatOculto') === '1') oculto = true; } catch {} chatVisible(!oculto); }
   escalar();
   reiniciar();
   const forzarGrabacion = params.get('grabacion') === '1' || params.has('corrida') || params.has('paso');

@@ -17,7 +17,32 @@ function findStudent(db, q) {
   if (!e) throw new Error(`No encontré a "${q}". Usá buscar_estudiantes para ver ids y nombres.`);
   return e;
 }
-const studentArg = { estudiante: { type: 'string', description: 'Id (e01) o nombre del estudiante' } };
+function findCourse(db, q) {
+  const c = db.cursos.find((x) => norm(x.id) === norm(q) || norm(x.nombre) === norm(q));
+  if (!c) throw new Error(`No existe el curso "${q}".`);
+  return c;
+}
+// Las consultas por estudiante aceptan uno (`estudiante`), varios (`estudiantes`) o un curso entero
+// (`curso`): una llamada para los 24, no 24 llamadas. Con `estudiante` devuelven el objeto solo;
+// con lista o curso, `{ hoy, curso?, estudiantes: [...] }` con id y nombre en cada ítem.
+const studentArg = {
+  estudiante: { type: 'string', description: 'Un estudiante: id (e01) o nombre' },
+  estudiantes: { type: 'array', items: { type: 'string' }, description: 'Varios estudiantes: ids o nombres' },
+  curso: { type: 'string', description: 'Todos los estudiantes de un curso, ej. bio1 o Biología 1' },
+};
+const porEstudiante = (name, description, campo) => ({
+  name, description: `${description} Para uno, varios o un curso entero.`,
+  inputSchema: { type: 'object', properties: studentArg },
+  run: (db, a) => {
+    const uno = (e) => ({ estudiante: e.nombre, ...campo(db, e) });
+    if (a.estudiante && !a.estudiantes && !a.curso) return uno(findStudent(db, a.estudiante));
+    let lista, curso;
+    if (a.estudiantes) lista = (Array.isArray(a.estudiantes) ? a.estudiantes : String(a.estudiantes).split(',')).map((q) => findStudent(db, q));
+    else if (a.curso) { curso = findCourse(db, a.curso); lista = db.estudiantes.filter((e) => e.curso === curso.id); }
+    else throw new Error('Indicá `estudiante`, `estudiantes` (lista) o `curso`.');
+    return { hoy: db.hoy, ...(curso ? { curso: curso.nombre } : {}), estudiantes: lista.map((e) => ({ id: e.id, ...uno(e) })) };
+  },
+});
 
 export const TOOLS = [
   {
@@ -37,48 +62,13 @@ export const TOOLS = [
     inputSchema: { type: 'object', properties: { curso: { type: 'string' } } },
     run: (db, a) => { const c = db.cursos.find((x) => !a.curso || norm(x.id) === norm(a.curso) || norm(x.nombre) === norm(a.curso)) || db.cursos[0]; return { curso: c.nombre, programa: c.programa, proxima_evaluacion: c.proxima_evaluacion }; },
   },
-  {
-    name: 'ver_asistencia',
-    description: 'Asistencia por semana, resumen y cambios recientes de un estudiante. Para Bienestar.',
-    inputSchema: { type: 'object', properties: studentArg, required: ['estudiante'] },
-    run: (db, a) => { const e = findStudent(db, a.estudiante); return { estudiante: e.nombre, ...e.asistencia, nota: e.asistencia_nota || null }; },
-  },
-  {
-    name: 'ver_actividad_campus',
-    description: 'Ingresos al campus virtual y entregas pendientes de un estudiante. Para Bienestar.',
-    inputSchema: { type: 'object', properties: studentArg, required: ['estudiante'] },
-    run: (db, a) => { const e = findStudent(db, a.estudiante); return { estudiante: e.nombre, hoy: db.hoy, ...e.campus }; },
-  },
-  {
-    name: 'ver_alertas_previas',
-    description: 'Alertas o intervenciones anteriores de un estudiante. Para Bienestar.',
-    inputSchema: { type: 'object', properties: studentArg, required: ['estudiante'] },
-    run: (db, a) => { const e = findStudent(db, a.estudiante); return { estudiante: e.nombre, alertas_previas: e.alertas_previas }; },
-  },
-  {
-    name: 'ver_uso_tutor',
-    description: 'Consultas al tutor virtual por tema y ejercicios resueltos de un estudiante. Para el Tutor.',
-    inputSchema: { type: 'object', properties: studentArg, required: ['estudiante'] },
-    run: (db, a) => { const e = findStudent(db, a.estudiante); return { estudiante: e.nombre, ...e.tutor }; },
-  },
-  {
-    name: 'ver_notas',
-    description: 'Notas de trabajos prácticos y parciales de un estudiante. Para el Tutor.',
-    inputSchema: { type: 'object', properties: studentArg, required: ['estudiante'] },
-    run: (db, a) => { const e = findStudent(db, a.estudiante); return { estudiante: e.nombre, notas: e.notas }; },
-  },
-  {
-    name: 'ver_situacion_administrativa',
-    description: 'Inscripciones, cuotas impagas, becas, bloqueos y trámites abiertos de un estudiante. Para Advisor.',
-    inputSchema: { type: 'object', properties: studentArg, required: ['estudiante'] },
-    run: (db, a) => { const e = findStudent(db, a.estudiante); return { estudiante: e.nombre, hoy: db.hoy, ...e.administrativo }; },
-  },
-  {
-    name: 'ver_ingresantes',
-    description: 'Cómo ingresó un estudiante: curso de ingreso, expectativa declarada, pedido de ayuda económica. Para Admisiones.',
-    inputSchema: { type: 'object', properties: studentArg, required: ['estudiante'] },
-    run: (db, a) => { const e = findStudent(db, a.estudiante); return { estudiante: e.nombre, ...e.ingreso }; },
-  },
+  porEstudiante('ver_asistencia', 'Asistencia por semana, resumen y cambios recientes. Para Bienestar.', (_db, e) => ({ ...e.asistencia, nota: e.asistencia_nota || null })),
+  porEstudiante('ver_actividad_campus', 'Ingresos al campus virtual y entregas pendientes. Para Bienestar.', (db, e) => ({ hoy: db.hoy, ...e.campus })),
+  porEstudiante('ver_alertas_previas', 'Alertas o intervenciones anteriores. Para Bienestar.', (_db, e) => ({ alertas_previas: e.alertas_previas })),
+  porEstudiante('ver_uso_tutor', 'Consultas al tutor virtual por tema y ejercicios resueltos. Para el Tutor.', (_db, e) => ({ ...e.tutor })),
+  porEstudiante('ver_notas', 'Notas de trabajos prácticos y parciales. Para el Tutor.', (_db, e) => ({ notas: e.notas })),
+  porEstudiante('ver_situacion_administrativa', 'Inscripciones, cuotas impagas, becas, bloqueos y trámites abiertos. Para Advisor.', (db, e) => ({ hoy: db.hoy, ...e.administrativo })),
+  porEstudiante('ver_ingresantes', 'Cómo ingresó cada estudiante: curso de ingreso, expectativa declarada, pedido de ayuda económica. Para Admisiones.', (_db, e) => ({ ...e.ingreso })),
   {
     name: 'ver_aspirantes',
     description: 'Aspirantes en curso para la próxima cohorte. Para Admisiones.',

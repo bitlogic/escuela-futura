@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { crearBus } from './bus.mjs';
 import { crearResolutor } from './menciones.mjs';
-import { crearHttp } from './http.mjs';
+import { crearHttp, sanearDecision } from './http.mjs';
 
 const AGENTES = [{ id: 'coordinacion', nombre: 'Coordinación' }];
 const PERSONA = { id: 'persona:direccion', nombre: 'Dirección' };
@@ -66,4 +66,10 @@ test('la vista puede conectarse, escribir y reiniciar', async () => {
     assert.equal(codigo, 403);
     await lector.cancel().catch(() => {});
   } finally { http.cerrar(); }
+});
+
+test('sanearDecision acepta solo acciones cortas con estado válido', () => {
+  assert.equal(sanearDecision(null), null); assert.equal(sanearDecision({ acciones: 'x' }), null); assert.equal(sanearDecision({ acciones: [] }), null);
+  assert.deepEqual(sanearDecision({ acciones: [{ texto: 'llamada', quien: 'Bienestar', estado: 'yo' }, { texto: 'x', estado: 'zzz' }, { estado: 'si' }], nota: 'ok' }),
+    { acciones: [{ texto: 'llamada', quien: 'Bienestar', estado: 'yo' }, { texto: 'x', quien: '', estado: 'si' }], nota: 'ok', caso: '', objetivo: '' });
 });

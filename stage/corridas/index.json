@@ -1,6 +1,31 @@
 {
-  "predeterminada": "2026-10-16-primer-anio-en-riesgo.eventos.json",
+  "predeterminada": "2026-10-17-martina-seis-actos.eventos.json",
   "corridas": [
+    {
+      "archivo": "2026-10-17-martina-seis-actos.eventos.json",
+      "titulo": "Martina (seis actos)",
+      "fecha": "2026-10-17"
+    },
+    {
+      "archivo": "2026-10-17-prueba2.eventos.json",
+      "titulo": "prueba2",
+      "fecha": "2026-10-17"
+    },
+    {
+      "archivo": "2026-10-16-primer-anio-en-riesgo-seis-actos.eventos.json",
+      "titulo": "Primer año en riesgo (seis actos)",
+      "fecha": "2026-10-16"
+    },
+    {
+      "archivo": "2026-10-16-prueba1.eventos.json",
+      "titulo": "prueba1",
+      "fecha": "2026-10-16"
+    },
+    {
+      "archivo": "2026-10-16-primer-anio-en-riesgo-lotes.eventos.json",
+      "titulo": "Primer año en riesgo (herramientas por lote)",
+      "fecha": "2026-10-16"
+    },
     {
       "archivo": "2026-10-16-primer-anio-en-riesgo.eventos.json",
       "titulo": "Primer año en riesgo",

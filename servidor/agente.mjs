@@ -3,7 +3,7 @@
 // entre turnos (solo se agrega al final; nunca se edita). Lo que el agente escribe fuera de enviar_mensaje
 // no va al chat: se muestra como "piensa" en el mapa.
 
-import { HERRAMIENTA_LUGAR, HERRAMIENTA_TEXTO } from '../stage/herramientas.js';
+import { HERRAMIENTA_LUGAR, textoHerramienta } from '../stage/herramientas.js';
 
 export const ENVIAR_MENSAJE = {
   name: 'enviar_mensaje',
@@ -90,9 +90,8 @@ export function crearCorredor({ cliente, modelo, effort = 'medium', instruccione
           try {
             if (u.name === 'enviar_mensaje') { content = ctx.enviar(String(u.input.texto || '')); mando = true; }
             else {
-              const arg = u.input && (u.input.estudiante || u.input.curso) ? String(u.input.estudiante || u.input.curso) : '';
-              ctx.emitir({ tipo: 'herramienta', herramienta: u.name, lugar: HERRAMIENTA_LUGAR[u.name] || null, texto: (HERRAMIENTA_TEXTO[u.name] || u.name) + (arg ? ' de ' + arg : '') });
-              content = ejecutar(u.name, u.input || {});
+              ctx.emitir({ tipo: 'herramienta', herramienta: u.name, lugar: HERRAMIENTA_LUGAR[u.name] || null, texto: textoHerramienta(u.name, u.input) });
+              content = ejecutar(u.name, u.input || {}, a.id);
             }
           } catch (e) { content = e.message; is_error = true; }
           resultados.push({ type: 'tool_result', tool_use_id: u.id, content, ...(is_error ? { is_error } : {}) });

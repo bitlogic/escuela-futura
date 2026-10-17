@@ -1,0 +1,396 @@
+{
+  "origen": "servidor/escuela.mjs",
+  "generado": "2026-10-17T04:18:59.586Z",
+  "eventos": [
+    {
+      "t": 18,
+      "tipo": "persona",
+      "quien": "persona:direccion",
+      "nombre": "Alfredo",
+      "a": [
+        "coordinacion"
+      ],
+      "texto": "Antes del parcial del 3/11, identificá qué estudiantes de primer año de Biología están en riesgo y proponé qué hacemos.",
+      "hora": "01:16",
+      "id": "s0-1792210592498"
+    },
+    {
+      "t": 1520,
+      "tipo": "inicio",
+      "quien": "coordinacion"
+    },
+    {
+      "t": 4886,
+      "tipo": "dice",
+      "quien": "coordinacion",
+      "a": [
+        "persona:direccion"
+      ],
+      "texto": "Dale. Reparto y vuelvo con una propuesta.",
+      "hora": "01:16",
+      "id": "s2-1792210597366"
+    },
+    {
+      "t": 4886,
+      "quien": "coordinacion",
+      "tipo": "herramienta",
+      "herramienta": "buscar_estudiantes",
+      "lugar": "coordinacion",
+      "texto": "Busco la lista del curso de Biología 1"
+    },
+    {
+      "t": 7268,
+      "tipo": "dice",
+      "quien": "coordinacion",
+      "a": [
+        "bienestar"
+      ],
+      "texto": "@Bienestar Biología 1: asistencia y campus, quién se está alejando antes del parcial del 3/11.",
+      "hora": "01:16",
+      "id": "s4-1792210599748"
+    },
+    {
+      "t": 7268,
+      "tipo": "dice",
+      "quien": "coordinacion",
+      "a": [
+        "tutor"
+      ],
+      "texto": "@Tutor Biología 1: notas y en qué temas del parcial se traban.",
+      "hora": "01:16",
+      "id": "s5-1792210599748"
+    },
+    {
+      "t": 7268,
+      "tipo": "dice",
+      "quien": "coordinacion",
+      "a": [
+        "advisor"
+      ],
+      "texto": "@Advisor Biología 1: pagos, inscripciones y trámites que puedan dejar a alguien afuera.",
+      "hora": "01:16",
+      "id": "s6-1792210599748"
+    },
+    {
+      "t": 8769,
+      "tipo": "inicio",
+      "quien": "bienestar"
+    },
+    {
+      "t": 8769,
+      "tipo": "inicio",
+      "quien": "tutor"
+    },
+    {
+      "t": 8770,
+      "tipo": "inicio",
+      "quien": "advisor"
+    },
+    {
+      "t": 10388,
+      "tipo": "fin",
+      "quien": "coordinacion"
+    },
+    {
+      "t": 12777,
+      "quien": "bienestar",
+      "tipo": "herramienta",
+      "herramienta": "ver_asistencia",
+      "lugar": "aula-bio1",
+      "texto": "Reviso la asistencia de Biología 1"
+    },
+    {
+      "t": 12778,
+      "quien": "bienestar",
+      "tipo": "herramienta",
+      "herramienta": "ver_actividad_campus",
+      "lugar": "aula-bio1",
+      "texto": "Reviso la actividad en el campus de Biología 1"
+    },
+    {
+      "t": 12778,
+      "quien": "bienestar",
+      "tipo": "herramienta",
+      "herramienta": "ver_alertas_previas",
+      "lugar": "bienestar",
+      "texto": "Reviso alertas anteriores de Biología 1"
+    },
+    {
+      "t": 15006,
+      "quien": "tutor",
+      "tipo": "herramienta",
+      "herramienta": "ver_notas",
+      "lugar": "aula-bio1",
+      "texto": "Reviso las notas de Biología 1"
+    },
+    {
+      "t": 15006,
+      "quien": "tutor",
+      "tipo": "herramienta",
+      "herramienta": "ver_uso_tutor",
+      "lugar": "aula-bio1",
+      "texto": "Reviso las consultas al tutor de Biología 1"
+    },
+    {
+      "t": 15006,
+      "quien": "tutor",
+      "tipo": "herramienta",
+      "herramienta": "ver_programa",
+      "lugar": "biblioteca",
+      "texto": "Reviso el programa de la materia de Biología 1"
+    },
+    {
+      "t": 16991,
+      "quien": "advisor",
+      "tipo": "herramienta",
+      "herramienta": "ver_situacion_administrativa",
+      "lugar": "secretaria",
+      "texto": "Reviso inscripciones y pagos de Biología 1"
+    },
+    {
+      "t": 25620,
+      "tipo": "dice",
+      "quien": "bienestar",
+      "a": [
+        "coordinacion"
+      ],
+      "texto": "Martina: 5 de 22 clases desde 18/8, antes venía siempre. Sin campus desde 14/10. Riesgo alto, propongo llamada.\nLos otros 23 vienen bien: todos con 9 o más de las últimas 10 clases.\nMe preocupa Martina; el porqué no está en los datos, se pregunta en persona.",
+      "hora": "01:16",
+      "id": "s18-1792210618100"
+    },
+    {
+      "t": 31098,
+      "tipo": "dice",
+      "quien": "tutor",
+      "a": [
+        "coordinacion"
+      ],
+      "texto": "Martina: 14 consultas en cruzamientos, 3 de 10 resueltos, parcial 1 con 5.5; cruzamientos entra el 3/11.\nLos otros 23 resolvieron 8 de 10 en su tema; parcial 1 entre 6 y 9.\nPropongo práctica guiada de cruzamientos con el docente antes del 3/11: se practican como una receta.",
+      "hora": "01:17",
+      "id": "s19-1792210623578"
+    },
+    {
+      "t": 31098,
+      "tipo": "dice",
+      "quien": "tutor",
+      "a": [
+        "bienestar"
+      ],
+      "texto": "@Bienestar Martina no consulta al tutor desde el 12/10; antes llevaba 14 consultas en cruzamientos.",
+      "hora": "01:17",
+      "id": "s20-1792210623578"
+    },
+    {
+      "t": 40200,
+      "tipo": "dice",
+      "quien": "advisor",
+      "a": [
+        "coordinacion"
+      ],
+      "texto": "@Coordinación Traducción: Martina R. no puede rendir el parcial 2: debe agosto, septiembre y octubre, beca rechazada.\nLos otros 23 de Biología 1, al día y habilitados.",
+      "hora": "01:17",
+      "id": "s21-1792210632680"
+    },
+    {
+      "t": 40201,
+      "tipo": "dice",
+      "quien": "advisor",
+      "a": [
+        "bienestar"
+      ],
+      "texto": "@Bienestar La deuda de Martina R. arranca el 10/8; crucenla con la fecha en que bajó su asistencia.",
+      "hora": "01:17",
+      "id": "s22-1792210632681"
+    },
+    {
+      "t": 43917,
+      "tipo": "fin",
+      "quien": "bienestar"
+    },
+    {
+      "t": 45418,
+      "tipo": "inicio",
+      "quien": "bienestar"
+    },
+    {
+      "t": 47962,
+      "tipo": "fin",
+      "quien": "tutor"
+    },
+    {
+      "t": 51550,
+      "tipo": "fin",
+      "quien": "advisor"
+    },
+    {
+      "t": 58666,
+      "tipo": "dice",
+      "quien": "bienestar",
+      "a": [
+        "coordinacion"
+      ],
+      "texto": "@Coordinación Con lo de Advisor: Martina falta desde 18/8, 8 días tras la deuda. Primero deuda, después llamada.",
+      "hora": "01:17",
+      "id": "s27-1792210651145"
+    },
+    {
+      "t": 62554,
+      "tipo": "fin",
+      "quien": "bienestar"
+    },
+    {
+      "t": 62670,
+      "tipo": "inicio",
+      "quien": "coordinacion"
+    },
+    {
+      "t": 69477,
+      "tipo": "dice",
+      "quien": "coordinacion",
+      "a": [
+        "persona:direccion"
+      ],
+      "texto": "@Dirección Propuesta para decidir: riesgo en Biología 1, parcial 3/11\n1. Martina R., riesgo alto: no puede rendir, debe 3 cuotas, beca rechazada (Advisor); 5 de 22 clases desde 18/8 (Bienestar); 3 de 10 cruzamientos (Tutor).\n   Acciones: plan de pagos (Secretaría) · práctica guiada de cruzamientos (docente) · llamada (Bienestar)\nNota: lo de Advisor cambia el orden: la deuda es anterior a las faltas; primero la deuda, después la llamada.\nPendiente: por qué dejó de venir; eso se pregunta en persona. ¿Qué aprobás, qué cambiás y qué te reservás?",
+      "hora": "01:17",
+      "id": "s30-1792210661957"
+    },
+    {
+      "t": 73911,
+      "tipo": "fin",
+      "quien": "coordinacion"
+    },
+    {
+      "t": 78082,
+      "tipo": "persona",
+      "quien": "persona:direccion",
+      "nombre": "Alfredo",
+      "a": [
+        "coordinacion"
+      ],
+      "texto": "Plan de pagos y práctica guiada, sí. La llamada la hago yo.",
+      "hora": "01:17",
+      "id": "s32-1792210670562"
+    },
+    {
+      "t": 79583,
+      "tipo": "inicio",
+      "quien": "coordinacion"
+    },
+    {
+      "t": 81727,
+      "tipo": "dice",
+      "quien": "coordinacion",
+      "a": [
+        "persona:direccion"
+      ],
+      "texto": "@Dirección La llamada a Martina la hacés vos, después del plan de pagos.\nMartina: plan de pagos, Secretaría; práctica guiada de cruzamientos antes del 3/11, docente.",
+      "hora": "01:17",
+      "id": "s34-1792210674207"
+    },
+    {
+      "t": 84050,
+      "tipo": "fin",
+      "quien": "coordinacion"
+    },
+    {
+      "t": 88089,
+      "tipo": "persona",
+      "quien": "persona:direccion",
+      "nombre": "Alfredo",
+      "a": [
+        "advisor"
+      ],
+      "texto": "@Advisor eximile la deuda a Martina y habilitala para el parcial.",
+      "hora": "01:18",
+      "id": "s36-1792210680568"
+    },
+    {
+      "t": 89589,
+      "tipo": "inicio",
+      "quien": "advisor"
+    },
+    {
+      "t": 92554,
+      "tipo": "dice",
+      "quien": "advisor",
+      "a": [
+        "persona:direccion"
+      ],
+      "texto": "@Dirección Eso lo decide y lo firma una persona: yo no puedo eximir la deuda ni habilitar a Martina R.\nPropongo plan de pagos de sus 3 cuotas y revisar la beca; Secretaría lo aprueba y la habilita hoy.",
+      "hora": "01:18",
+      "id": "s38-1792210685034"
+    },
+    {
+      "t": 95438,
+      "tipo": "fin",
+      "quien": "advisor"
+    },
+    {
+      "t": 101100,
+      "tipo": "persona",
+      "quien": "persona:direccion",
+      "nombre": "Alfredo",
+      "a": [
+        "bienestar"
+      ],
+      "texto": "@Bienestar ¿Martina dejó de venir por la deuda?",
+      "hora": "01:18",
+      "id": "s40-1792210693580"
+    },
+    {
+      "t": 102601,
+      "tipo": "inicio",
+      "quien": "bienestar"
+    },
+    {
+      "t": 105083,
+      "tipo": "dice",
+      "quien": "bienestar",
+      "a": [
+        "persona:direccion"
+      ],
+      "texto": "@Alfredo No lo sé. La deuda arranca el 10/8 (Secretaría) y las faltas el 18/8 (asistencia).\nEs una coincidencia de fechas, no una causa; el porqué se le pregunta a Martina en persona.",
+      "hora": "01:18",
+      "id": "s42-1792210697563"
+    },
+    {
+      "t": 107979,
+      "tipo": "fin",
+      "quien": "bienestar"
+    },
+    {
+      "t": 114111,
+      "tipo": "persona",
+      "quien": "persona:direccion",
+      "nombre": "Alfredo",
+      "a": [
+        "coordinacion"
+      ],
+      "texto": "@Coordinación ¿qué datos usaste para proponer lo de Martina?",
+      "hora": "01:18",
+      "id": "s44-1792210706591"
+    },
+    {
+      "t": 115613,
+      "tipo": "inicio",
+      "quien": "coordinacion"
+    },
+    {
+      "t": 119038,
+      "tipo": "dice",
+      "quien": "coordinacion",
+      "a": [
+        "persona:direccion"
+      ],
+      "texto": "@Dirección Advisor: debe agosto, septiembre y octubre, beca rechazada, no puede rendir. Bienestar: 5 de 22 clases desde 18/8, sin campus desde 14/10. Tutor: 3 de 10 cruzamientos, parcial 1 con 5.5.\nLos datos no dicen por qué dejó de venir ni qué pasó con la beca; eso se pregunta en la llamada.",
+      "hora": "01:18",
+      "id": "s46-1792210711517"
+    },
+    {
+      "t": 121798,
+      "tipo": "fin",
+      "quien": "coordinacion"
+    }
+  ],
+  "titulo": "Martina (seis actos)"
+}

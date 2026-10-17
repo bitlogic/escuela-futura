@@ -1,8 +1,8 @@
 """Genera data/escuela-futura.json: datos sintéticos de Escuela Futura.
 
 Uso: python3 scripts/generar_datos.py
-Todo es ficticio. Los cuatro casos de la demo están escritos a mano; el resto
-del curso se genera con una semilla fija para que el archivo sea reproducible.
+Todo es ficticio. El caso de la demo (Martina R.) está escrito a mano; el resto
+del curso (23 estudiantes que vienen bien) se genera con una semilla fija para que el archivo sea reproducible.
 """
 import json, random
 from datetime import date, timedelta
@@ -69,55 +69,12 @@ casos.append(estudiante(
     ingreso={"curso_de_ingreso": True, "expectativa_declarada": "Quiero seguir Medicina el año que viene.", "pidio_ayuda_economica": True},
 ))
 
-# 2. Tomás G.: viene siempre, participa, pero le va mal en genética y casi no usa el tutor.
-casos.append(estudiante(
-    "e02", "Tomás G.", semanas=[(2, 2)] * 12 + [(1, 2)],
-    campus={"ultimo_ingreso": "2026-10-29", "ingresos_ultimos_30_dias": 22, "entregas_pendientes": 0},
-    alertas_previas=[],
-    tutor={"consultas": [{"tema": TEMAS[3], "consultas": 2, "ejercicios_resueltos": 1, "ejercicios_totales": 10}],
-           "ultima_consulta": "2026-09-30"},
-    notas=[{"evaluacion": "TP 1", "fecha": "2026-08-28", "nota": 6},
-           {"evaluacion": "Parcial 1", "fecha": "2026-09-22", "nota": 4},
-           {"evaluacion": "TP 2 (cruzamientos)", "fecha": "2026-10-16", "nota": 3}],
-    administrativo={"inscripcion_parcial_2": "habilitada", "cuotas_impagas": [], "beca": None, "tramites_abiertos": []},
-    ingreso={"curso_de_ingreso": True, "expectativa_declarada": "Me gusta la biología pero me cuesta la matemática.", "pidio_ayuda_economica": False},
-))
-
-# 3. Lucía P.: desde septiembre falta a las clases de la tarde; entrega todo de noche; trámite de cambio de comisión sin respuesta.
-casos.append(estudiante(
-    "e03", "Lucía P.", semanas=[(2, 2)] * 5 + [(1, 2)] * 8,
-    asistencia_nota="Desde el 7/9 falta a la clase de los jueves 14 h; asiste a la de los martes 9 h.",
-    campus={"ultimo_ingreso": "2026-10-29", "ingresos_ultimos_30_dias": 18, "entregas_pendientes": 0,
-            "horario_habitual": "entre las 22 y la 1"},
-    alertas_previas=[],
-    tutor={"consultas": [{"tema": TEMAS[3], "consultas": 6, "ejercicios_resueltos": 9, "ejercicios_totales": 10}],
-           "ultima_consulta": "2026-10-27"},
-    notas=[{"evaluacion": "TP 1", "fecha": "2026-08-28", "nota": 8},
-           {"evaluacion": "Parcial 1", "fecha": "2026-09-22", "nota": 7}],
-    administrativo={"inscripcion_parcial_2": "habilitada", "cuotas_impagas": [], "beca": None,
-                    "tramites_abiertos": [{"tramite": "Cambio de comisión (de jueves 14 h a jueves 19 h)",
-                                           "iniciado": "2026-10-06", "estado": "sin respuesta"}]},
-    ingreso={"curso_de_ingreso": False, "expectativa_declarada": "Necesito horarios compatibles con trabajar.", "pidio_ayuda_economica": False},
-))
-
-# 4. Joaquín M.: desaparece hace cuatro semanas; ya tuvo una alerta el año pasado.
-casos.append(estudiante(
-    "e04", "Joaquín M.", semanas=[(2, 2)] * 3 + [(1, 2)] * 6 + [(0, 2)] * 4,
-    asistencia_nota="No asiste desde el 28/9.",
-    campus={"ultimo_ingreso": "2026-09-26", "ingresos_ultimos_30_dias": 0, "entregas_pendientes": 3},
-    alertas_previas=[{"fecha": "2025-06-15", "detalle": "Alerta por inasistencias en el curso de ingreso; se resolvió con una llamada."}],
-    tutor={"consultas": [], "ultima_consulta": "2026-08-20"},
-    notas=[{"evaluacion": "TP 1", "fecha": "2026-08-28", "nota": 6},
-           {"evaluacion": "Parcial 1", "fecha": "2026-09-22", "nota": 6}],
-    administrativo={"inscripcion_parcial_2": "habilitada", "cuotas_impagas": [], "beca": "beca parcial 30%", "tramites_abiertos": []},
-    ingreso={"curso_de_ingreso": True, "expectativa_declarada": "Primero de mi familia en estudiar en la universidad.", "pidio_ayuda_economica": True},
-))
-
-NOMBRES = ["Sofía A.", "Benjamín C.", "Valentina D.", "Mateo E.", "Catalina F.", "Santiago H.", "Emilia I.",
+# Los otros 23 vienen bien: la demo sigue un solo hilo, el de Martina.
+NOMBRES = ["Tomás G.", "Lucía P.", "Joaquín M.", "Sofía A.", "Benjamín C.", "Valentina D.", "Mateo E.", "Catalina F.", "Santiago H.", "Emilia I.",
            "Thiago J.", "Isabella K.", "Lautaro L.", "Renata N.", "Agustín O.", "Julieta Q.", "Felipe S.",
            "Camila T.", "Bautista U.", "Abril V.", "Facundo Y.", "Delfina Z.", "Nicolás W."]
 resto = []
-for i, nombre in enumerate(NOMBRES, start=5):
+for i, nombre in enumerate(NOMBRES, start=2):
     p1 = random.choice([6, 6.5, 7, 7, 7.5, 8, 8, 8.5, 9])
     resto.append(estudiante(
         f"e{i:02d}", nombre, semanas=normal_asistencia(random.uniform(0.85, 1.0)),

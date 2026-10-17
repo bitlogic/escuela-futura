@@ -21,5 +21,6 @@ dogfood-output/
 .env
 
 # Runtime de start.sh / stop.sh
-.escuela.pid
-escuela.log
+.escuela-*.pid
+escuela-*.log
+evaluaciones/

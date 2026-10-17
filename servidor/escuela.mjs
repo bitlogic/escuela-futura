@@ -18,7 +18,8 @@ import { crearResolutor } from './menciones.mjs';
 import { crearBus } from './bus.mjs';
 import { crearCorredor } from './agente.mjs';
 import { crearHttp } from './http.mjs';
-import { TOOLS, ejecutar } from '../mcp-escuela/herramientas.mjs';
+import { TOOLS, ejecutar as ejecutarDatos } from '../mcp-escuela/herramientas.mjs';
+import { crearTableroServidor, HERRAMIENTAS_TABLERO, NOMBRES_HERRAMIENTAS } from './tablero.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -52,10 +53,14 @@ const log = (...a) => {
 const pack = cargarPack();
 const resolver = crearResolutor({ agentes: pack.agentes, persona: PERSONA });
 const cliente = new Anthropic({ maxRetries: 4, timeout: 90_000 });
-const corredor = crearCorredor({ cliente, modelo: MODELO, effort: EFFORT, instrucciones: pack.instrucciones.replaceAll('{{DIRECTOR}}', PERSONA.nombre), agentes: pack.agentes, herramientas: TOOLS, ejecutar, fallbacks: !process.env.ESCUELA_SIN_FALLBACK, log });
+// El Tablero: las tareas nacen de las decisiones (API) o de los agentes (sus dos herramientas); el bus las emite
+let tablero = null;
+const ejecutar = (nombre, args, agenteId) => (NOMBRES_HERRAMIENTAS.has(nombre) ? tablero.ejecutar(agenteId, nombre, args) : ejecutarDatos(nombre, args));
+const corredor = crearCorredor({ cliente, modelo: MODELO, effort: EFFORT, instrucciones: pack.instrucciones.replaceAll('{{DIRECTOR}}', PERSONA.nombre), agentes: pack.agentes, herramientas: [...TOOLS, ...HERRAMIENTAS_TABLERO], ejecutar, fallbacks: !process.env.ESCUELA_SIN_FALLBACK, log });
 const bus = crearBus({ agentes: pack.agentes, persona: PERSONA, resolver, correrTurno: corredor.correrTurno, log });
-const reiniciar = () => { corredor.reiniciar(); bus.reiniciar(); };
-const http = crearHttp({ bus, reiniciar, info: { modelo: MODELO, persona: PERSONA.nombre }, log });
+tablero = crearTableroServidor({ bus, nombrePersona: PERSONA.nombre, log });
+const reiniciar = () => { corredor.reiniciar(); bus.reiniciar(); tablero.reiniciar(); };
+const http = crearHttp({ bus, reiniciar, info: { modelo: MODELO, persona: PERSONA.nombre }, log, tablero });
 
 const puerto = await http.escuchar(PUERTO);
 const url = `http://localhost:${puerto}/stage/`;

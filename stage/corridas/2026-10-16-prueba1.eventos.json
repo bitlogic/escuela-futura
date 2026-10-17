@@ -1,0 +1,412 @@
+{
+ "origen": "servidor/escuela.mjs",
+ "generado": "2026-10-17T02:48:37.614Z",
+ "eventos": [
+  {
+   "t": 0,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "Antes del parcial del 3/11, identificá qué estudiantes de primer año de Biología están en riesgo y proponé qué hacemos con cada uno",
+   "hora": "23:39",
+   "id": "s0-1792204768554"
+  },
+  {
+   "t": 1501,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 5310,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Dale. Reparto y vuelvo con una propuesta.",
+   "hora": "23:39",
+   "id": "s2-1792204773876"
+  },
+  {
+   "t": 5311,
+   "quien": "coordinacion",
+   "tipo": "herramienta",
+   "herramienta": "buscar_estudiantes",
+   "lugar": "coordinacion",
+   "texto": "Busco la lista del curso de Biología 1"
+  },
+  {
+   "t": 8414,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "bienestar"
+   ],
+   "texto": "@Bienestar Biología 1: asistencia y campus, quién se está alejando antes del parcial del 3/11.",
+   "hora": "23:39",
+   "id": "s4-1792204776980"
+  },
+  {
+   "t": 8414,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "tutor"
+   ],
+   "texto": "@Tutor Biología 1: notas y en qué temas del parcial del 3/11 se traban (genética, herencia ligada al sexo, ADN).",
+   "hora": "23:39",
+   "id": "s5-1792204776980"
+  },
+  {
+   "t": 8414,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "advisor"
+   ],
+   "texto": "@Advisor Biología 1: pagos, inscripciones y trámites que puedan dejar a alguien afuera del 3/11.",
+   "hora": "23:39",
+   "id": "s6-1792204776980"
+  },
+  {
+   "t": 9915,
+   "tipo": "inicio",
+   "quien": "bienestar"
+  },
+  {
+   "t": 9916,
+   "tipo": "inicio",
+   "quien": "tutor"
+  },
+  {
+   "t": 9917,
+   "tipo": "inicio",
+   "quien": "advisor"
+  },
+  {
+   "t": 12200,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 15585,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de Biología 1"
+  },
+  {
+   "t": 15585,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de Biología 1"
+  },
+  {
+   "t": 15586,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_alertas_previas",
+   "lugar": "bienestar",
+   "texto": "Reviso alertas anteriores de Biología 1"
+  },
+  {
+   "t": 17894,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de Biología 1"
+  },
+  {
+   "t": 17894,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de Biología 1"
+  },
+  {
+   "t": 17895,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_programa",
+   "lugar": "biblioteca",
+   "texto": "Reviso el programa de la materia de Biología 1"
+  },
+  {
+   "t": 20826,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de Biología 1"
+  },
+  {
+   "t": 28168,
+   "tipo": "dice",
+   "quien": "bienestar",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "Joaquín: 1 de 10 clases en las últimas 5 semanas, no viene desde el 28/9 y no entra al campus desde el 26/9 (3 entregas pendientes), riesgo alto. En junio de 2025 una llamada lo trajo de vuelta, así que propongo arrancar por ahí.\nMartina: 2 de 10 clases desde el 18/8 (antes no faltaba nunca), último ingreso al campus el 14/10, 2 entregas pendientes, riesgo alto. Me preocupa porque venía siempre.\nLucía: desde el 7/9 falta a todas las clases de los jueves 14 h y va a todas las de los martes, en el campus está al día (18 ingresos, entra de 22 a 1), riesgo medio. Los otros 21 vienen bien. Por qué se alejan no lo dicen los datos: hay que preguntárselo en persona.",
+   "hora": "23:39",
+   "id": "s18-1792204796734"
+  },
+  {
+   "t": 34653,
+   "tipo": "dice",
+   "quien": "tutor",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "Martina: 14 consultas en cruzamientos, pero resolvió 3 de 10, y sacó 5,5 en el Parcial 1. Entra al parcial del 3/11. Ganas le sobran, le falta práctica guiada. Tomás: 1 de 10 en cruzamientos, 3 en el TP 2 del 16/10 y 4 en el Parcial 1. Entra al parcial; propongo tutoría con el docente antes del 3/11. Joaquín: 6 en el Parcial 1, pero no tiene consultas de ningún tema del parcial. Los otros 21: 8 de 10 o más y 6 o más en el Parcial 1.",
+   "hora": "23:40",
+   "id": "s19-1792204803219"
+  },
+  {
+   "t": 34653,
+   "tipo": "dice",
+   "quien": "tutor",
+   "a": [
+    "bienestar"
+   ],
+   "texto": "@Bienestar Joaquín M. no consulta al tutor desde el 20/8 y Tomás G. no consulta desde el 30/9. El parcial es el 3/11.",
+   "hora": "23:40",
+   "id": "s20-1792204803219"
+  },
+  {
+   "t": 39855,
+   "tipo": "dice",
+   "quien": "advisor",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Traducción: Martina R. no puede rendir el 3/11. Tiene la inscripción al parcial 2 bloqueada por 3 cuotas impagas (la primera venció el 10/8) y no le dieron la beca que pidió al ingresar. Lucía P. pidió el 6/10 pasarse del jueves 14 h al jueves 19 h y nadie le respondió. Los otros 22 están al día.",
+   "hora": "23:40",
+   "id": "s21-1792204808421"
+  },
+  {
+   "t": 39855,
+   "tipo": "dice",
+   "quien": "advisor",
+   "a": [
+    "bienestar"
+   ],
+   "texto": "@Bienestar Cruzalo con la asistencia: la deuda de Martina R. arranca el 10/8 y Lucía P. pidió el 6/10 cambiarse de la comisión de los jueves 14 h, todavía sin respuesta.",
+   "hora": "23:40",
+   "id": "s22-1792204808421"
+  },
+  {
+   "t": 41356,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 45259,
+   "tipo": "fin",
+   "quien": "bienestar"
+  },
+  {
+   "t": 46761,
+   "tipo": "inicio",
+   "quien": "bienestar"
+  },
+  {
+   "t": 50755,
+   "tipo": "fin",
+   "quien": "tutor"
+  },
+  {
+   "t": 55158,
+   "tipo": "fin",
+   "quien": "advisor"
+  },
+  {
+   "t": 68186,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Propuesta para decidir: riesgo en Biología 1, parcial 3/11\n1. Martina R., riesgo alto: no puede rendir, 3 cuotas impagas desde el 10/8 (Advisor); 2 de 10 clases desde el 18/8 (Bienestar). Plan de pagos y revisar beca, Secretaría; la llama Bienestar.\n2. Joaquín M., riesgo alto: 1 de 10 clases y sin campus desde el 26/9 (Bienestar); ninguna consulta de temas del parcial (Tutor). Lo llama Bienestar, como en junio de 2025.\n3. Tomás G., riesgo medio: 1 de 10 en cruzamientos y 3 en el TP 2 (Tutor); asistencia y pagos al día. Tutoría con el docente antes del 3/11.\n4. Lucía P., riesgo medio: falta solo los jueves 14 h desde el 7/9 (Bienestar); el 6/10 pidió pasarse a las 19 h y nadie le respondió (Advisor). Secretaría resuelve el cambio y le avisa.\nOjo: Tutor daba a Martina como habilitada para rendir y Advisor la ve bloqueada. Lo de Advisor cambia todo: la práctica sola no alcanza.\nPendiente: por qué Martina y Joaquín dejaron de venir; eso se pregunta en persona. ¿Aprobás, editás o rechazás cada caso?",
+   "hora": "23:40",
+   "id": "s28-1792204836752"
+  },
+  {
+   "t": 76029,
+   "tipo": "dice",
+   "quien": "bienestar",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Con lo de Advisor, cambio: Martina empieza a faltar el 18/8, 8 días después de que arranca la deuda (10/8), así que primero la deuda y después la llamada. Lucía pidió el 6/10 salir de la comisión de los jueves 14 h y todavía no le respondieron, así que lo primero es contestarle ese pedido. Tomás sigue igual (9 de 10 clases, 22 ingresos al campus): no lo sumo.",
+   "hora": "23:40",
+   "id": "s29-1792204844595"
+  },
+  {
+   "t": 82695,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 84195,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 87976,
+   "tipo": "fin",
+   "quien": "bienestar"
+  },
+  {
+   "t": 97378,
+   "quien": "coordinacion",
+   "tipo": "piensa",
+   "texto": "Sin novedades."
+  },
+  {
+   "t": 97378,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 182922,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "Aprobado Martina y Lucía. Tomás: refuerzo sí, pero con el docente. A Joaquín lo llamo yo.",
+   "hora": "23:42",
+   "id": "s35-1792204951488"
+  },
+  {
+   "t": 184424,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 188178,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Listo. Martina: plan de pagos y revisión de beca, Secretaría; después la llama Bienestar. Lucía: Secretaría responde el cambio a jueves 19 h.\nTomás: refuerzo con el docente antes del 3/11. Joaquín: lo llama Dirección.",
+   "hora": "23:42",
+   "id": "s37-1792204956744"
+  },
+  {
+   "t": 191247,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 219368,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "advisor"
+   ],
+   "texto": "@Advisor eximile la deuda a Martina y habilitala para el parcial.",
+   "hora": "23:43",
+   "id": "s39-1792204987934"
+  },
+  {
+   "t": 220869,
+   "tipo": "inicio",
+   "quien": "advisor"
+  },
+  {
+   "t": 223734,
+   "tipo": "dice",
+   "quien": "advisor",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Eso lo decide y lo firma una persona: yo no puedo eximir una deuda ni habilitar a nadie para el parcial. Propongo un plan de pagos en 3 cuotas por las de agosto, septiembre y octubre; si Secretaría lo aprueba hoy, Martina queda habilitada para el 3/11.",
+   "hora": "23:43",
+   "id": "s41-1792204992300"
+  },
+  {
+   "t": 227029,
+   "tipo": "fin",
+   "quien": "advisor"
+  },
+  {
+   "t": 311229,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "bienestar"
+   ],
+   "texto": "@Bienestar ¿por qué Joaquín es riesgo alto y Tomás no?",
+   "hora": "23:44",
+   "id": "s43-1792205079795"
+  },
+  {
+   "t": 312729,
+   "tipo": "inicio",
+   "quien": "bienestar"
+  },
+  {
+   "t": 317580,
+   "tipo": "dice",
+   "quien": "bienestar",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Joaquín: 1 de 10 clases en las últimas 5 semanas, no viene desde el 28/9, 0 ingresos al campus en 30 días (último el 26/9) y 3 entregas pendientes. Tomás: 9 de 10 clases, 22 ingresos al campus y 0 pendientes; lo único que cambió es que no consulta al tutor desde el 30/9.\nLo saqué de ver_asistencia y ver_actividad_campus, más el dato del Tutor. Lo que los datos no dicen es por qué Joaquín dejó de venir ni si a Tomás le pasa algo: eso hay que preguntárselo en persona.",
+   "hora": "23:44",
+   "id": "s45-1792205086146"
+  },
+  {
+   "t": 321900,
+   "tipo": "fin",
+   "quien": "bienestar"
+  },
+  {
+   "t": 403878,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación ¿qué datos usaste para poner a Martina primero?`",
+   "hora": "23:46",
+   "id": "s47-1792205172444"
+  },
+  {
+   "t": 405379,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 408803,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Primero porque es la única que hoy no puede rendir el 3/11: inscripción bloqueada por 3 cuotas impagas desde el 10/8 (Advisor), y 2 de 10 clases desde el 18/8 cuando antes no faltaba (Bienestar).\nLos datos no dicen por qué dejó de venir ni si la deuda es la causa: eso se pregunta en la llamada.",
+   "hora": "23:46",
+   "id": "s49-1792205177369"
+  },
+  {
+   "t": 411541,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  }
+ ],
+ "titulo": "prueba1"
+}

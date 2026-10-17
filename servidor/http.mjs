@@ -18,7 +18,15 @@ const leerJson = (req) => new Promise((ok, no) => { let s = ''; req.on('data', (
  * @param {Function} o.reiniciar  reinicia bus + conversaciones
  * @param {object} o.info       {modelo, persona}
  */
-export function crearHttp({ bus, reiniciar, info, log = () => {}, corridasDir = join(STAGE, 'corridas') }) {
+/** La decisión estructurada de la tarjeta: hasta 12 acciones con texto corto, quién y sí / lo hago yo / no. Cualquier otra cosa, null. */
+export function sanearDecision(d) {
+  if (!d || typeof d !== 'object' || !Array.isArray(d.acciones)) return null;
+  const corto = (x) => String(x || '').slice(0, 120);
+  const acciones = d.acciones.slice(0, 12).filter((a) => a && a.texto).map((a) => ({ texto: corto(a.texto), quien: corto(a.quien), estado: ['si', 'yo', 'no'].includes(a.estado) ? a.estado : 'si' }));
+  return acciones.length ? { acciones, nota: corto(d.nota), caso: corto(d.caso), objetivo: String(d.objetivo || '').slice(0, 300) } : null;
+}
+
+export function crearHttp({ bus, reiniciar, info, log = () => {}, corridasDir = join(STAGE, 'corridas'), tablero = null }) {
   const clientes = new Set();
   const leerIndice = () => { try { return JSON.parse(readFileSync(join(corridasDir, 'index.json'), 'utf8')); } catch { return { predeterminada: null, corridas: [] }; } };
   bus.suscribir((frame) => { const d = `event: eventos\ndata: ${JSON.stringify(frame)}\n\n`; for (const c of clientes) c.write(d); });
@@ -46,12 +54,20 @@ export function crearHttp({ bus, reiniciar, info, log = () => {}, corridasDir = 
         return;
       }
       if (ruta === '/api/mensaje' && req.method === 'POST') {
-        const { texto } = await leerJson(req);
+        const { texto, decision } = await leerJson(req);
         const t = String(texto || '').trim();
         if (!t) return json(res, 400, { error: 'Mensaje vacío.' });
-        const r = bus.mensajePersona(t);
+        const dec = sanearDecision(decision);
+        const r = bus.mensajePersona(t, { decision: dec });
         if (r.invalidas.length) return json(res, 400, { error: `No hay nadie que se llame @${r.invalidas.join(', @')}. Podés hablarle a: ${r.nombres.filter((n) => n !== 'todos').join(', ')} o @todos.`, invalidas: r.invalidas });
+        if (dec && tablero) tablero.desdeDecision(dec);   // lo aprobado nace en el Tablero, en manos de personas
         return json(res, 200, { ok: true, a: r.a });
+      }
+      // El Tablero: el estado y las operaciones de la persona (los agentes operan por sus herramientas)
+      if (ruta === '/api/tablero' && req.method === 'GET') return json(res, 200, tablero ? tablero.estado() : { tareas: [] });
+      if (ruta === '/api/tablero' && req.method === 'POST') {
+        if (!tablero) return json(res, 404, { error: 'Sin tablero.' });
+        try { const e = tablero.operar(await leerJson(req), 'persona'); return json(res, 200, { ok: true, evento: e }); } catch (e) { return json(res, 400, { error: e.message }); }
       }
       if (ruta === '/api/reiniciar' && req.method === 'POST') {
         reiniciar();

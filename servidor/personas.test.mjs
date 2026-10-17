@@ -3,12 +3,13 @@ import assert from 'node:assert/strict';
 import { cargarPack, parsePersona } from './personas.mjs';
 import { crearResolutor } from './menciones.mjs';
 import { TOOLS } from '../mcp-escuela/herramientas.mjs';
+import { HERRAMIENTAS_TABLERO } from './tablero.mjs';
 
 test('el pack carga seis agentes, cada uno con herramientas que existen', () => {
   const { instrucciones, agentes } = cargarPack();
   assert.equal(agentes.length, 6);
   assert.match(instrucciones, /enviar_mensaje/);
-  const nombres = new Set(TOOLS.map((t) => t.name));
+  const nombres = new Set([...TOOLS, ...HERRAMIENTAS_TABLERO].map((t) => t.name));
   for (const a of agentes) { assert.ok(a.herramientas.length, a.id); for (const h of a.herramientas) assert.ok(nombres.has(h), `${a.id}: ${h}`); assert.doesNotMatch(a.prompt, /^---/); }
   assert.deepEqual(agentes.find((a) => a.id === 'coordinacion').herramientas, ['buscar_estudiantes']);
 });

@@ -3,7 +3,6 @@
 # Uso: ./stop.sh [--puerto N]
 
 cd "$(dirname "$0")" || exit 1
-PIDFILE=.escuela.pid
 
 PUERTO=""
 prev=""
@@ -15,6 +14,7 @@ if [ -z "$PUERTO" ]; then
   PUERTO=${ESCUELA_PUERTO:-$( [ -f .env ] && sed -n 's/^[[:space:]]*ESCUELA_PUERTO[[:space:]]*=[[:space:]]*//p' .env | tail -1)}
   PUERTO=${PUERTO:-8080}
 fi
+PIDFILE=.escuela-$PUERTO.pid
 
 PIDS=""
 if [ -f "$PIDFILE" ]; then

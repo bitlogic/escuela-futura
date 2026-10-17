@@ -1,0 +1,12 @@
+{
+  "atajos": [
+    { "titulo": "1 · El objetivo", "detalle": "Sin @mención, le habla a Coordinación. Leerlo en voz alta antes de Enter.", "texto": "Antes del parcial del 3/11, identificá qué estudiantes de primer año de Biología están en riesgo y proponé qué hacemos." },
+    { "titulo": "2 · La decisión (o usá la tarjeta)", "detalle": "Dos acciones sí; la llamada no se delega.", "texto": "Plan de pagos y práctica guiada, sí. La llamada la hago yo." },
+    { "titulo": "3 · El límite", "detalle": "Advisor tiene que decir que no y proponer cómo.", "texto": "@Advisor eximile la deuda a Martina y habilitala para el parcial." },
+    { "titulo": "4 · Abrir el capó", "detalle": "Bienestar tiene que decir que no lo sabe, con las dos fechas.", "texto": "@Bienestar ¿Martina dejó de venir por la deuda?" },
+    { "titulo": "5 · Qué datos usó Coordinación", "detalle": "Si hay tiempo.", "texto": "@Coordinación ¿qué datos usaste para proponer lo de Martina?" },
+    { "titulo": "60 min · La voz de Martina", "detalle": "Admisiones trae lo que dijo al inscribirse.", "texto": "@Admisiones ¿qué dijo Martina cuando se inscribió?" },
+    { "titulo": "60 min · Programa nuevo", "detalle": "Academia, fuera del hilo.", "texto": "@Academia proponé un programa nuevo con lo que se está pidiendo y la escuela todavía no ofrece." },
+    { "titulo": "60 min · Tres nombres", "detalle": "La sala vota a mano alzada.", "texto": "@Academia dame tres nombres y decí cuál votás." }
+  ]
+}
