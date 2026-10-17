@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "escuela-futura": {
-      "command": "node",
-      "args": ["${ESCUELA_FUTURA_DIR}/mcp-escuela/server.mjs"]
-    }
-  }
-}

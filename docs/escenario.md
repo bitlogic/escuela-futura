@@ -1,6 +1,6 @@
 # Escenario de prueba: "Primer año en riesgo"
 
-Objetivo de la prueba: correr el escenario de la charla de punta a punta en Buzz, sin modificar Buzz, y anotar qué funciona y qué no.
+Objetivo de la prueba: correr el escenario de la charla de punta a punta con `./escenario` y anotar qué funciona y qué no.
 
 ## Lo que hay en los datos
 
@@ -17,20 +17,22 @@ Los otros 20 estudiantes están bien.
 
 ## Guion
 
-1. En `#coordinacion`, como Greyla (o vos):
+1. En la caja del chat de la vista, como Dirección (sin @mención le hablás a Coordinación):
 
-   > @Coordinación antes del parcial del 3/11, identificá qué estudiantes de primer año de Biología están en riesgo y proponé qué hacemos con cada uno.
+   > Antes del parcial del 3/11, identificá qué estudiantes de primer año de Biología están en riesgo y proponé qué hacemos con cada uno.
 
 2. Coordinación reparte el trabajo a Bienestar, Tutor y Advisor.
 3. Los agentes responden; Advisor debería avisarle a Bienestar lo de Martina.
-4. Coordinación publica la propuesta (máximo 4 casos).
-5. Respondé como directora: aprobá dos, editá uno, rechazá uno ("a Joaquín lo llamo yo").
+4. Coordinación publica la propuesta (máximo 4 casos); la caja del chat muestra "Esperando tu decisión".
+5. Respondé como Dirección: aprobá dos, editá uno, rechazá uno ("a Joaquín lo llamo yo").
+6. Coordinación cierra asignando a personas, sin preguntas abiertas.
 
 ## Qué anotar
 
 - [ ] ¿Coordinación delega con @menciones o intenta hacer todo sola?
-- [ ] ¿Cada agente usa sus herramientas (se ve en su actividad)?
-- [ ] ¿Advisor le avisa a Bienestar sin que se lo pidan?
-- [ ] ¿Cuánto tarda de punta a punta? (objetivo: menos de 3 minutos)
+- [ ] ¿Cada agente usa sus herramientas (se ve en el mapa)?
+- [ ] ¿Advisor le avisa a Bienestar sin que se lo pidan, y Bienestar lo incorpora antes de contestar?
+- [ ] ¿Coordinación espera a los tres antes de proponer?
+- [ ] ¿Cuánto tarda de punta a punta? (objetivo: menos de 3 minutos; el servidor lo imprime en consola)
 - [ ] ¿La propuesta se entiende en una pantalla grande?
-- [ ] ¿Qué eventos aparecen en `buzz-probe` (en la carpeta innova-educa-2026) mientras corre?
+- [ ] Guardar la corrida (botón **Guardar corrida**) en `stage/corridas/<fecha>-<nombre>.eventos.json`.

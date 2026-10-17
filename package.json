@@ -1,0 +1,17 @@
+{
+  "name": "escuela-futura",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Demo de Escuela Agéntica: seis agentes institucionales que trabajan junto a una persona que decide.",
+  "type": "module",
+  "scripts": {
+    "start": "node servidor/escuela.mjs",
+    "test": "node --test \"servidor/*.test.mjs\" \"stage/*.test.js\""
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.135.0"
+  }
+}

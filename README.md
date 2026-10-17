@@ -1,68 +1,45 @@
 # Escuela Futura
 
-Demo de la charla **Escuela Agéntica** (Innova Educa 21, 5/11/2026): una escuela ficticia donde seis agentes institucionales trabajan junto a personas en [Buzz](https://github.com/block/buzz).
+Demo de la charla **Escuela Agéntica** (Innova Educa 21, 5/11/2026): una escuela ficticia donde seis agentes institucionales trabajan junto a una persona que decide. Los agentes corren sobre la API de Anthropic en un servidor propio; se los ve trabajar en una vista de la escuela desde arriba, en pixel-art, con el chat del equipo al lado.
 
 Todo es ficticio: la escuela, los estudiantes y los datos.
 
 ## Qué hay acá
 
 ```
-pack/                     Persona Pack de Buzz (fuente de verdad de los agentes)
-  .plugin/plugin.json     manifiesto
+pack/                     fuente de verdad de los agentes
   instructions.md         instrucciones del equipo (compartidas)
-  agents/*.persona.md     Coordinación, Tutor, Advisor, Bienestar, Admisiones, Academia
-  avatars/                íconos (.svg editables + .png)
-  .mcp.json               servidor MCP de la escuela
-mcp-escuela/server.mjs    herramientas de la escuela (MCP por stdio, sin dependencias)
+  agents/*.persona.md     Coordinación, Tutor, Advisor, Bienestar, Admisiones, Academia (prompt + tools)
+  avatars/                íconos
+servidor/                 los agentes y el bus de menciones (Node, @anthropic-ai/sdk) · ver docs/bus.md
+mcp-escuela/              herramientas de la escuela: en proceso para el servidor, por MCP (stdio) para Claude Code
 data/escuela-futura.json  datos sintéticos (24 estudiantes de Biología 1)
-scripts/
-  generar_datos.py        regenera data/ (python3 scripts/generar_datos.py)
-  build-team.mjs          arma dist/escuela-futura.team.json desde pack/
-  entorno.sh              estado / apagar / buzz / vista del entorno de demo
-  canales.py + canales.json  estado / miembros / vaciar / reset de los canales (vía CLI de Buzz)
-dist/escuela-futura.team.json   equipo listo para importar en el desktop de Buzz
-docs/entorno.md           receta para levantar y apagar el entorno
-docs/escenario.md         guion de la prueba "Primer año en riesgo"
+stage/                    la vista: escuela desde arriba + chat + organigrama · ver stage/README.md
+scripts/generar_datos.py  regenera data/
+docs/bus.md               cómo funciona el bus y la API de la vista
+docs/escenario.md         guion de la demo "Primer año en riesgo"
 ```
 
 ## Puesta en marcha
 
-La receta completa y repetible (qué app, qué relay, cómo limpiar y cómo levantar cada vez) está en **[docs/entorno.md](docs/entorno.md)**; el comando es `bash scripts/entorno.sh` (`estado`, `apagar`, `buzz`, `vista`). Lo que sigue es el detalle de cada paso.
+Requisitos: Node 20+ y una API key de Anthropic.
 
-Requisitos: Buzz Dev (build del repo de Buzz), Node 18+ y Claude Code instalado y logueado.
+```bash
+npm install
+cp .env.example .env      # y completá ANTHROPIC_API_KEY
+./escenario               # levanta el servidor y abre http://localhost:8080/stage/
+```
 
-1. **Registrar las herramientas de la escuela en Claude Code** (los agentes de Buzz con runtime Claude las toman de ahí):
+En la vista, escribí en la caja del chat como Dirección (sin `@mención` le hablás a Coordinación) y seguí `docs/escenario.md`. **Reiniciar** arranca una sesión nueva; **Guardar corrida** descarga lo que pasó para reproducirlo después (`stage/corridas/`). Sin servidor (o sin red), la vista reproduce la corrida grabada: plan B de la demo.
 
-   ```bash
-   claude mcp add --scope user escuela-futura -- node "$HOME/github/escuela-futura/mcp-escuela/server.mjs"
-   claude mcp list   # debería mostrar escuela-futura
-   ```
+Flags: `./escenario --puerto 9000 --sin-navegador`. Variables: `ESCUELA_MODEL` (`claude-opus-5-5`), `ESCUELA_EFFORT` (`medium`), `ESCUELA_PUERTO`.
 
-2. **Importar el equipo en Buzz:** desktop → Agents → *Agent teams* → **Import** → `dist/escuela-futura.team.json`.
-   Se crean los 6 agentes con sus avatares, prompts e instrucciones del equipo.
-
-3. **Crear los canales** y sumar a los agentes:
-
-   | Canal | Miembros |
-   |---|---|
-   | `#coordinacion` | todos + Greyla |
-   | `#permanencia` | Bienestar, Coordinación |
-   | `#secretaria` | Advisor, Coordinación |
-   | `#aula-biologia-1` | Tutor, Coordinación |
-   | `#admisiones` | Admisiones |
-   | `#academia` | Academia, Coordinación |
-
-4. Seguí `docs/escenario.md`.
+Tests: `npm test`.
 
 ## Cambiar algo
 
-- **Un agente:** editá su `pack/agents/<nombre>.persona.md` y corré `node scripts/build-team.mjs`. Reimportá el equipo (o pegá el prompt a mano en el agente).
-- **Los datos:** editá `scripts/generar_datos.py` y corré `python3 scripts/generar_datos.py`. El servidor MCP relee el archivo en cada llamada.
-- **Los íconos:** reemplazá los `.png` en `pack/avatars/` (512×512) y volvé a armar el equipo.
-- **El modelo:** `ESCUELA_MODEL=<id> node scripts/build-team.mjs`. Sin la variable, cada agente usa el modelo por defecto del runtime.
-
-## Notas
-
-- El desktop de Buzz no importa Persona Packs directamente; por eso `build-team.mjs` los traduce al formato de team snapshot.
-- Los agentes se crean con `respondTo: anyone` para que puedan mencionarse entre ellos. Usalos solo en un relay privado.
-- `pack/.mcp.json` usa `${ESCUELA_FUTURA_DIR}`; sirve si en algún momento se corre el pack con `buzz-acp` directamente.
+- **Un agente:** editá su `pack/agents/<nombre>.persona.md` (el frontmatter `tools:` dice qué herramientas usa) y reiniciá el servidor.
+- **Las reglas del equipo:** `pack/instructions.md`.
+- **Los datos:** editá `scripts/generar_datos.py` y corré `python3 scripts/generar_datos.py`. Las herramientas releen el archivo en cada llamada.
+- **Las herramientas:** `mcp-escuela/herramientas.mjs`. Para usarlas desde Claude Code: `claude mcp add --scope user escuela-futura -- node "$PWD/mcp-escuela/server.mjs"`.
+- **La vista:** `stage/` (ver su README).

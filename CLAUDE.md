@@ -1,25 +1,24 @@
 # Escuela Futura
 
-Demo en vivo para la charla **"Escuela Agéntica"** (Innova Educa 21, Universidad Siglo 21, Córdoba, 5/11/2026), que dan Alfre (Bitlogic) y Greyla Alvarez. Tesis de la charla: *no se puede formar personas para trabajar con agentes desde una institución que no trabaja con agentes*. La demo muestra una escuela ficticia donde seis agentes trabajan junto a personas, y una persona decide.
+Demo en vivo para la charla **"Escuela Agéntica"** (Innova Educa 21, Universidad Siglo 21, Córdoba, 5/11/2026), que dan Alfre (Bitlogic) y Greyla Alvarez. Tesis de la charla: *no se puede formar personas para trabajar con agentes desde una institución que no trabaja con agentes*. La demo muestra una escuela ficticia donde seis agentes trabajan junto a personas, y una persona decide: el director o directora de la escuela es quien mira la pantalla y escribe en el chat (en la vista se llama "Dirección"; no hay un personaje humano en el mapa).
 
 Todo es ficticio: la escuela, los estudiantes y los datos. Idioma del proyecto: español rioplatense.
 
 ## Cómo funciona
 
-- **Los agentes corren en [Buzz](https://github.com/block/buzz)** (workspace de personas + agentes sobre un relay Nostr). Usamos Buzz sin modificar, **la build del repo (`Buzz Dev`, `just desktop-standalone` en `~/github/buzz`)**, contra la comunidad hosteada `wss://escuelafutura.communities.buzz.xyz`. Canal principal: `#coordinacion`. Buzz.app (la instalada) no se usa: tiene otra carpeta de datos y otro llavero, y sus agentes no arrancan desde Buzz Dev. **Cómo levantar/apagar todo: `scripts/entorno.sh` y `docs/entorno.md`.**
-- **`pack/`** es la fuente de verdad de los agentes (Persona Pack de Buzz): `agents/*.persona.md` (prompt + config por agente), `instructions.md` (reglas del equipo), `avatars/`. El desktop de Buzz no importa packs: `scripts/build-team.mjs` los traduce a `dist/escuela-futura.team.json` (team snapshot) para importar en Agents → Agent teams → Import.
-- **`mcp-escuela/server.mjs`** es un servidor MCP (stdio, sin dependencias) con las herramientas de la escuela (`ver_asistencia`, `ver_notas`, `ver_situacion_administrativa`, …) sobre **`data/escuela-futura.json`** (24 estudiantes sintéticos; se regenera con `scripts/generar_datos.py`). Se registra en Claude Code con `claude mcp add --scope user escuela-futura -- node <ruta>/mcp-escuela/server.mjs`; los agentes de Buzz con runtime Claude lo toman de ahí.
-- **`stage/`** es la vista de escenario "la escuela desde arriba": una escuela en pixel-art desde arriba (personajes de Pixel Agents, `stage/oficina.js`), conectada fija al canal `#coordinacion` (escenario 16:9 con un chat del canal a la izquierda; la clave vive en `stage/conexion.local.js`, fuera de git), donde los agentes caminan según lo que hacen de verdad. Se abre con `./escenario` (o `python3 escuela.py`) desde la raíz (→ `http://localhost:8080/stage/`). Reproduce corridas grabadas (`stage/corridas/*.eventos.json`) y tiene modo en vivo contra el relay. Ver `stage/README.md`.
-- **`docs/escenario.md`** es el guion de la demo ("Primer año en riesgo") y qué anotar. **`docs/corridas/`** guarda los exports crudos del probe.
-- **`innova-educa-2026/buzz-probe/index.html`** (otro repo, en la carpeta de la charla) es la página que escucha el relay y exporta los eventos a JSON.
+- **Un solo proceso:** `./escenario` (= `node servidor/escuela.mjs`) levanta los agentes y sirve la vista en `http://localhost:8080/stage/`. Necesita `ANTHROPIC_API_KEY` en `.env` (fuera de git; ver `.env.example`). Antes (hasta el commit `34f3b0a`) los agentes corrían en Buzz sobre un relay Nostr; se reemplazó por un servidor propio para sacar esa dependencia.
+- **`servidor/`** es el bus de menciones: una conversación por agente sobre la API de Anthropic (`@anthropic-ai/sdk`, única dependencia); los mensajes despiertan a quien `@mencionan`; los agentes hablan solo con la herramienta `enviar_mensaje`. Las reglas (quién espera a quién, retención hasta que callen, avisos de "falta X", topes de saltos/turnos/mensajes) están en **`docs/bus.md`**, junto con la API SSE/HTTP que consume la vista. Modelo por `ESCUELA_MODEL` (default `claude-opus-5-5`), `ESCUELA_EFFORT` (`medium`).
+- **`pack/`** es la fuente de verdad de los agentes: `agents/*.persona.md` (frontmatter con `name`, `display_name`, `description`, `tools`; el cuerpo es el prompt) e `instructions.md` (reglas del equipo, incluida la sección "Cómo hablar"). El servidor los lee al arrancar: cambiar un prompt = reiniciar el servidor.
+- **`mcp-escuela/herramientas.mjs`** tiene las 12 herramientas (`buscar_estudiantes`, `ver_asistencia`, `ver_notas`, `ver_situacion_administrativa`, …) sobre `data/escuela-futura.json` (24 estudiantes sintéticos; se regenera con `scripts/generar_datos.py`). El servidor las corre en proceso. `mcp-escuela/server.mjs` las expone por MCP stdio para Claude Code (`claude mcp add --scope user escuela-futura -- node <ruta>/mcp-escuela/server.mjs`).
+- **`stage/`** es la vista: escuela en pixel-art desde arriba (personajes de Pixel Agents, `oficina.js`), chat del equipo, organigrama (`organigrama.html`), tema claro/oscuro. Se conecta al servidor por SSE; sin servidor reproduce la corrida grabada (`stage/corridas/*.eventos.json`). `stage/herramientas.js` dice a qué sala va cada herramienta; lo usan la vista y el servidor. Ver `stage/README.md`.
+- **`docs/escenario.md`** es el guion de la demo ("Primer año en riesgo") y qué anotar.
 
-## Hallazgos sobre Buzz que conviene no redescubrir
+## Hallazgos que conviene no redescubrir
 
-- La actividad de los agentes viaja como eventos **kind 24200** (ephemeral), cifrados NIP-44 para el dueño de los agentes. Traen `turn_started`/`turn_completed`, cada `tool_call` con `rawInput`, y los mensajes que mandan (`buzz messages send --channel … --mention …`). `stage/normalizar.js` los interpreta.
-- El relay **no entrega eventos de canal a suscripciones globales**: hay que suscribirse por canal con `#h: [id]`. Todo requiere AUTH NIP-42.
-- Mensajes de personas: kind 9 con tag `h` (canal) y `p` (mencionado). Aprobaciones: kinds 46030/46031 y 46010/46011 (todavía no usadas).
-- Buzz Dev guarda datos en `~/Library/Application Support/xyz.block.buzz.app.dev/` y las claves de agentes en el llavero `buzz-desktop-dev.main`; Buzz.app usa `xyz.block.buzz.app` y `buzz-desktop`. Un agente creado en una app aparece en la otra sin clave (`has no private key available`): se borra y se reimporta el equipo.
-- Los agentes contestan solo cuando los @mencionan. `respondTo: anyone` en el snapshot para que puedan mencionarse entre ellos.
+- Opus 5.5 rechaza `temperature` y `tool_choice` forzado; el thinking está siempre activo y `max_tokens` lo incluye (por eso 8000). Las conversaciones solo se agregan al final, nunca se editan.
+- La delegación triple de Coordinación sale como tres `tool_use` en una misma respuesta: los `tool_result` van todos en un solo mensaje de usuario (si se parten, el modelo deja de llamar en paralelo) y los tres eventos `dice` salen en un solo frame SSE (la vista los necesita juntos para mandar al personaje al pasillo).
+- En la corrida con Buzz del 12/10, Coordinación recibía las respuestas de a una y mandó la propuesta en el tercer despertar por suerte del prompt. El bus ahora retiene el despertar hasta que los que deben respuesta callan (`docs/bus.md`).
+- Las herramientas del fetch de Node no dejan cambiar `Host`; el test del chequeo de Host usa `node:http`.
 
 ## Estilo
 
@@ -27,20 +26,16 @@ La vista `stage/` es pixel-art (estilo Pixel Agents), no sigue el brand kit. Bra
 
 ## Estado y pendientes
 
-Corrida completa del escenario el 12/10: Coordinación delega, tres agentes en paralelo, propuesta en 46 s, decisión humana reflejada. Pendientes, en orden:
+Reingeniería sin Buzz hecha el 16/10 (servidor, bus con tests, pack adaptado, vista por SSE). Pendientes, en orden:
 
-1. Limpieza inicial de `docs/entorno.md` (Buzz Dev con `--fresh`, importar nsec, sacar agentes viejos de la comunidad, reimportar equipo, canales).
-2. Probar el modo en vivo de `stage/` contra el relay.
-3. Antes de cada corrida de prueba, arrancar los agentes con sesión nueva (si no, reusan datos y no se ven las llamadas a herramientas en el mapa).
-4. Ajustar `pack/agents/coordinacion.persona.md`: tras la aprobación, cerrar asignando a roles humanos, sin pregunta abierta.
-5. Usuario propio para Greyla en la comunidad.
-6. Decidir relay para el 5/11: hosteado (depende de internet del auditorio) vs. propio (Docker, `deploy/compose/` en el repo de Buzz).
-7. Modo guionado como plan B: reproducir una corrida grabada si falla la red.
-8. Formato de la charla: 30 min (demo de ~5 min) o 60 min (demo completa).
+1. Primera corrida real del guion con API key: medir tiempo (objetivo < 3 min), ajustar prompts (espera de Coordinación, cierre sin pregunta abierta) y `ESCUELA_EFFORT`; guardar la corrida en `stage/corridas/` como plan B.
+2. Decidir modelo para el 5/11 (Opus 5.5 vs Sonnet 5.5) según tiempo y calidad de la propuesta.
+3. Probar en el proyector los dos temas (claro/oscuro) y el layout en la resolución del auditorio.
+4. Formato de la charla: 30 min (demo de ~5 min) o 60 min (demo completa).
 
 ## Convenciones
 
-- No tocar el código de Buzz; si hace falta marca/UI, va en un fork aparte con una rama `escuela-futura`.
-- Los prompts de los agentes son cortos, en español, y cada agente usa solo sus herramientas. Nunca contactan a un estudiante ni ejecutan algo con consecuencias: proponen, una persona decide.
-- Cambios en `pack/` → `node scripts/build-team.mjs` y reimportar el equipo.
-- Para levantar o apagar el entorno, usar siempre `bash scripts/entorno.sh` (estado / apagar / buzz / vista), no comandos sueltos. Para dejar los canales en estado conocido (miembros exactos, sin mensajes): `python3 scripts/canales.py reset`, que usa el CLI `buzz` del repo de Buzz; la membresía deseada vive en `scripts/canales.json`.
+- Los prompts de los agentes son cortos, en español, y cada agente usa solo sus herramientas (`tools:` del frontmatter). Nunca contactan a un estudiante ni ejecutan algo con consecuencias: proponen, una persona decide.
+- `npm test` antes de commitear: tests del bus (turnos guionados, reloj manual), del corredor (cliente falso), del pack, del HTTP y del chat.
+- Para levantar la demo, siempre `./escenario`; para una sesión nueva, el botón **Reiniciar** de la vista (o `POST /api/reiniciar`).
+- La vista tiene que seguir reproduciendo las corridas grabadas sin servidor (plan B si falla la red).
