@@ -19,7 +19,7 @@
   #escenario { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; background: var(--panel); }
   .px { clip-path: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px), 0 4px, 4px 4px); }
 
-  header { position: absolute; left: 46px; right: 46px; top: 26px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+  header { position: absolute; left: 46px; right: 46px; top: 26px; height: 64px; display: flex; align-items: center; justify-content: space-between; z-index: 2; }   /* encima de #arbol, que si no se queda con los clics del conmutador */
   header h1 { margin: 0; font: 700 38px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
   header h1 span { color: var(--acento); }
   #vistas { display: flex; background: var(--ink); padding: 4px; gap: 4px; }
