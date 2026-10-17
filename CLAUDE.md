@@ -1,6 +1,6 @@
 # Escuela Futura
 
-Demo en vivo para la charla **"Escuela Agéntica"** (Innova Educa 21, Universidad Siglo 21, Córdoba, 5/11/2026), que dan Alfre (Bitlogic) y Greyla Alvarez. Tesis de la charla: *no se puede formar personas para trabajar con agentes desde una institución que no trabaja con agentes*. La demo muestra una escuela ficticia donde seis agentes trabajan junto a personas, y una persona decide: el director o directora de la escuela es quien mira la pantalla y escribe en el chat (en la vista se llama "Dirección"; no hay un personaje humano en el mapa).
+Demo en vivo para la charla **"Escuela Agéntica"** (Innova Educa 21, Universidad Siglo 21, Córdoba, 5/11/2026), que dan Alfre (Bitlogic) y Greyla Alvarez. Tesis de la charla: *no se puede formar personas para trabajar con agentes desde una institución que no trabaja con agentes*. La demo muestra una escuela ficticia donde seis agentes trabajan junto a personas, y una persona decide: el director o directora de la escuela es quien mira la pantalla y escribe en el chat. En el mapa tiene su personaje en el escritorio de Dirección; su nombre se configura (`ESCUELA_DIRECTOR` en `.env`, o `?nombre=` en la vista; por defecto "Alfredo") y los agentes la mencionan como `@Dirección`.
 
 Todo es ficticio: la escuela, los estudiantes y los datos. Idioma del proyecto: español rioplatense.
 

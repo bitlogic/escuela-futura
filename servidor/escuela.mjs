@@ -5,7 +5,8 @@
 //   node servidor/escuela.mjs --puerto 9000 --sin-navegador
 //
 // Variables (en .env o en el entorno): ANTHROPIC_API_KEY (obligatoria), ESCUELA_MODEL (claude-opus-5-5),
-// ESCUELA_EFFORT (medium), ESCUELA_PUERTO (8080), ESCUELA_SIN_FALLBACK=1 para no reintentar en otro modelo.
+// ESCUELA_EFFORT (medium), ESCUELA_PUERTO (8080), ESCUELA_DIRECTOR (Alfredo: el nombre de quien decide),
+// ESCUELA_SIN_FALLBACK=1 para no reintentar en otro modelo.
 
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -33,7 +34,8 @@ const valor = (n, def) => { const i = args.indexOf(n); return i >= 0 ? args[i + 
 const PUERTO = Number(valor('--puerto', process.env.ESCUELA_PUERTO || 8080));
 const MODELO = process.env.ESCUELA_MODEL || 'claude-opus-5-5';
 const EFFORT = process.env.ESCUELA_EFFORT || 'medium';
-const PERSONA = { id: 'persona:direccion', nombre: 'Dirección', alias: ['direccion', 'director', 'directora'] };
+// La persona que decide: su nombre se configura (ESCUELA_DIRECTOR); @Dirección la menciona igual.
+const PERSONA = { id: 'persona:direccion', nombre: process.env.ESCUELA_DIRECTOR || 'Alfredo', alias: ['direccion', 'director', 'directora'] };
 
 if (!process.env.ANTHROPIC_API_KEY) {
   console.error('Falta ANTHROPIC_API_KEY. Ponela en .env (ANTHROPIC_API_KEY=sk-ant-…) o en el entorno.');
@@ -50,7 +52,7 @@ const log = (...a) => {
 const pack = cargarPack();
 const resolver = crearResolutor({ agentes: pack.agentes, persona: PERSONA });
 const cliente = new Anthropic({ maxRetries: 4, timeout: 90_000 });
-const corredor = crearCorredor({ cliente, modelo: MODELO, effort: EFFORT, instrucciones: pack.instrucciones, agentes: pack.agentes, herramientas: TOOLS, ejecutar, fallbacks: !process.env.ESCUELA_SIN_FALLBACK, log });
+const corredor = crearCorredor({ cliente, modelo: MODELO, effort: EFFORT, instrucciones: pack.instrucciones.replaceAll('{{DIRECTOR}}', PERSONA.nombre), agentes: pack.agentes, herramientas: TOOLS, ejecutar, fallbacks: !process.env.ESCUELA_SIN_FALLBACK, log });
 const bus = crearBus({ agentes: pack.agentes, persona: PERSONA, resolver, correrTurno: corredor.correrTurno, log });
 const reiniciar = () => { corredor.reiniciar(); bus.reiniciar(); };
 const http = crearHttp({ bus, reiniciar, info: { modelo: MODELO, persona: PERSONA.nombre }, log });

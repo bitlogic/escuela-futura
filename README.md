@@ -30,7 +30,7 @@ cp .env.example .env      # y completá ANTHROPIC_API_KEY
 ./escenario               # levanta el servidor y abre http://localhost:8080/stage/
 ```
 
-En la vista, escribí en la caja del chat como Dirección (sin `@mención` le hablás a Coordinación) y seguí `docs/escenario.md`. **Reiniciar** arranca una sesión nueva; **Guardar corrida** descarga lo que pasó para reproducirlo después (`stage/corridas/`). Sin servidor (o sin red), la vista reproduce la corrida grabada: plan B de la demo.
+En la vista, escribí en la caja del chat como la persona que decide (por defecto "Alfredo"; `ESCUELA_DIRECTOR` en `.env` o `?nombre=Greyla` en la URL lo cambian; sin `@mención` le hablás a Coordinación) y seguí `docs/escenario.md`. **Reiniciar** arranca una sesión nueva; **Guardar corrida** descarga lo que pasó para reproducirlo después (`stage/corridas/`). Sin servidor (o sin red), la vista reproduce la corrida grabada: plan B de la demo.
 
 Flags: `./escenario --puerto 9000 --sin-navegador`. Variables: `ESCUELA_MODEL` (`claude-opus-5-5`), `ESCUELA_EFFORT` (`medium`), `ESCUELA_PUERTO`.
 

@@ -114,6 +114,7 @@
 
   .pj { position: absolute; left: 0; top: 0; width: 0; height: 0; will-change: transform; }
   .tag { position: absolute; left: 0; top: calc(10px * var(--u)); transform: translateX(-50%); background: var(--etiqueta-fondo); color: var(--etiqueta-texto); padding: calc(3px * var(--u)) calc(8px * var(--u)); font-size: calc(15px * var(--u)); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+  .pj.persona .tag { background: var(--acento); color: var(--ink); }   /* la persona que decide, en naranja como en el chat */
   .tag.martina { background: var(--acento); color: var(--ink); }
   /* Globos: sans legible, hasta 4 líneas; el texto completo está en el chat */
   .bub { position: absolute; left: 0; bottom: calc(112px * var(--u)); transform: translateX(-50%); width: max-content; max-width: calc(380px * var(--esc)); background: var(--globo-borde); padding: 4px; opacity: 0; transition: opacity 180ms steps(3); }
@@ -278,7 +279,7 @@ const etiquetas = new Map();
 function etiqueta(p) {
   let e = etiquetas.get(p);
   if (e) return e;
-  const el = document.createElement('div'); el.className = 'pj';
+  const el = document.createElement('div'); el.className = 'pj' + (p.persona ? ' persona' : '');
   const bub = document.createElement('div'); bub.className = 'bub'; const sp = document.createElement('span'); const tx = document.createElement('i'); sp.appendChild(tx); bub.appendChild(sp);
   const tag = document.createElement('div'); tag.className = 'tag px'; tag.textContent = p.nombre;
   el.append(bub, tag); $('capa').appendChild(el);
@@ -319,6 +320,10 @@ const esAgente = (d) => fichas.has(d);
 const esPersona = (d) => String(d || '').startsWith('persona:');
 
 // La decisión: mientras una propuesta espera, la caja de chat lo dice y la pantalla de Dirección se enciende.
+function nombrarPersona(nombre) {
+  CONFIG.personas.nombre = nombre;
+  const p = fichas && fichas.get('persona:direccion'); if (p) { p.nombre = nombre; etiqueta(p).tag.textContent = nombre; }
+}
 function esperarDecision(on) {
   const cambio = decisionPendiente !== !!on;
   decisionPendiente = !!on; ofi.esperandoDecision = !!on; $('redactar').classList.toggle('esperando', !!on);
@@ -328,7 +333,8 @@ function esperarDecision(on) {
 
 function aplicar(ev) {
   if (ev.tipo === 'persona') {
-    // La persona que decide es quien mira la pantalla: no tiene sprite, habla por el chat.
+    // La persona que decide: habla por el chat y su personaje lo dice desde Dirección.
+    const p = fichas.get('persona:direccion'); if (p) decir(p, ev.texto);
     chatAgregar({ clave: ev.id, autor: CONFIG.personas.nombre, texto: ev.texto, hora: ev.hora, t: ev.t, persona: true, decision: decisionPendiente });
     esperarDecision(false);
     return;
@@ -362,6 +368,7 @@ function reiniciar() {
   $('capa').querySelectorAll('.pj').forEach((n) => n.remove()); etiquetas.clear();
   fichas = ofi.personajes; pendientes = []; temporizadores = []; indice = 0; reloj = 0;
   esperarDecision(false);
+  ofi.agregar('persona:direccion', { nombre: CONFIG.personas.nombre, casa: CONFIG.personas.casa, persona: true });   // quien decide, en su escritorio de Dirección
   for (const a of CONFIG.agentes) ofi.agregar(a.id, { nombre: a.nombre, casa: a.casa });
   actualizarEstado();
 }
@@ -573,7 +580,7 @@ function conectar() {
   s.addEventListener('estado', (e) => {
     let d = {}; try { d = JSON.parse(e.data); } catch {}
     abierto = huboConexion = true; textoEstado = '';
-    if (d.persona) CONFIG.personas.nombre = d.persona;
+    if (d.persona && !params.get('nombre')) nombrarPersona(d.persona);   // el nombre lo manda el servidor (ESCUELA_DIRECTOR), salvo ?nombre=
     enviarMensaje = enviarAlServidor; actualizarEstado();
   });
   s.addEventListener('snapshot', (e) => { try { cargarSnapshot(JSON.parse(e.data).eventos || []); } catch (err) { console.error(err); } });
@@ -604,6 +611,7 @@ async function cargarGrabacion() {
 // ?corrida=… o ?paso=N, arranca con la corrida grabada.
 try {
   CONFIG = await (await fetch('agentes.json')).json();
+  if (params.get('nombre')) CONFIG.personas.nombre = params.get('nombre').trim().slice(0, 40);   // ?nombre=Greyla: quién es la persona que decide
   ofi = await crearOficina($('lienzo')); ofi.tema(tema);
   for (const t of CARTELES) { const c = document.createElement('div'); c.className = 'sala-cartel'; c.textContent = t.texto; c.dataset.x = t.x; c.dataset.y = t.y; $('capa').appendChild(c); }
   const m = document.createElement('div'); m.id = 'martina'; m.className = 'tag martina px'; m.textContent = 'Martina'; $('capa').appendChild(m);

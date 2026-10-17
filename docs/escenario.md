@@ -17,14 +17,14 @@ Los otros 20 estudiantes están bien.
 
 ## Guion
 
-1. En la caja del chat de la vista, como Dirección (sin @mención le hablás a Coordinación):
+1. En la caja del chat de la vista, como la persona que decide (sin @mención le hablás a Coordinación):
 
    > Antes del parcial del 3/11, identificá qué estudiantes de primer año de Biología están en riesgo y proponé qué hacemos con cada uno.
 
 2. Coordinación reparte el trabajo a Bienestar, Tutor y Advisor.
 3. Los agentes responden; Advisor debería avisarle a Bienestar lo de Martina.
 4. Coordinación publica la propuesta (máximo 4 casos); la caja del chat muestra "Esperando tu decisión".
-5. Respondé como Dirección: aprobá dos, editá uno, rechazá uno ("a Joaquín lo llamo yo").
+5. Respondé como quien decide: aprobá dos, editá uno, rechazá uno ("a Joaquín lo llamo yo").
 6. Coordinación cierra asignando a personas, sin preguntas abiertas.
 
 ## Qué anotar
