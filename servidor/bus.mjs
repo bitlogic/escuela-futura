@@ -10,7 +10,7 @@
 export const LIMITES = {
   espera: 1500,          // ms que se juntan mensajes antes de arrancar un turno
   reintento: 500,        // ms entre chequeos mientras se retiene un despertar
-  retencionMax: 45000,   // ms como mucho reteniendo un despertar por los que faltan
+  retencionMax: 90000,   // ms como mucho reteniendo un despertar por los que faltan (un turno con 24 herramientas tarda ~60 s)
   saltoMax: 5,           // profundidad de cadena agente→agente que todavía despierta
   turnos: { coordinacion: 10, otros: 6 },
   mensajes: 40,          // mensajes de agentes por corrida
@@ -71,7 +71,8 @@ export function crearBus({ agentes, persona, resolver, correrTurno, programar = 
       if (emisor && emisor.turno) emisor.turno.hablo.add(id);
       const despierta = esPersona || (salto <= L.saltoMax && !topeTurnos(x) && S.mensajesAgentes <= L.mensajes);
       x.cola.push({ ...m, despierta });
-      if (despierta) { despertados.push(id); if (emisor) emisor.pendientes.add(id); if (x.estado !== 'corriendo') programarArranque(x, esPersona); }
+      // Espera respuesta solo si le escribe a alguien que no le había escrito: contestar no crea expectativa
+      if (despierta) { despertados.push(id); if (emisor && emisor.turno && !emisor.turno.remitentes.includes(id)) emisor.pendientes.add(id); if (x.estado !== 'corriendo') programarArranque(x, esPersona); }
       else noDespiertan.push(id);
     }
     log('msg', m.nombre, '→', a.join(','), despertados.length ? '' : '(no despierta)');
@@ -141,22 +142,24 @@ export function crearBus({ agentes, persona, resolver, correrTurno, programar = 
     if (turno.epoca !== S.epoca) return;
     x.turno = null;
     emitir({ tipo: 'fin', quien: x.id });
-    // R4: a quien lo esperaba y no le escribió, se le avisa (y se lo despierta si hace falta)
+    // R4: a quien lo esperaba y no le escribió, se le avisa. Se lo despierta solo si ya estaba por arrancar
+    // (retenido o con mensajes); si está quieto, el aviso espera a su próximo turno: no vale un turno por sí solo.
     for (const y of ag.values()) {
       if (!y.pendientes.has(x.id) || turno.hablo.has(y.id)) continue;
       y.pendientes.delete(x.id); y.sinRespuesta.push(x.nombre);
-      if (y.estado !== 'corriendo') programarArranque(y);
+      if (y.estado === 'esperando' || (y.estado === 'inactivo' && y.cola.some((m) => m.despierta))) programarArranque(y);
     }
     x.estado = 'inactivo';
-    if (x.cola.some((m) => m.despierta) || x.sinRespuesta.length) programarArranque(x);
+    if (x.cola.some((m) => m.despierta)) programarArranque(x);
   }
 
   return {
     /** Mensaje de la persona (desde el navegador). Sin mención, le habla a Coordinación. */
     mensajePersona(texto) {
       const r = resolver(texto, { de: persona.id, porDefecto: ['coordinacion'] });
+      if (r.invalidas.length) return { a: [], despertados: [], invalidas: r.invalidas, nombres: r.nombres };   // no se manda: un dedazo no debe ir a Coordinación
       const { despertados } = publicar({ de: persona.id, texto, a: r.a, salto: 0 });
-      return { a: r.a, despertados, invalidas: r.invalidas };
+      return { a: r.a, despertados, invalidas: [] };
     },
     reiniciar,
     suscribir(fn) { oyentes.add(fn); return () => oyentes.delete(fn); },

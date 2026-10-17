@@ -97,7 +97,7 @@ test('fin sin respuesta y retención vencida avisan quién falta', async () => {
   const g2 = { coordinacion: [async (ctx) => { ctx.enviar('@Bienestar a.'); ctx.enviar('@Advisor c.'); }], bienestar: [async (ctx) => ctx.enviar('@Coordinación listo')], advisor: ['abierto'] };
   const b2 = armar({ guion: g2 });
   b2.bus.mensajePersona('objetivo'); await b2.r.avanzar(3000);
-  await b2.r.avanzar(50000);
+  await b2.r.avanzar(95000);   // el tope de retención es de 90 s
   const l2 = b2.turnos.filter((t) => t.id === 'coordinacion')[1].lote;
   assert.deepEqual(l2.faltan, ['Advisor']);
 });
@@ -143,6 +143,37 @@ test('ping-pong: pasado el salto máximo se publica pero no se despierta; una pe
   const antes = inicios.length;
   bus.mensajePersona('@Advisor seguí'); await r.avanzar(3000);
   assert.ok(eventos.filter((e) => e.tipo === 'inicio').length > antes, 'la persona siempre despierta');
+});
+
+test('contestar no crea expectativa: nadie se despierta porque no le respondan una respuesta', async () => {
+  // Coordinación pide a Tutor; Tutor contesta; Coordinación le resume a Dirección. Tutor no tiene que volver a arrancar.
+  const guion = {
+    coordinacion: [async (ctx) => ctx.enviar('@Tutor notas.'), async (ctx) => ctx.enviar('@Dirección listo, cinco de cinco.')],
+    tutor: [async (ctx) => ctx.enviar('@Coordinación todo bien')],
+  };
+  const { bus, r, tipos } = armar({ guion });
+  bus.mensajePersona('objetivo'); await r.avanzar(60000);
+  const turnosDe = (id) => tipos(id).filter((t) => t === 'inicio' || t === 'fin');
+  assert.deepEqual(turnosDe('tutor'), ['inicio', 'fin'], 'Tutor arrancó una sola vez');
+  assert.deepEqual(turnosDe('coordinacion'), ['inicio', 'fin', 'inicio', 'fin']);
+  assert.deepEqual(bus.estado().agentes.map((a) => a.pendientes).flat(), [], 'sin pendientes colgados');
+});
+
+test('un aviso no contestado no despierta a quien lo mandó si está quieto', async () => {
+  // Advisor le avisa a Bienestar sin que se lo pidan; Bienestar contesta solo a Coordinación. Advisor no vuelve a arrancar.
+  const guion = { advisor: [async (ctx) => { ctx.enviar('@Bienestar ojo con Martina'); ctx.enviar('@Coordinación Martina bloqueada'); }], bienestar: [async (ctx) => ctx.enviar('@Coordinación sin novedades')], coordinacion: [] };
+  const { bus, r, tipos } = armar({ guion });
+  bus.mensajePersona('@Advisor revisá'); await r.avanzar(60000);
+  const turnosDe = (id) => tipos(id).filter((t) => t === 'inicio' || t === 'fin');
+  assert.deepEqual(turnosDe('advisor'), ['inicio', 'fin']);
+  assert.deepEqual(turnosDe('bienestar'), ['inicio', 'fin']);
+});
+
+test('una mención inválida de la persona no se manda', async () => {
+  const { bus, r, eventos } = armar({ guion: {} });
+  const res = bus.mensajePersona('@Pepe hola'); await r.avanzar(3000);
+  assert.deepEqual(res.invalidas, ['Pepe']); assert.ok(res.nombres.includes('Coordinación'));
+  assert.deepEqual(eventos, []);
 });
 
 test('reiniciar en medio de un turno descarta su resultado', async () => {

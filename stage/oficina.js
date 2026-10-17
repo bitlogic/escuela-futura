@@ -72,7 +72,8 @@ export const SALAS = {
   for (let i = 0; i < 7; i++) p.visitas.push({ x: 30 + i * 56, y: CARRIL, ocupado: null });
   SALAS.pasillo = p;
 }
-export const CARTELES = Object.values(FISICAS).map((f) => ({ texto: f.nombre, x: f.x0 + 4, y: f.arriba ? 117 : 281 }));
+// Los carteles de abajo van sobre el borde inferior del piso (a 281 se cortaban con el borde del plano).
+export const CARTELES = Object.values(FISICAS).map((f) => ({ texto: f.nombre, x: f.x0 + 4, y: f.arriba ? 117 : 267 }));
 
 const dentroDe = (x, y) => Object.values(FISICAS).find((f) => x >= f.x0 && x <= f.x0 + f.ancho && y >= f.y0 - 4 && y <= f.y1 + 4);
 

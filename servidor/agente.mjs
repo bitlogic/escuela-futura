@@ -101,7 +101,8 @@ export function crearCorredor({ cliente, modelo, effort = 'medium', instruccione
         const bloques = nuevos.length ? [...resultados, { type: 'text', text: 'Mensajes nuevos mientras trabajabas:\n' + nuevos.map((m) => `[${m.hora}] ${m.nombre}: ${m.texto}`).join('\n') }] : resultados;
         mensajes.push({ role: 'user', content: bloques });
       }
-      if (!mando && textoFinal) ctx.emitir({ tipo: 'piensa', texto: textoFinal.replace(/\s+/g, ' ').slice(0, 140) });
+      // Una nota corta ("Espero a Advisor.") se muestra; un razonamiento largo no se proyecta
+      if (!mando && textoFinal) { const nota = textoFinal.replace(/\s+/g, ' ').trim(); ctx.emitir({ tipo: 'piensa', texto: nota.length <= 80 ? nota : 'Sin novedades.' }); }
     } finally { controladores.delete(ac); }
   }
 

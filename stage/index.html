@@ -60,7 +60,9 @@
   .r .av img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
   .r b { flex: none; font-size: calc(19px * var(--esc)); letter-spacing: .08em; text-transform: uppercase; }
   .r span { min-width: 0; flex: 1; font: 600 calc(22px * var(--esc))/1.2 var(--sans); color: var(--texto-suave); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #foco { flex: 1; min-height: 0; overflow: hidden; position: relative; }
+  #foco { flex: 1; min-height: 0; overflow-y: auto; position: relative; scrollbar-width: none; }
+  #foco::-webkit-scrollbar { display: none; }
+  #msgs.fijado #riel { display: none; }   /* con la propuesta fijada, todo el panel es para leerla */
   .f { --t: 34px; display: grid; grid-template-columns: calc(56px * var(--esc)) minmax(0, 1fr); column-gap: calc(18px * var(--esc)); row-gap: 6px; animation: entra .4s steps(6) both; }
   .f .av { grid-row: 1 / 3; width: calc(56px * var(--esc)); height: calc(56px * var(--esc)); background: var(--c); overflow: hidden; }
   .f .av img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
@@ -72,8 +74,9 @@
   .f .cuerpo .it i { font-style: normal; color: var(--c); margin-right: .45em; }
   .f .cuerpo .de { margin: 0 0 .1em; padding-left: 1.35em; color: var(--texto-suave); font-weight: 600; }
   .f .a { color: var(--mencion); }
-  #foco.recortado { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent); }
-  #msgs.recortado::after { content: 'sigue en el canal'; position: absolute; right: calc(28px * var(--esc)); bottom: calc(26px * var(--esc)); padding: 4px 10px; background: var(--panel); color: var(--acento); font: 700 calc(17px * var(--esc))/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+  #foco.recortado:not(.al-final) { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent); }
+  #msgs.recortado.al-final::after { display: none; }
+  #msgs.recortado::after { content: 'sigue abajo ↓'; position: absolute; right: calc(28px * var(--esc)); bottom: calc(26px * var(--esc)); padding: 4px 10px; background: var(--panel); color: var(--acento); font: 700 calc(17px * var(--esc))/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
   .f.persona .cuerpo { padding: 12px 14px; margin: 6px -14px 0; background: color-mix(in srgb, var(--c) 12%, transparent); }
   /* La decisión de la persona: el mensaje que cierra la propuesta, en azul */
   .f.decision .cuerpo { background: var(--azul); color: var(--sobre-azul); font-weight: 700; animation: sube .5s steps(5) both; }
@@ -213,13 +216,16 @@ function chatLimpiar() { hilo.limpiar(); $('msgs').innerHTML = VACIO; }
 function cara_(id) { const av = document.createElement('div'); av.className = 'av px'; const im = document.createElement('img'); im.src = urlDeCara(id); im.alt = ''; av.appendChild(im); return av; }
 function conMenciones(el, linea) { for (const t of trozos(linea)) { if (t.mencion) { const a = document.createElement('span'); a.className = 'a'; a.textContent = t.texto; el.appendChild(a); } else el.appendChild(document.createTextNode(t.texto)); } return el; }
 const colorDe = (id) => `var(--ag-${id || 'persona'})`;   // el color sale de las variables del tema, así cambia sin redibujar
+let fijado = null;   // la propuesta queda en foco mientras se espera la decisión, aunque sigan llegando mensajes
 function chatDibujar(animar = true) {
   const cont = $('msgs'); const ms = hilo.mensajes;
-  if (!ms.length) { cont.innerHTML = VACIO; cont.classList.remove('recortado'); return; }
-  const ultimo = ms[ms.length - 1];
+  if (!ms.length) { cont.innerHTML = VACIO; cont.classList.remove('recortado', 'fijado'); return; }
+  const fijo = decisionPendiente && fijado && ms.includes(fijado) ? fijado : null;
+  const ultimo = fijo || ms[ms.length - 1];
+  cont.classList.toggle('fijado', !!fijo);
   const idDe = (m) => (m.persona ? null : agenteDe(m.autor));
   const riel = document.createElement('div'); riel.id = 'riel';
-  for (const m of ms.slice(Math.max(0, ms.length - 1 - RIEL), -1)) {
+  for (const m of ms.filter((m) => m !== ultimo).slice(-RIEL)) {
     const id = idDe(m); const r = document.createElement('div'); r.className = 'r'; r.style.setProperty('--c', colorDe(id));
     const nom = document.createElement('b'); nom.textContent = m.autor || 'Alguien';
     const resumen = document.createElement('span'); resumen.textContent = primeraLinea(m.texto);
@@ -239,17 +245,21 @@ function chatDibujar(animar = true) {
   f.append(cara_(id), nom, cuerpo);
   if (!animar) f.style.animation = 'none';   // al reacomodar (ancho, ventana) no se repite la entrada
   const foco = document.createElement('div'); foco.id = 'foco'; foco.appendChild(f);
+  foco.addEventListener('scroll', () => alFinal(foco), { passive: true });
   cont.replaceChildren(riel, foco);
   ajustarFoco();
 }
-// El último mensaje se muestra completo: se achica la letra (hasta el 62 %) hasta que entre; si aun así no entra, se desvanece y se avisa.
+// El último mensaje se muestra completo: se achica la letra (hasta el 53 %) hasta que entre; si aun así no entra,
+// se desvanece abajo y se puede desplazar con la rueda (o ↓) para leer el resto.
 function ajustarFoco() {
   const cont = $('msgs'), foco = $('foco'), f = foco && foco.firstElementChild; if (!f) return;
   const esc = Number(getComputedStyle(document.documentElement).getPropertyValue('--esc')) || 1;
-  let t = 34 * esc; const min = 21 * esc; f.style.setProperty('--t', t + 'px');
+  let t = 34 * esc; const min = 24 * esc; f.style.setProperty('--t', t + 'px');   // no baja de 24: desde el fondo del auditorio, mejor desplazar que achicar
   while (f.scrollHeight > foco.clientHeight && t > min) { t -= 1; f.style.setProperty('--t', t + 'px'); }
   const corto = f.scrollHeight > foco.clientHeight; foco.classList.toggle('recortado', corto); cont.classList.toggle('recortado', corto);
+  alFinal(foco);
 }
+function alFinal(foco) { const fin = foco.scrollTop + foco.clientHeight >= foco.scrollHeight - 4; foco.classList.toggle('al-final', fin); $('msgs').classList.toggle('al-final', fin); }
 new ResizeObserver(() => ajustarFoco()).observe($('msgs'));   // cambia el alto disponible (p. ej. al aparecer "Trabajando: …")
 function chatAgregar({ clave, autor, texto, hora, t, persona, decision }) { if (hilo.agregar({ clave, autor, texto, hora, t, persona, decision }) && !silencioso) chatDibujar(); }
 let ultimoTrabajando = '', avisoHasta = 0;
@@ -308,7 +318,12 @@ const esAgente = (d) => fichas.has(d);
 const esPersona = (d) => String(d || '').startsWith('persona:');
 
 // La decisión: mientras una propuesta espera, la caja de chat lo dice y la pantalla de Dirección se enciende.
-function esperarDecision(on) { decisionPendiente = on; ofi.esperandoDecision = on; $('redactar').classList.toggle('esperando', on); }
+function esperarDecision(on) {
+  const cambio = decisionPendiente !== !!on;
+  decisionPendiente = !!on; ofi.esperandoDecision = !!on; $('redactar').classList.toggle('esperando', !!on);
+  if (!on) fijado = null;
+  if (cambio && !silencioso) chatDibujar(false);
+}
 
 function aplicar(ev) {
   if (ev.tipo === 'persona') {
@@ -330,7 +345,7 @@ function aplicar(ev) {
     chatAgregar({ clave: ev.id, autor: f.nombre, texto: ev.texto, hora: ev.hora, t: ev.t });
     if (personas.length) {
       ofi.ir(f, CONFIG.personas.casa);   // va a presentar al despacho de Dirección
-      if (esPropuesta) esperarDecision(true);
+      if (esPropuesta) { fijado = hilo.mensajes[hilo.mensajes.length - 1]; esperarDecision(true); }
     } else if (agentes.length) {
       const hermanos = eventos.filter((e) => e.tipo === 'dice' && e.quien === ev.quien && Math.abs(e.t - ev.t) < 1500);
       const todos = [...new Set(hermanos.flatMap((e) => (e.a || []).filter(esAgente)))];
@@ -370,7 +385,7 @@ function actualizarEstado() {
   { const c = $('chat-estado'); c.className = modoVivo && !textoEstado ? 'vivo' : ''; c.textContent = t; }
   $('btn-vivo').classList.toggle('on', modoVivo); $('btn-grab').classList.toggle('on', !modoVivo);
   for (const id of ['btn-prev', 'btn-play', 'btn-next', 'velocidad']) $(id).disabled = modoVivo;
-  $('texto').disabled = !enviarMensaje; $('texto').placeholder = enviarMensaje ? '@Coordinación …' : 'Sin conexión';
+  $('texto').disabled = !enviarMensaje; $('texto').placeholder = enviarMensaje ? '@Coordinación …' : (modoVivo ? 'Sin conexión' : 'Grabación · En vivo (v) para escribir');
 }
 
 function posicionar() {
@@ -435,7 +450,8 @@ $('btn-guardar').onclick = async () => {
   let data;
   try { data = modoVivo ? await (await fetch('/api/corrida')).json() : { origen: 'grabacion', generado: new Date().toISOString(), eventos }; } catch { aviso('No se pudo bajar la corrida.'); return; }
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
-  a.download = new Date().toISOString().slice(0, 10) + '-corrida.eventos.json'; a.click(); URL.revokeObjectURL(a.href);
+  const d = new Date(), dd = (n) => String(n).padStart(2, '0');   // fecha local, no UTC: a la noche cambiaba de día
+  a.download = `${d.getFullYear()}-${dd(d.getMonth() + 1)}-${dd(d.getDate())}-corrida.eventos.json`; a.click(); URL.revokeObjectURL(a.href);
 };
 const cajaTexto = $('texto');
 const ajustarCaja = () => { cajaTexto.style.height = '0'; const base = parseFloat(getComputedStyle(cajaTexto).maxHeight); cajaTexto.style.height = Math.min(base, Math.max(base * 64 / 230, cajaTexto.scrollHeight + 6)) + 'px'; };   // crece con el texto y se ve completo
@@ -486,6 +502,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') $('btn-next').click();
   if (e.key === 'ArrowLeft') $('btn-prev').click();
   if (e.key === 'r') $('btn-reiniciar').click();
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { const fo = $('foco'); if (fo) { e.preventDefault(); fo.scrollBy({ top: (e.key === 'ArrowDown' ? 1 : -1) * fo.clientHeight * 0.6, behavior: 'smooth' }); } }
   if (e.key === 'v') $('btn-vivo').click();
   if (e.key === 'g') $('btn-grab').click();
   if (e.key === 't') $('btn-tema').click();
@@ -526,7 +543,7 @@ function desconectar() { deseaVivo = false; enviarMensaje = null; if (es) { cons
 
 function enviarAlServidor(texto) {
   fetch('/api/mensaje', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ texto }) })
-    .then(async (r) => { if (!r.ok) { let m = 'No se pudo enviar.'; try { m = (await r.json()).error || m; } catch {} aviso(m); } })
+    .then(async (r) => { if (!r.ok) { let m = 'No se pudo enviar.'; try { m = (await r.json()).error || m; } catch {} aviso(m); if (!cajaTexto.value) { cajaTexto.value = texto; ajustarCaja(); } } })   // rechazado (p. ej. @mención inexistente): el texto vuelve a la caja
     .catch(() => aviso('No se pudo enviar. ¿Está el servidor?'));
   return true;
 }

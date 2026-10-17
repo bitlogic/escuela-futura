@@ -27,7 +27,9 @@ test('la vista puede conectarse, escribir y reiniciar', async () => {
     assert.equal((await fetch(base + '/api/mensaje', { method: 'POST', body: JSON.stringify({ texto: 'hola' }) })).status, 403, 'sin Content-Type JSON no pasa (CSRF)');
     assert.equal((await fetch(base + '/api/mensaje', { method: 'POST', headers: { ...JSON_, Origin: 'http://evil.example' }, body: '{"texto":"x"}' })).status, 403, 'Origin ajeno no pasa');
     const r = await (await fetch(base + '/api/mensaje', { method: 'POST', headers: { ...JSON_, Origin: base }, body: JSON.stringify({ texto: 'hola' }) })).json();
-    assert.deepEqual(r, { ok: true, a: ['coordinacion'], invalidas: [] });
+    assert.deepEqual(r, { ok: true, a: ['coordinacion'] });
+    const inv = await fetch(base + '/api/mensaje', { method: 'POST', headers: JSON_, body: JSON.stringify({ texto: '@Pepe hola' }) });
+    assert.equal(inv.status, 400); assert.match((await inv.json()).error, /No hay nadie que se llame @Pepe/);
     await leer('"tipo":"fin"');
     const frames = [...buf.matchAll(/event: eventos\ndata: (.*)\n/g)].map((m) => JSON.parse(m[1]));
     const tipos = frames.flat().map((e) => e.tipo);

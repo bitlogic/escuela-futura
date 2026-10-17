@@ -49,7 +49,8 @@ export function crearHttp({ bus, reiniciar, info, log = () => {} }) {
         const t = String(texto || '').trim();
         if (!t) return json(res, 400, { error: 'Mensaje vacío.' });
         const r = bus.mensajePersona(t);
-        return json(res, 200, { ok: true, a: r.a, invalidas: r.invalidas });
+        if (r.invalidas.length) return json(res, 400, { error: `No hay nadie que se llame @${r.invalidas.join(', @')}. Podés hablarle a: ${r.nombres.filter((n) => n !== 'todos').join(', ')} o @todos.`, invalidas: r.invalidas });
+        return json(res, 200, { ok: true, a: r.a });
       }
       if (ruta === '/api/reiniciar' && req.method === 'POST') {
         reiniciar();
