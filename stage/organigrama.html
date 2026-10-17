@@ -22,7 +22,9 @@
   header { position: absolute; left: 46px; right: 46px; top: 26px; height: 64px; display: flex; align-items: center; justify-content: space-between; z-index: 2; }   /* encima de #arbol, que si no se queda con los clics del conmutador */
   header h1 { margin: 0; font: 700 38px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
   header h1 span { color: var(--acento); }
-  #vistas { display: flex; background: var(--ink); padding: 4px; gap: 4px; }
+  /* Mismo conmutador y mismo lugar que en index.html (fijo a la ventana, fuera del escenario escalado). Embebido no se muestra: lo pone la vista madre. */
+  #vistas { position: fixed; right: 14px; top: 10px; z-index: 60; display: flex; background: var(--ink); padding: 4px; gap: 4px; }
+  body.embebido #vistas { display: none; }
   #vistas button { font: 700 18px var(--mono); letter-spacing: .08em; text-transform: uppercase; background: transparent; color: #f4efe2; border: 0; padding: 8px 14px; cursor: pointer; }
   #vistas button.on { background: var(--acento); color: var(--ink); }
   #vistas button:hover:not(.on) { background: #2c2f48; }
@@ -52,10 +54,10 @@
 </style>
 </head>
 <body>
+<div id="vistas" class="px"><button id="v-escuela">Escuela</button><button id="v-org" class="on">Organigrama <kbd>o</kbd></button></div>
 <div id="escenario">
   <header>
     <div><h1>Escuela <span>Futura</span> · Organigrama</h1></div>
-    <div id="vistas" class="px"><button id="v-escuela">Escuela <kbd>o</kbd></button><button id="v-org" class="on">Organigrama</button></div>
   </header>
   <div id="arbol" style="position:absolute;inset:0;top:44px"></div>
 </div>
@@ -65,6 +67,7 @@ import { MODELOS, cargarHojas, caraViva, aplicarColores } from './personajes.js'
 
 const $ = (s) => document.querySelector(s);
 const embebido = new URLSearchParams(location.search).has('embebido');
+document.body.classList.toggle('embebido', embebido);
 let tema = document.documentElement.dataset.tema === 'claro' ? 'claro' : 'oscuro';
 function aplicarTema(t) { tema = t === 'claro' ? 'claro' : 'oscuro'; document.documentElement.dataset.tema = tema; aplicarColores(tema); try { localStorage.setItem('tema', tema); } catch {} }
 aplicarTema(tema);

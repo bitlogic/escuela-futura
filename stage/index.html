@@ -124,8 +124,9 @@
   .pj.abajo .bub::after { bottom: auto; top: -10px; transform: scaleY(-1); }
 
   /* Conmutador de vistas (arriba a la derecha) y controles (aparecen al mover el mouse) */
-  #vistas { position: absolute; right: 14px; top: 10px; z-index: 20; display: flex; background: var(--ink); padding: 4px; gap: 4px; }
-  #vistas button { font: 700 calc(18px * var(--esc)) var(--mono); letter-spacing: .08em; text-transform: uppercase; background: transparent; color: #f4efe2; border: 0; padding: 8px 14px; cursor: pointer; }
+  /* Fijo a la ventana y por encima del organigrama: ocupa exactamente el mismo lugar en las dos vistas (mismo CSS en organigrama.html) */
+  #vistas { position: fixed; right: 14px; top: 10px; z-index: 60; display: flex; background: var(--ink); padding: 4px; gap: 4px; }
+  #vistas button { font: 700 18px var(--mono); letter-spacing: .08em; text-transform: uppercase; background: transparent; color: #f4efe2; border: 0; padding: 8px 14px; cursor: pointer; }
   #vistas button.on { background: var(--acento); color: var(--ink); }
   #vistas button:hover:not(.on) { background: #2c2f48; }
   #vistas kbd { font: inherit; background: rgba(255,255,255,.14); padding: 2px 8px; margin-left: 8px; }
@@ -145,6 +146,7 @@
 </head>
 <body>
 <iframe id="org" title="Organigrama"></iframe>
+<div id="vistas" class="px"><button id="v-escuela" class="on">Escuela</button><button id="v-org">Organigrama <kbd>o</kbd></button></div>
 <div id="escenario">
   <aside id="chat">
     <div id="chat-cab"><span class="canal"><b>#</b>coordinacion</span><span id="chat-estado">Grabación</span></div>
@@ -158,7 +160,6 @@
       <canvas id="lienzo"></canvas>
       <div id="capa"></div>
     </div>
-    <div id="vistas" class="px"><button id="v-escuela" class="on">Escuela</button><button id="v-org">Organigrama <kbd>o</kbd></button></div>
     <div id="barra">
       <button id="btn-prev" title="Paso anterior (←)">‹</button>
       <button id="btn-play" title="Play / pausa (espacio)">Pausa</button>

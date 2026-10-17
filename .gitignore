@@ -19,3 +19,7 @@ dogfood-output/
 
 # Credenciales locales
 .env
+
+# Runtime de start.sh / stop.sh
+.escuela.pid
+escuela.log

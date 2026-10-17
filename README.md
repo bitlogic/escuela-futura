@@ -34,6 +34,8 @@ En la vista, escribí en la caja del chat como Dirección (sin `@mención` le ha
 
 Flags: `./escenario --puerto 9000 --sin-navegador`. Variables: `ESCUELA_MODEL` (`claude-opus-5-5`), `ESCUELA_EFFORT` (`medium`), `ESCUELA_PUERTO`.
 
+Para dejarlo corriendo en segundo plano: `./start.sh` (acepta los mismos flags; PID en `.escuela.pid`, salida en `escuela.log`) y `./stop.sh` para cortarlo.
+
 Tests: `npm test`.
 
 ## Cambiar algo
