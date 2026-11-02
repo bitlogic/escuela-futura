@@ -24,3 +24,6 @@ dogfood-output/
 .escuela-*.pid
 escuela-*.log
 evaluaciones/
+
+# Informes de /impeccable critique (locales)
+.impeccable/

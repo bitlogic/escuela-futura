@@ -12,10 +12,10 @@
   @font-face { font-family: "Plain"; src: url("assets/Plain-Regular.otf"); font-weight: 400; font-display: block; }
   @font-face { font-family: "Plain"; src: url("assets/Plain-Medium.otf"); font-weight: 500 600; font-display: block; }
   @font-face { font-family: "Plain"; src: url("assets/Plain-Bold.otf"); font-weight: 700; font-display: block; }
-  :root { color-scheme: dark; --ink: #1a1a2e; --texto: #f4efe2; --suave: #9a9eba; --tenue: #6b6f8a; --acento: #ff7a3d; --azul: #3e6be8; --ok: #5fae6a; --fondo: #0b0b12; --panel: #10101b; --tarjeta: #181826; --linea: #2c2f48; --campo: #1b1b2b;
+  :root { color-scheme: dark; --ink: #1a1a2e; --texto: #f4efe2; --suave: #9a9eba; --tenue: #8f93b0; --acento: #ff7a3d; --azul: #3e6be8; --ok: #5fae6a; --fondo: #0b0b12; --panel: #10101b; --tarjeta: #181826; --linea: #2c2f48; --campo: #1b1b2b;
     --c-direccion: #ff7a3d; --c-secretaria: #44c9b3; --c-docente: #f0c13f; --c-bienestar: #f07fb0; --c-admisiones: #e0b84a; --c-academica: #6fd987; --c-otro: #9a9eba;
     --mono: "Silkscreen", "Press Start 2P", ui-monospace, Menlo, monospace; --sans: "Plain", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-  :root[data-tema="claro"] { color-scheme: light; --ink: #1a1a2e; --texto: #121212; --suave: #5c5f73; --tenue: #8a8d9e; --acento: #c2410c; --azul: #2f54c8; --ok: #2f7a3b; --fondo: #e9e2d3; --panel: #f9f4ea; --tarjeta: #ffffff; --linea: #d6cdb9; --campo: #ffffff;
+  :root[data-tema="claro"] { color-scheme: light; --ink: #1a1a2e; --texto: #121212; --suave: #5c5f73; --tenue: #8a8d9e; --acento: #c2410c; --azul: #2f54c8; --ok: #2f7a3b; --fondo: #e9e2d3; --panel: #f9f4ea; --tarjeta: #fbf8f1; --linea: #d6cdb9; --campo: #fbf8f1;
     --c-direccion: #c2410c; --c-secretaria: #0d6e60; --c-docente: #7d6000; --c-bienestar: #b4306a; --c-admisiones: #7e6212; --c-academica: #1d7a42; --c-otro: #5c5f73; }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
@@ -29,13 +29,15 @@
   #vistas button.on { background: var(--acento); color: var(--ink); } #vistas button:hover:not(.on) { background: #2c2f48; }
   #vistas kbd { font: inherit; background: rgba(255,255,255,.14); padding: 2px 8px; margin-left: 8px; }
 
-  header { flex: none; display: flex; align-items: center; gap: 28px; padding: 30px 720px 22px 56px; }   /* a la derecha va el conmutador de vistas, fijo */
-  header h1 { margin: 0; font: 700 34px var(--mono); letter-spacing: .06em; text-transform: uppercase; } header h1 span { color: var(--acento); }
+  header { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 22px 28px; padding: 90px 720px 22px 56px; }   /* arriba y a la derecha va el conmutador de vistas, fijo a la ventana: a escala 1 (chat cerrado) hay que dejarle 60px */
+  body.embebido header { padding-right: 56px; }   /* embebido, el conmutador de la vista madre queda arriba, no al costado */
+  header h1 { margin: 0; font: 700 30px var(--sans); letter-spacing: 0; } header h1 span { color: inherit; }   /* el naranja es de la persona; sans: el mono pixel es para etiquetas, no para títulos */
   header .hueco { flex: 1; }
-  .modos { display: flex; background: var(--linea); padding: 3px; gap: 3px; }
+  .modos { display: flex; background: var(--panel); padding: 3px; gap: 3px; }
   .modos button { font: 700 18px var(--sans); letter-spacing: .05em; text-transform: uppercase; background: transparent; color: var(--texto); border: 0; padding: 9px 18px; cursor: pointer; }
-  .modos button.on { background: var(--panel); }
-  #mas { font: 700 18px var(--sans); letter-spacing: .05em; text-transform: uppercase; background: var(--acento); color: var(--ink); border: 0; padding: 12px 18px; cursor: pointer; }
+  .modos button.on { background: var(--texto); color: var(--panel); }   /* el activo en papel sobre tinta: el naranja es de la persona */
+  #mas { font: 700 18px var(--sans); letter-spacing: .05em; text-transform: uppercase; background: transparent; color: var(--texto); border: 2px solid var(--linea); padding: 10px 16px; cursor: pointer; }
+  #mas:hover:not(:disabled) { border-color: var(--suave); }
   #mas:disabled { opacity: .4; cursor: default; }
   #cuerpo { flex: 1; min-height: 0; padding: 0 56px 40px; position: relative; }
   #vacio { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; color: var(--suave); font: 600 30px/1.4 var(--sans); padding: 0 300px; }
@@ -44,18 +46,25 @@
   /* Kanban: cuatro columnas iguales, tarjetas planas */
   #kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; height: 100%; }
   .col { display: flex; flex-direction: column; min-height: 0; border-top: 4px solid var(--linea); padding-top: 14px; }
-  .col.sobre { background: color-mix(in srgb, var(--azul) 10%, transparent); }
-  .col.lista { border-top-color: var(--ok); } .col.revision { border-top-color: var(--azul); }
+  .col h2 small:empty { display: none; }   /* sin bordes de color por columna ni "0" en las vacías: el Kanban es la vista de trabajo, no la del auditorio */
   .col h2 { margin: 0 0 16px; display: flex; align-items: baseline; gap: 12px; font: 700 22px var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--texto); }
   .col h2 small { font: 600 20px var(--sans); color: var(--tenue); }
   .col .pila { flex: 1; min-height: 60px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; scrollbar-width: thin; }
-  .tj { background: var(--tarjeta); border: 3px solid var(--linea); padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; cursor: grab; }
-  .tj:active { cursor: grabbing; } .tj.arrastrando { opacity: .4; }
-  .tj.quieta { cursor: default; }
+  .tj { background: var(--tarjeta); border: 3px solid var(--linea); padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .col.llena .tj { padding: 12px 16px; gap: 6px; } .col.llena .tj .que { font-size: 22px; }   /* con 5 o más tarjetas (Martina + la rutina del acto 7), más apretadas para que entren a 1080p */
+  .tj .mov { display: flex; gap: 8px; margin-left: auto; }
+  .tj .mov button { font: 700 20px var(--sans); background: transparent; color: var(--texto); border: 2px solid var(--linea); padding: 4px 12px; cursor: pointer; line-height: 1; }
+  .tj .mov button:hover:not(:disabled) { border-color: var(--suave); } .tj .mov button:disabled { opacity: .3; cursor: default; }
+  .tj .mov button.lista { background: var(--ok); border-color: var(--ok); color: var(--ink); }
   .tj .que { font: 700 26px/1.25 var(--sans); color: var(--texto); }
   .tj .fila { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .quien { display: inline-flex; align-items: center; gap: 8px; font: 700 17px var(--sans); letter-spacing: .04em; text-transform: uppercase; color: var(--texto); }
   .quien::before { content: ''; width: 12px; height: 12px; background: var(--c); }
+  .quien select { font: 700 17px var(--sans); letter-spacing: .04em; text-transform: uppercase; background: transparent; color: var(--texto); border: 0; border-bottom: 2px solid var(--linea); padding: 2px 0; cursor: pointer; max-width: 240px; }
+  .quien select:hover, .quien select:focus { border-bottom-color: var(--suave); outline: none; }
+  .quien select option { background: var(--panel); color: var(--texto); text-transform: none; }
+  .chip.agente { background: var(--azul); color: #f4efe2; }   /* trabajo de un agente: azul, no el naranja de la persona */
+  .chip.entrego { background: var(--azul); color: #f4efe2; }
   .caso { font: 600 18px var(--sans); color: var(--suave); }
   .chip { font: 700 14px var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 3px 8px; background: var(--linea); color: var(--suave); }
   .nota { font: 500 18px/1.3 var(--sans); color: var(--suave); font-style: italic; }
@@ -68,7 +77,8 @@
   .grupo .cab .avance { font: 600 20px var(--sans); color: var(--suave); }
   .grupo .cab .estado { font: 700 15px var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 4px 10px; background: var(--linea); color: var(--texto); }
   .grupo .cab .estado.lista { background: var(--ok); color: var(--ink); } .grupo .cab .estado.revision { background: var(--azul); color: #f4efe2; }
-  .ren { display: grid; grid-template-columns: 200px minmax(0, 1fr) auto; align-items: center; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--linea); }
+  .ren { display: grid; grid-template-columns: 340px minmax(0, 1fr) 200px; align-items: center; gap: 24px; padding: 16px 0; border-bottom: 1px solid var(--linea); }
+  .ren .fila { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; } .ren .fila .quien, .ren .fila .quien select { font-size: 24px; }   /* en manos de quién: es lo primero que se lee */
   .ren select { font: 700 16px var(--sans); letter-spacing: .04em; text-transform: uppercase; background: var(--campo); color: var(--texto); border: 2px solid var(--linea); padding: 8px 10px; width: 100%; }
   .ren select:disabled { opacity: .6; }
   .ren .que { font: 600 24px/1.25 var(--sans); color: var(--texto); display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
@@ -81,7 +91,7 @@
   .nueva button:hover { border-color: var(--suave); }
   .nueva .rot { font: 700 15px var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--tenue); }
   #aviso { position: absolute; left: 56px; bottom: 16px; font: 600 18px var(--sans); color: var(--acento); }
-  #form-tarea { display: none; gap: 12px; align-items: center; }
+  #form-tarea { display: none; gap: 12px; align-items: center; flex-basis: 100%; }   /* en su propia fila: no empuja el título */
   #form-tarea.abierto { display: flex; }
   #form-tarea input { font: 600 20px var(--sans); background: var(--campo); color: var(--texto); border: 2px solid var(--linea); padding: 10px 12px; width: 420px; outline: none; }
   #form-tarea input:focus { border-color: var(--acento); }
@@ -106,7 +116,7 @@
 </div>
 
 <script type="module">
-import { crearTablero, ESTADOS, ETIQUETAS, estadoDeTarea, puedeMover } from './tablero.js';
+import { crearTablero, ESTADOS, ETIQUETAS, estadoDeTarea, puedeMover, AGENTES } from './tablero.js';
 
 const $ = (s) => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -116,7 +126,11 @@ let tema = document.documentElement.dataset.tema === 'claro' ? 'claro' : 'oscuro
 const aplicarTema = (t) => { tema = t === 'claro' ? 'claro' : 'oscuro'; document.documentElement.dataset.tema = tema; try { localStorage.setItem('tema', tema); } catch {} };
 const modelo = crearTablero();
 let vivo = false, modo = 'kanban';
-try { modo = localStorage.getItem('tableroModo') === 'lista' ? 'lista' : 'kanban'; } catch {}
+// Quién puede ser responsable: la persona que decide, las áreas de personas y los agentes (trabajo interno)
+const NOMBRE_PERSONA = (params.get('nombre') || 'Dirección').trim().slice(0, 40);
+const AREAS = [NOMBRE_PERSONA, 'Secretaría', 'Docente', 'Equipo de Bienestar', 'Admisiones', 'Académica'];
+modo = 'lista';   // la demo abre en Lista: el responsable grande y cada caso como grupo; el Kanban es la vista de trabajo
+try { modo = localStorage.getItem('tableroModo') === 'kanban' ? 'kanban' : 'lista'; } catch {}
 
 // ── Datos: embebido, la vista madre manda los eventos `tarea`; suelto, se conecta al servidor por SSE ──
 const irA = (cual) => { if (embebido) parent.postMessage({ tipo: 'vista', cual }, '*'); else location.href = cual === 'escuela' ? 'index.html' : cual === 'org' ? 'organigrama.html' : 'tablero.html'; };
@@ -153,12 +167,25 @@ async function operar(op) {
 const el = (tag, clase, texto) => { const e = document.createElement(tag); if (clase) e.className = clase; if (texto != null) e.textContent = texto; return e; };
 const colorDe = (resp) => { const r = String(resp || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); return r.includes('secretar') ? 'var(--c-secretaria)' : r.includes('docente') || r.includes('tutor') ? 'var(--c-docente)' : r.includes('bienestar') ? 'var(--c-bienestar)' : r.includes('admisi') ? 'var(--c-admisiones)' : r.includes('academ') ? 'var(--c-academica)' : r ? 'var(--c-direccion)' : 'var(--c-otro)'; };
 const NOMBRES = { coordinacion: 'Coordinación', tutor: 'Tutor', advisor: 'Advisor', bienestar: 'Bienestar', admisiones: 'Admisiones', academia: 'Academia' };
-function quien(s) { const q = el('span', 'quien', s.responsable || 'sin responsable'); q.style.setProperty('--c', colorDe(s.responsable)); return q; }
+function quien(s) {
+  const q = el('span', 'quien'); q.style.setProperty('--c', s.agente ? 'var(--acento)' : colorDe(s.responsable));
+  if (!vivo || s.estado === 'descartada' || s.estado === 'lista') { q.append(s.responsable || 'sin responsable'); return q; }
+  // En vivo, el responsable se elige acá: una persona, un área, o un agente (que se despierta y la hace)
+  const sel = el('select'); sel.title = 'Quién la hace';
+  const grupoP = el('optgroup'); grupoP.label = 'Personas'; for (const a of AREAS) { const o = el('option', null, a); o.value = 'p:' + a; grupoP.appendChild(o); } sel.appendChild(grupoP);
+  const grupoA = el('optgroup'); grupoA.label = 'Agentes (hacen el trabajo interno y lo dejan en revisión)'; for (const [id, n] of Object.entries(AGENTES)) { const o = el('option', null, n + ' · agente'); o.value = 'a:' + id; grupoA.appendChild(o); } sel.appendChild(grupoA);
+  const actual = s.agente ? 'a:' + s.agente : 'p:' + (s.responsable || '');
+  if (![...sel.options].some((o) => o.value === actual)) { const o = el('option', null, s.responsable || 'sin responsable'); o.value = actual; sel.insertBefore(o, grupoP); }
+  sel.value = actual;
+  sel.onchange = () => { const v = sel.value; operar(v.startsWith('a:') ? { op: 'asignar', id: s.id, agente: v.slice(2) } : { op: 'asignar', id: s.id, responsable: v.slice(2) }).then((ok) => { if (!ok) sel.value = actual; }); };
+  q.appendChild(sel); return q;
+}
 function chips(s, conCaso) {
   const f = el('div', 'fila'); f.appendChild(quien(s));
   if (conCaso) f.appendChild(el('span', 'caso', s.tarea.titulo));
+  if (s.agente) f.appendChild(el('span', 'chip agente px', s.estado === 'progreso' ? 'agente trabajando' : 'agente'));
   if (NOMBRES[s.creadaPor]) f.appendChild(el('span', 'chip px', 'propuesta por ' + NOMBRES[s.creadaPor]));
-  if (s.estado === 'revision' && NOMBRES[s.movidaPor]) f.appendChild(el('span', 'chip px', 'revisó ' + NOMBRES[s.movidaPor]));
+  if (s.estado === 'revision' && NOMBRES[s.movidaPor]) f.appendChild(el('span', 'chip px' + (s.agente === s.movidaPor ? ' entrego' : ''), (s.agente === s.movidaPor ? 'entregó ' : 'revisó ') + NOMBRES[s.movidaPor]));
   return f;
 }
 function dibujar() {
@@ -169,19 +196,25 @@ function dibujar() {
   // Kanban
   const k = $('#kanban'); k.replaceChildren();
   for (const est of ESTADOS) {
-    const col = el('section', 'col ' + est); const h = el('h2', null, ETIQUETAS[est]); const lista = subs.filter((s) => s.estado === est); h.appendChild(el('small', null, String(lista.length))); col.appendChild(h);
+    const lista = subs.filter((s) => s.estado === est);
+    const col = el('section', 'col ' + est + (lista.length >= 5 ? ' llena' : '')); const h = el('h2', null, ETIQUETAS[est]); h.appendChild(el('small', null, lista.length ? String(lista.length) : '')); col.appendChild(h);
     const pila = el('div', 'pila');
     for (const s of lista) {
-      const tj = el('article', 'tj px' + (vivo ? '' : ' quieta')); tj.draggable = vivo; tj.dataset.id = s.id;
-      tj.appendChild(el('div', 'que', s.texto)); tj.appendChild(chips(s, true)); if (s.nota) tj.appendChild(el('div', 'nota', s.nota));
-      tj.addEventListener('dragstart', (e) => { e.dataTransfer.setData('text/plain', s.id); e.dataTransfer.effectAllowed = 'move'; tj.classList.add('arrastrando'); });
-      tj.addEventListener('dragend', () => tj.classList.remove('arrastrando'));
+      const tj = el('article', 'tj px'); tj.dataset.id = s.id;
+      tj.appendChild(el('div', 'que', s.texto)); const fila = chips(s, true); tj.appendChild(fila); if (s.nota) tj.appendChild(el('div', 'nota', s.nota));
+      // Se mueve con flechas (← →), no arrastrando: en el proyector se ve el clic y el salto de columna. Solo en vivo.
+      if (vivo) {
+        const i = ESTADOS.indexOf(est); const mov = el('div', 'mov');
+        for (const [d, rot] of [[-1, '←'], [1, '→']]) {
+          const destino = ESTADOS[i + d]; const b = el('button', destino === 'lista' ? 'lista' : '', rot); b.type = 'button';
+          b.disabled = !destino || !puedeMover('persona', est, destino); b.title = destino ? 'Pasar a ' + ETIQUETAS[destino] : '';
+          b.onclick = () => operar({ op: 'mover', id: s.id, estado: destino }); mov.appendChild(b);
+        }
+        fila.appendChild(mov);
+      }
       pila.appendChild(tj);
     }
     col.appendChild(pila);
-    col.addEventListener('dragover', (e) => { e.preventDefault(); col.classList.add('sobre'); });
-    col.addEventListener('dragleave', () => col.classList.remove('sobre'));
-    col.addEventListener('drop', (e) => { e.preventDefault(); col.classList.remove('sobre'); const id = e.dataTransfer.getData('text/plain'); const s = modelo.subtarea(id); if (s && s.estado !== est) operar({ op: 'mover', id, estado: est }); });
     k.appendChild(col);
   }
   // Lista
@@ -189,17 +222,20 @@ function dibujar() {
   for (const t of modelo.tareas) {
     const g = el('section', 'grupo'); const cab = el('div', 'cab'); cab.appendChild(el('h2', null, t.titulo));
     const vivas = t.subtareas.filter((s) => s.estado !== 'descartada'); const listas = vivas.filter((s) => s.estado === 'lista').length;
-    cab.appendChild(el('span', 'avance', `${listas} de ${vivas.length}`)); const estT = estadoDeTarea(t); cab.appendChild(el('span', 'estado px ' + estT, ETIQUETAS[estT])); g.appendChild(cab);
+    // recién nacidas no son "0 de 3": están en manos de personas
+    cab.appendChild(el('span', 'avance', listas ? `${listas} de ${vivas.length} hechas` : `${vivas.length} ${vivas.length === 1 ? 'acción' : 'acciones'}`));
+    const estT = estadoDeTarea(t); cab.appendChild(el('span', 'estado px ' + estT, ETIQUETAS[estT])); g.appendChild(cab);
     for (const s of t.subtareas) {
       const r = el('div', 'ren ' + s.estado);
+      r.appendChild(chips({ ...s, tarea: t }, false));   // primero quién: la tesis es "en manos de personas"
+      const que = el('div', 'que'); que.append(s.texto); if (s.nota) que.appendChild(el('span', 'nota', s.nota)); r.appendChild(que);
       if (s.estado === 'descartada') r.appendChild(el('span', 'estado-fijo', 'Descartada'));
       else { const sel = el('select'); for (const est of ESTADOS) { const o = el('option', null, ETIQUETAS[est]); o.value = est; o.selected = est === s.estado; sel.appendChild(o); } sel.disabled = !vivo; sel.onchange = () => operar({ op: 'mover', id: s.id, estado: sel.value }).then((ok) => { if (!ok) sel.value = s.estado; }); r.appendChild(sel); }
-      const que = el('div', 'que'); que.append(s.texto); if (s.nota) que.appendChild(el('span', 'nota', s.nota)); r.appendChild(que);
-      r.appendChild(chips({ ...s, tarea: t }, false)); g.appendChild(r);
+      g.appendChild(r);
     }
     if (vivo) {
       const n = el('form', 'nueva'); n.appendChild(el('span', 'rot', '+ acción'));
-      const txt = el('input'); txt.placeholder = 'Qué hay que hacer'; txt.maxLength = 120; const resp = el('input'); resp.placeholder = 'Quién (Secretaría, docente, Dirección…)'; resp.maxLength = 60;
+      const txt = el('input'); txt.placeholder = 'Qué hay que hacer'; txt.maxLength = 120; const resp = el('input'); resp.placeholder = 'Quién'; resp.title = 'Secretaría, docente, Dirección…'; resp.maxLength = 60;
       const b = el('button', null, 'Agregar'); b.type = 'submit'; n.append(txt, resp, b);
       n.onsubmit = async (e) => { e.preventDefault(); if (!txt.value.trim()) return; if (await operar({ op: 'sub', tarea: t.id, texto: txt.value, responsable: resp.value })) { txt.value = ''; resp.value = ''; } };
       g.appendChild(n);
@@ -216,7 +252,14 @@ dibujar();
 
 // ── Escala a la ventana y teclas ──
 const esc = $('#escenario');
-function escalar() { const f = Math.min(innerWidth / 1920, innerHeight / 1080); esc.style.transform = `translate(${(innerWidth - 1920 * f) / 2}px, ${(innerHeight - 1080 * f) / 2}px) scale(${f})`; }
+// Base fluida: si la columna es más angosta que 16:9 (chat abierto), el tablero se angosta (hasta 1440) en vez de achicarse entero;
+// así el texto se mantiene cerca de su tamaño de diseño (regla de la última fila) y el Kanban reparte sus cuatro columnas en lo que hay.
+function escalar() {
+  const W = Math.round(Math.max(1440, Math.min(1920, innerWidth * 1080 / innerHeight)));
+  esc.style.width = W + 'px';
+  const f = Math.min(innerWidth / W, innerHeight / 1080);
+  esc.style.transform = `translate(${(innerWidth - W * f) / 2}px, ${(innerHeight - 1080 * f) / 2}px) scale(${f})`;
+}
 addEventListener('resize', escalar); escalar();
 addEventListener('keydown', (e) => {
   if (/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return;
@@ -224,7 +267,8 @@ addEventListener('keydown', (e) => {
   if (e.key === 'o') irA('org');
   if (e.key === 'k') $('#m-kanban').click(); if (e.key === 'l') $('#m-lista').click();
   if (e.key === 't') { aplicarTema(tema === 'oscuro' ? 'claro' : 'oscuro'); if (embebido) parent.postMessage({ tipo: 'tema', tema }, '*'); }
-  if (e.key === 'f' && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+  if (e.key === 'c' && embebido) parent.postMessage({ tipo: 'chat' }, '*');   // el chat lo abre y cierra la vista madre
+  if (e.key === 'f') { if (embebido) parent.postMessage({ tipo: 'pantalla' }, '*'); else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
 });
 </script>
 </body>

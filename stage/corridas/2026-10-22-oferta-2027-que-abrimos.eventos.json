@@ -1,0 +1,694 @@
+{
+ "origen": "servidor/escuela.mjs",
+ "generado": "2026-10-22T13:43:47.530Z",
+ "eventos": [
+  {
+   "t": 0,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "Hay gente que pide cursar de noche y consultas por bioinformática. Proponé qué abrimos en 2027 y qué falta validar.",
+   "hora": "10:42",
+   "id": "s0-1792676563031"
+  },
+  {
+   "t": 1502,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 5310,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "Dale. Reparto y vuelvo con una propuesta.",
+   "hora": "10:42",
+   "id": "s2-1792676568340",
+   "verificacion": {
+    "datos": [],
+    "resumen": {
+     "verificados": 0,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 5310,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "academia"
+   ],
+   "texto": "@Academia Oferta 2027: qué piden y no damos (cursada nocturna, bioinformática); uno o dos borradores con la señal que los sostiene.",
+   "hora": "10:42",
+   "id": "s3-1792676568341",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "2027",
+      "clave": "2027",
+      "estado": "citado"
+     }
+    ],
+    "resumen": {
+     "verificados": 0,
+     "citados": 1,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 5310,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "admisiones"
+   ],
+   "texto": "@Admisiones Oferta 2027: qué preguntan los aspirantes que hoy no ofrecemos, en especial cursada de noche y bioinformática.",
+   "hora": "10:42",
+   "id": "s4-1792676568341",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "2027",
+      "clave": "2027",
+      "estado": "citado"
+     }
+    ],
+    "resumen": {
+     "verificados": 0,
+     "citados": 1,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 6811,
+   "tipo": "inicio",
+   "quien": "academia"
+  },
+  {
+   "t": 6812,
+   "tipo": "inicio",
+   "quien": "admisiones"
+  },
+  {
+   "t": 7152,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 8928,
+   "quien": "academia",
+   "tipo": "herramienta",
+   "herramienta": "ver_oferta_academica",
+   "lugar": "academia",
+   "texto": "Reviso la oferta académica"
+  },
+  {
+   "t": 8929,
+   "quien": "academia",
+   "tipo": "herramienta",
+   "herramienta": "ver_demanda_formativa",
+   "lugar": "academia",
+   "texto": "Reviso qué se está pidiendo"
+  },
+  {
+   "t": 10163,
+   "quien": "admisiones",
+   "tipo": "herramienta",
+   "herramienta": "ver_aspirantes",
+   "lugar": "admisiones",
+   "texto": "Reviso los aspirantes"
+  },
+  {
+   "t": 10163,
+   "quien": "admisiones",
+   "tipo": "herramienta",
+   "herramienta": "ver_oferta_academica",
+   "lugar": "academia",
+   "texto": "Reviso la oferta académica"
+  },
+  {
+   "t": 12796,
+   "tipo": "dice",
+   "quien": "academia",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación\nBioinformática Express: 11 consultas de aspirantes y 7 ingresantes la mencionan (Admisiones); 2 docentes con formación. Curso corto de 4 meses, de 18 a 22.\nBiotecnología de Noche: 9 ingresantes trabajan de día y 7 aspirantes 2027 preguntaron por la noche (Bienestar, Admisiones); hoy toda la oferta es de mañana o tarde.\nFalta validar: docentes disponibles de noche (sin relevar), cupo y arancel, si quieren cursar de noche o directamente no cursar.",
+   "hora": "10:42",
+   "id": "s12-1792676575827",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "11",
+      "clave": "11",
+      "estado": "verificado"
+     },
+     {
+      "texto": "7",
+      "clave": "7",
+      "estado": "verificado"
+     },
+     {
+      "texto": "2",
+      "clave": "2",
+      "estado": "verificado"
+     },
+     {
+      "texto": "4",
+      "clave": "4",
+      "estado": "derivado"
+     },
+     {
+      "texto": "18",
+      "clave": "18",
+      "estado": "verificado"
+     },
+     {
+      "texto": "22",
+      "clave": "22",
+      "estado": "sin_fuente"
+     },
+     {
+      "texto": "9",
+      "clave": "9",
+      "estado": "verificado"
+     },
+     {
+      "texto": "7",
+      "clave": "7",
+      "estado": "verificado"
+     },
+     {
+      "texto": "2027",
+      "clave": "2027",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 7,
+     "citados": 0,
+     "derivados": 1,
+     "noComprobados": 0,
+     "sinFuente": 1
+    }
+   }
+  },
+  {
+   "t": 15235,
+   "tipo": "dice",
+   "quien": "admisiones",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Entre los 71 preinscriptos 2027 piden: bioinformática 11 consultas, horario nocturno 7. Becas 19, visitar el laboratorio 5.\nHoy no hay programa de bioinformática ni cursada nocturna: los tres se dictan de mañana (Biotecnología) o de tarde (Biología, Gestión Ambiental).",
+   "hora": "10:42",
+   "id": "s13-1792676578266",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "71",
+      "clave": "71",
+      "estado": "verificado"
+     },
+     {
+      "texto": "2027",
+      "clave": "2027",
+      "estado": "verificado"
+     },
+     {
+      "texto": "11",
+      "clave": "11",
+      "estado": "verificado"
+     },
+     {
+      "texto": "7",
+      "clave": "7",
+      "estado": "verificado"
+     },
+     {
+      "texto": "19",
+      "clave": "19",
+      "estado": "verificado"
+     },
+     {
+      "texto": "5",
+      "clave": "5",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 6,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 16291,
+   "tipo": "fin",
+   "quien": "academia"
+  },
+  {
+   "t": 18572,
+   "tipo": "fin",
+   "quien": "admisiones"
+  },
+  {
+   "t": 18744,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 27259,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Propuesta para decidir: qué abrimos en 2027\n1. Bioinformática Express: 11 consultas entre 71 preinscriptos (Admisiones); 2 docentes con formación, curso de 4 meses de 18 a 22 (Academia).\n   Acciones: confirmar docentes (Dirección) · calcular cupo y arancel (Secretaría) · aprobar borrador (Dirección)\n2. Biotecnología de Noche: 7 aspirantes piden noche (Admisiones); 9 ingresantes trabajan de día (Academia, según Bienestar); hoy todo es de mañana o tarde.\n   Acciones: relevar docentes nocturnos (Dirección) · encuesta a los 7 aspirantes (Admisiones) · llamada a 9 ingresantes (Equipo de Bienestar)\nNota: las dos propuestas comparten franja de 18 a 22; si abren juntas, compiten por los mismos docentes.\nRiesgo de equivocarnos: 11 consultas no son 11 inscripciones; si piden info y no cursan, abrimos un curso vacío. Por eso va primero la encuesta.\nPendiente: docentes de noche sin relevar, cupo, arancel y si quieren cursar de noche o no cursar. ¿Qué aprobás, qué hacés vos y qué no?",
+   "hora": "10:43",
+   "id": "s17-1792676590290",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "2027",
+      "clave": "2027",
+      "estado": "derivado"
+     },
+     {
+      "texto": "11",
+      "clave": "11",
+      "estado": "verificado"
+     },
+     {
+      "texto": "71",
+      "clave": "71",
+      "estado": "verificado"
+     },
+     {
+      "texto": "2",
+      "clave": "2",
+      "estado": "verificado"
+     },
+     {
+      "texto": "4",
+      "clave": "4",
+      "estado": "derivado"
+     },
+     {
+      "texto": "18",
+      "clave": "18",
+      "estado": "verificado"
+     },
+     {
+      "texto": "22",
+      "clave": "22",
+      "estado": "sin_fuente"
+     },
+     {
+      "texto": "7",
+      "clave": "7",
+      "estado": "verificado"
+     },
+     {
+      "texto": "9",
+      "clave": "9",
+      "estado": "verificado"
+     },
+     {
+      "texto": "7",
+      "clave": "7",
+      "estado": "verificado"
+     },
+     {
+      "texto": "9",
+      "clave": "9",
+      "estado": "verificado"
+     },
+     {
+      "texto": "18",
+      "clave": "18",
+      "estado": "verificado"
+     },
+     {
+      "texto": "22",
+      "clave": "22",
+      "estado": "sin_fuente"
+     },
+     {
+      "texto": "11",
+      "clave": "11",
+      "estado": "verificado"
+     },
+     {
+      "texto": "11",
+      "clave": "11",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 11,
+     "citados": 0,
+     "derivados": 2,
+     "noComprobados": 0,
+     "sinFuente": 2
+    }
+   }
+  },
+  {
+   "t": 28978,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 29437,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "Bioinformática Express: Calcular cupo y arancel y aprobar borrador, sí. El confirmar docentes lo hago yo. Biotecnología de Noche: Encuesta a los 7 aspirantes y llamada a 9 ingresantes, sí. El relevar docentes nocturnos lo hago yo.",
+   "hora": "10:43",
+   "id": "s19-1792676592468",
+   "decision": {
+    "acciones": [
+     {
+      "texto": "confirmar docentes",
+      "quien": "Dirección",
+      "estado": "yo"
+     },
+     {
+      "texto": "calcular cupo y arancel",
+      "quien": "Secretaría",
+      "estado": "si"
+     },
+     {
+      "texto": "aprobar borrador",
+      "quien": "Dirección",
+      "estado": "si"
+     },
+     {
+      "texto": "relevar docentes nocturnos",
+      "quien": "Dirección",
+      "estado": "yo"
+     },
+     {
+      "texto": "encuesta a los 7 aspirantes",
+      "quien": "Admisiones",
+      "estado": "si"
+     },
+     {
+      "texto": "llamada a 9 ingresantes",
+      "quien": "Equipo de Bienestar",
+      "estado": "si"
+     }
+    ],
+    "nota": "",
+    "caso": "Bioinformática Express, Biotecnología de Noche",
+    "objetivo": "Hay gente que pide cursar de noche y consultas por bioinformática. Proponé qué abrimos en 2027 y qué falta validar."
+   }
+  },
+  {
+   "t": 29437,
+   "tipo": "tarea",
+   "op": "crear",
+   "id": "t1",
+   "titulo": "Bioinformática Express, Biotecnología de Noche",
+   "origen": "Hay gente que pide cursar de noche y consultas por bioinformática. Proponé qué abrimos en 2027 y qué falta validar.",
+   "quien": "persona"
+  },
+  {
+   "t": 29437,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s2",
+   "tarea": "t1",
+   "texto": "Confirmar docentes",
+   "responsable": "Alfredo",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 29437,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s3",
+   "tarea": "t1",
+   "texto": "Calcular cupo y arancel",
+   "responsable": "Secretaría",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 29437,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s4",
+   "tarea": "t1",
+   "texto": "Aprobar borrador",
+   "responsable": "Dirección",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 29437,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s5",
+   "tarea": "t1",
+   "texto": "Relevar docentes nocturnos",
+   "responsable": "Alfredo",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 29437,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s6",
+   "tarea": "t1",
+   "texto": "Encuesta a los 7 aspirantes",
+   "responsable": "Admisiones",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 29437,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s7",
+   "tarea": "t1",
+   "texto": "Llamada a 9 ingresantes",
+   "responsable": "Equipo de Bienestar",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 30939,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 33196,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Confirmar docentes y relevar docentes nocturnos los hacés vos. Bioinformática Express: cupo y arancel, Secretaría; aprobar borrador, Dirección. Biotecnología de Noche: encuesta a los 7 aspirantes, Admisiones; llamada a 9 ingresantes, Equipo de Bienestar.",
+   "hora": "10:43",
+   "id": "s28-1792676596227",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "7",
+      "clave": "7",
+      "estado": "verificado"
+     },
+     {
+      "texto": "9",
+      "clave": "9",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 2,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 34756,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 38828,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "academia"
+   ],
+   "texto": "@Academia publicá el programa nocturno en la web y abrí la inscripción.",
+   "hora": "10:43",
+   "id": "s30-1792676601859"
+  },
+  {
+   "t": 40330,
+   "tipo": "inicio",
+   "quien": "academia"
+  },
+  {
+   "t": 42209,
+   "tipo": "dice",
+   "quien": "academia",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Alfredo Eso no lo puedo hacer yo: un programa nuevo lo aprueba el Consejo Académico y lo publica Comunicación, no un agente.\nSi lo decidís, dejo el borrador listo para el Consejo, con lo que falta validar: docentes de noche (sin relevar), cupo y arancel.",
+   "hora": "10:43",
+   "id": "s32-1792676605240",
+   "verificacion": {
+    "datos": [],
+    "resumen": {
+     "verificados": 0,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   },
+   "marca": "limite"
+  },
+  {
+   "t": 44034,
+   "tipo": "fin",
+   "quien": "academia"
+  },
+  {
+   "t": 44269,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "academia"
+   ],
+   "texto": "@Academia ¿de dónde salen los 9 que piden cursar de noche?",
+   "hora": "10:43",
+   "id": "s34-1792676607299"
+  },
+  {
+   "t": 45770,
+   "tipo": "inicio",
+   "quien": "academia"
+  },
+  {
+   "t": 47806,
+   "tipo": "dice",
+   "quien": "academia",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Alfredo Los 9 son ingresantes 2026 que trabajan de día, según Bienestar (demanda formativa: \"9 ingresantes que trabajan piden cursar de noche\").\nNo dice si cursarían de noche en concreto, ni qué programa les interesa. Tampoco hay docentes de noche relevados.",
+   "hora": "10:43",
+   "id": "s36-1792676610837",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "9",
+      "clave": "9",
+      "estado": "verificado"
+     },
+     {
+      "texto": "2026",
+      "clave": "2026",
+      "estado": "verificado"
+     },
+     {
+      "texto": "9",
+      "clave": "9",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 3,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 49489,
+   "tipo": "fin",
+   "quien": "academia"
+  },
+  {
+   "t": 50012,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "academia"
+   ],
+   "texto": "@Academia dame tres nombres para el programa nocturno y decime cuál votás.",
+   "hora": "10:43",
+   "id": "s38-1792676613043"
+  },
+  {
+   "t": 51514,
+   "tipo": "inicio",
+   "quien": "academia"
+  },
+  {
+   "t": 53205,
+   "tipo": "dice",
+   "quien": "academia",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Alfredo Tres nombres: Biotecnología Después del Laburo, Luna de Laboratorio, Bio Nocturna. Voto Luna de Laboratorio: me hace sonreír y se entiende que es de noche.",
+   "hora": "10:43",
+   "id": "s40-1792676616236",
+   "verificacion": {
+    "datos": [],
+    "resumen": {
+     "verificados": 0,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 54540,
+   "tipo": "fin",
+   "quien": "academia"
+  }
+ ],
+ "titulo": "Oferta 2027 · qué abrimos"
+}

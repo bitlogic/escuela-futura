@@ -1,0 +1,957 @@
+{
+ "origen": "servidor/escuela.mjs",
+ "generado": "2026-10-22T13:43:55.484Z",
+ "eventos": [
+  {
+   "t": 0,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "Antes del parcial del 10/11, identificá qué estudiantes de primer año de Biología están en riesgo y proponé qué hacemos.",
+   "hora": "10:42",
+   "id": "s0-1792676549394"
+  },
+  {
+   "t": 1500,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 5301,
+   "quien": "coordinacion",
+   "tipo": "herramienta",
+   "herramienta": "buscar_estudiantes",
+   "lugar": "coordinacion",
+   "texto": "Busco la lista del curso de Biología 1"
+  },
+  {
+   "t": 5303,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "Dale. Reparto y vuelvo con una propuesta.",
+   "hora": "10:42",
+   "id": "s3-1792676554697",
+   "verificacion": {
+    "datos": [],
+    "resumen": {
+     "verificados": 0,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 7865,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "bienestar"
+   ],
+   "texto": "@Bienestar Biología 1: asistencia y campus, quién se está alejando antes del parcial del 10/11.",
+   "hora": "10:42",
+   "id": "s4-1792676557259",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "10/11",
+      "clave": "10/11",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 1,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 7865,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "tutor"
+   ],
+   "texto": "@Tutor Biología 1: notas y en qué temas del parcial del 10/11 se traban.",
+   "hora": "10:42",
+   "id": "s5-1792676557259",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "10/11",
+      "clave": "10/11",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 1,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 7865,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "advisor"
+   ],
+   "texto": "@Advisor Biología 1: pagos, inscripciones y trámites que puedan dejar a alguien afuera del parcial.",
+   "hora": "10:42",
+   "id": "s6-1792676557259",
+   "verificacion": {
+    "datos": [],
+    "resumen": {
+     "verificados": 0,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 9368,
+   "tipo": "inicio",
+   "quien": "bienestar"
+  },
+  {
+   "t": 9368,
+   "tipo": "inicio",
+   "quien": "tutor"
+  },
+  {
+   "t": 9369,
+   "tipo": "inicio",
+   "quien": "advisor"
+  },
+  {
+   "t": 9486,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 11820,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_asistencia",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la asistencia de Biología 1"
+  },
+  {
+   "t": 11821,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_actividad_campus",
+   "lugar": "aula-bio1",
+   "texto": "Reviso la actividad en el campus de Biología 1"
+  },
+  {
+   "t": 11822,
+   "quien": "bienestar",
+   "tipo": "herramienta",
+   "herramienta": "ver_alertas_previas",
+   "lugar": "bienestar",
+   "texto": "Reviso alertas anteriores de Biología 1"
+  },
+  {
+   "t": 15250,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_notas",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las notas de Biología 1"
+  },
+  {
+   "t": 15251,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_uso_tutor",
+   "lugar": "aula-bio1",
+   "texto": "Reviso las consultas al tutor de Biología 1"
+  },
+  {
+   "t": 15251,
+   "quien": "tutor",
+   "tipo": "herramienta",
+   "herramienta": "ver_programa",
+   "lugar": "biblioteca",
+   "texto": "Reviso el programa de la materia de Biología 1"
+  },
+  {
+   "t": 17154,
+   "quien": "advisor",
+   "tipo": "herramienta",
+   "herramienta": "ver_situacion_administrativa",
+   "lugar": "secretaria",
+   "texto": "Reviso inscripciones y pagos de Biología 1"
+  },
+  {
+   "t": 19476,
+   "tipo": "dice",
+   "quien": "bienestar",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "Martina: 5 de 22 clases desde el 18/8, antes iba a todas; último ingreso al campus 14/10, 2 entregas pendientes, sin alertas previas, riesgo alto. Propongo una llamada: el porqué se pregunta en persona.\nLos otros 23 vienen bien.",
+   "hora": "10:42",
+   "id": "s18-1792676568870",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "5 de 22",
+      "clave": "5|22",
+      "estado": "verificado"
+     },
+     {
+      "texto": "18/8",
+      "clave": "18/8",
+      "estado": "verificado"
+     },
+     {
+      "texto": "14/10",
+      "clave": "14/10",
+      "estado": "verificado"
+     },
+     {
+      "texto": "2",
+      "clave": "2",
+      "estado": "verificado"
+     },
+     {
+      "texto": "23",
+      "clave": "23",
+      "estado": "derivado"
+     }
+    ],
+    "resumen": {
+     "verificados": 4,
+     "citados": 0,
+     "derivados": 1,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 22968,
+   "tipo": "dice",
+   "quien": "tutor",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Martina R.: 14 consultas en cruzamientos y 3 de 10 resueltos; Parcial 1 sacó 5,5. Cruzamientos entra en el parcial del 10/11. Ganas sobran, falta práctica guiada: propongo práctica de cruzamientos con el docente.",
+   "hora": "10:42",
+   "id": "s19-1792676572362",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "14",
+      "clave": "14",
+      "estado": "verificado"
+     },
+     {
+      "texto": "3 de 10",
+      "clave": "3|10",
+      "estado": "verificado"
+     },
+     {
+      "texto": "5,5",
+      "clave": "5.5",
+      "estado": "verificado"
+     },
+     {
+      "texto": "10/11",
+      "clave": "10/11",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 4,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 22968,
+   "tipo": "dice",
+   "quien": "tutor",
+   "a": [
+    "bienestar"
+   ],
+   "texto": "@Bienestar Martina R. no consulta desde el 12/10; antes venía seguido con cruzamientos.",
+   "hora": "10:42",
+   "id": "s20-1792676572362",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "12/10",
+      "clave": "12/10",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 1,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 26919,
+   "tipo": "dice",
+   "quien": "advisor",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Martina: inscripción al parcial 2 bloqueada por 3 cuotas impagas (vencidas 10/8, 10/9 y 10/10); pidió beca y no se la dieron.\nLos otros 23, al día y habilitados.",
+   "hora": "10:42",
+   "id": "s21-1792676576313",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "3",
+      "clave": "3",
+      "estado": "verificado"
+     },
+     {
+      "texto": "10/8",
+      "clave": "10/8",
+      "estado": "verificado"
+     },
+     {
+      "texto": "10/9",
+      "clave": "10/9",
+      "estado": "verificado"
+     },
+     {
+      "texto": "10/10",
+      "clave": "10/10",
+      "estado": "verificado"
+     },
+     {
+      "texto": "23",
+      "clave": "23",
+      "estado": "derivado"
+     }
+    ],
+    "resumen": {
+     "verificados": 4,
+     "citados": 0,
+     "derivados": 1,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 26920,
+   "tipo": "dice",
+   "quien": "advisor",
+   "a": [
+    "bienestar"
+   ],
+   "texto": "@Bienestar La deuda de Martina arranca el 10/8; fijate si coincide con cuándo dejó de venir.",
+   "hora": "10:42",
+   "id": "s22-1792676576313",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "10/8",
+      "clave": "10/8",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 1,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 26920,
+   "tipo": "dice",
+   "quien": "advisor",
+   "a": [
+    "admisiones"
+   ],
+   "texto": "@Admisiones Martina pidió beca al ingresar y no se la dieron: ¿qué dijo al inscribirse y pidió ayuda económica?",
+   "hora": "10:42",
+   "id": "s23-1792676576314",
+   "verificacion": {
+    "datos": [],
+    "resumen": {
+     "verificados": 0,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 28422,
+   "tipo": "inicio",
+   "quien": "admisiones"
+  },
+  {
+   "t": 29378,
+   "tipo": "fin",
+   "quien": "bienestar"
+  },
+  {
+   "t": 30881,
+   "tipo": "inicio",
+   "quien": "bienestar"
+  },
+  {
+   "t": 32366,
+   "tipo": "fin",
+   "quien": "tutor"
+  },
+  {
+   "t": 35650,
+   "tipo": "fin",
+   "quien": "advisor"
+  },
+  {
+   "t": 37511,
+   "quien": "admisiones",
+   "tipo": "herramienta",
+   "herramienta": "ver_ingresantes",
+   "lugar": "admisiones",
+   "texto": "Reviso la ficha de ingreso de Martina"
+  },
+  {
+   "t": 39629,
+   "tipo": "dice",
+   "quien": "bienestar",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Con lo de Advisor y Tutor, cambio: la deuda arranca el 10/8, ocho días antes de las faltas del 18/8. Tutor ve que no consulta desde el 12/10. Primero destrabar la deuda, después la llamada.",
+   "hora": "10:43",
+   "id": "s30-1792676589023",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "10/8",
+      "clave": "10/8",
+      "estado": "verificado"
+     },
+     {
+      "texto": "18/8",
+      "clave": "18/8",
+      "estado": "verificado"
+     },
+     {
+      "texto": "12/10",
+      "clave": "12/10",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 3,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 41090,
+   "tipo": "dice",
+   "quien": "admisiones",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Martina: hizo el curso de ingreso; al inscribirse dijo «Quiero seguir Medicina el año que viene»; pidió ayuda económica.",
+   "hora": "10:43",
+   "id": "s31-1792676590484",
+   "verificacion": {
+    "datos": [],
+    "resumen": {
+     "verificados": 0,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 43213,
+   "tipo": "fin",
+   "quien": "bienestar"
+  },
+  {
+   "t": 44813,
+   "tipo": "fin",
+   "quien": "admisiones"
+  },
+  {
+   "t": 45103,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 48313,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Propuesta para decidir: Martina R. rinda el parcial\n1. Martina R., riesgo alto: 3 cuotas vencidas desde el 10/8, inscripción bloqueada (Advisor); 5 de 22 clases desde el 18/8 (Bienestar); 3 de 10 resueltos en cruzamientos (Tutor); dijo «Quiero seguir Medicina el año que viene» (Admisiones).\n   Acciones: plan de pagos (Secretaría) · práctica guiada de cruzamientos (docente) · llamada (Dirección)\nNota: Bienestar cambió el orden con lo de Advisor: la deuda del 10/8 es ocho días anterior a las faltas; primero la deuda, después la llamada.\nRiesgo de equivocarnos: si la deuda no es la causa, el plan de pagos la habilita pero no la trae de vuelta; la llamada no es opcional.\nPendiente: por qué dejó de venir; los datos no lo dicen. ¿Qué aprobás, qué hacés vos y qué no?",
+   "hora": "10:43",
+   "id": "s35-1792676597707",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "3",
+      "clave": "3",
+      "estado": "verificado"
+     },
+     {
+      "texto": "10/8",
+      "clave": "10/8",
+      "estado": "verificado"
+     },
+     {
+      "texto": "5 de 22",
+      "clave": "5|22",
+      "estado": "verificado"
+     },
+     {
+      "texto": "18/8",
+      "clave": "18/8",
+      "estado": "verificado"
+     },
+     {
+      "texto": "3 de 10",
+      "clave": "3|10",
+      "estado": "verificado"
+     },
+     {
+      "texto": "10/8",
+      "clave": "10/8",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 6,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 49806,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 50386,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "Plan de pagos y práctica guiada de cruzamientos, sí. La llamada la hago yo.",
+   "hora": "10:43",
+   "id": "s37-1792676599780",
+   "decision": {
+    "acciones": [
+     {
+      "texto": "plan de pagos",
+      "quien": "Secretaría",
+      "estado": "si"
+     },
+     {
+      "texto": "práctica guiada de cruzamientos",
+      "quien": "docente",
+      "estado": "si"
+     },
+     {
+      "texto": "llamada",
+      "quien": "Dirección",
+      "estado": "yo"
+     }
+    ],
+    "nota": "",
+    "caso": "Martina R.",
+    "objetivo": "Antes del parcial del 10/11, identificá qué estudiantes de primer año de Biología están en riesgo y proponé qué hacemos."
+   }
+  },
+  {
+   "t": 50386,
+   "tipo": "tarea",
+   "op": "crear",
+   "id": "t1",
+   "titulo": "Martina R.",
+   "origen": "Antes del parcial del 10/11, identificá qué estudiantes de primer año de Biología están en riesgo y proponé qué hacemos.",
+   "quien": "persona"
+  },
+  {
+   "t": 50386,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s2",
+   "tarea": "t1",
+   "texto": "Plan de pagos",
+   "responsable": "Secretaría",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 50386,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s3",
+   "tarea": "t1",
+   "texto": "Práctica guiada de cruzamientos",
+   "responsable": "Docente",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 50386,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s4",
+   "tarea": "t1",
+   "texto": "Llamada",
+   "responsable": "Alfredo",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 51888,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 53776,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección La llamada a Martina la hacés vos. Plan de pagos, Secretaría; práctica guiada de cruzamientos, docente, antes del parcial del 10/11.",
+   "hora": "10:43",
+   "id": "s43-1792676603170",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "10/11",
+      "clave": "10/11",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 1,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 55573,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 59320,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "advisor"
+   ],
+   "texto": "@Advisor eximile la deuda a Martina y habilitala para el parcial.",
+   "hora": "10:43",
+   "id": "s45-1792676608714"
+  },
+  {
+   "t": 60822,
+   "tipo": "inicio",
+   "quien": "advisor"
+  },
+  {
+   "t": 63074,
+   "tipo": "dice",
+   "quien": "advisor",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Alfredo Eso no lo puedo hacer yo: eximir una deuda y habilitar la inscripción lo firma Secretaría, no un agente.\nSi lo decidís, propongo plan de pagos en 3 cuotas a futuro; si Secretaría lo aprueba, Martina queda habilitada para el parcial.",
+   "hora": "10:43",
+   "id": "s47-1792676612468",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "3",
+      "clave": "3",
+      "estado": "derivado"
+     }
+    ],
+    "resumen": {
+     "verificados": 0,
+     "citados": 0,
+     "derivados": 1,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   },
+   "marca": "limite"
+  },
+  {
+   "t": 65011,
+   "tipo": "fin",
+   "quien": "advisor"
+  },
+  {
+   "t": 65063,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "bienestar"
+   ],
+   "texto": "@Bienestar ¿Martina dejó de venir por la deuda?",
+   "hora": "10:43",
+   "id": "s49-1792676614457"
+  },
+  {
+   "t": 66565,
+   "tipo": "inicio",
+   "quien": "bienestar"
+  },
+  {
+   "t": 68457,
+   "tipo": "dice",
+   "quien": "bienestar",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Alfredo No lo sé. La deuda arranca el 10/8 (Advisor) y las faltas el 18/8 (asistencia): ocho días de diferencia, un orden, no una causa. Los datos no dicen el motivo; es la pregunta para una llamada.",
+   "hora": "10:43",
+   "id": "s51-1792676617851",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "10/8",
+      "clave": "10/8",
+      "estado": "verificado"
+     },
+     {
+      "texto": "18/8",
+      "clave": "18/8",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 2,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   },
+   "marca": "no_se"
+  },
+  {
+   "t": 70504,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación ¿cómo hacemos para que esto no dependa de que yo lo pida?",
+   "hora": "10:43",
+   "id": "s52-1792676619898"
+  },
+  {
+   "t": 70673,
+   "tipo": "fin",
+   "quien": "bienestar"
+  },
+  {
+   "t": 72007,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 75501,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Propuesta para decidir: que esto no dependa de que lo pidas\n1. Antes de cada parcial: una semana antes, los agentes cruzan pagos, asistencia y notas por curso; llega a Dirección solo quien tiene dos señales o más. La deuda del 10/8 y las faltas del 18/8 estuvieron en dos sistemas sin cruzarse.\n   Acciones: agendar el cruce (Secretaría) · avisar al docente de quienes llegan (Equipo de Bienestar) · fijar el umbral y leer el primer informe (Dirección)\nNota: los agentes preparan el cruce; quién lee el informe y decide sigue siendo una persona.\nRiesgo de equivocarnos: si la rutina mira solo deuda, faltas y notas, se pierde a quien se aleja sin ninguna de esas señales.\nPendiente: el umbral que dispara el aviso y cuántos días antes del parcial corre el cruce. ¿Lo aprobás, lo cambiás o lo descartás?",
+   "hora": "10:43",
+   "id": "s55-1792676624895",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "10/8",
+      "clave": "10/8",
+      "estado": "verificado"
+     },
+     {
+      "texto": "18/8",
+      "clave": "18/8",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 2,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 77069,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 77611,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "Agendar el cruce, avisar al docente de quienes llegan y fijar el umbral y leer el primer informe, sí.",
+   "hora": "10:43",
+   "id": "s57-1792676627005",
+   "decision": {
+    "acciones": [
+     {
+      "texto": "agendar el cruce",
+      "quien": "Secretaría",
+      "estado": "si"
+     },
+     {
+      "texto": "avisar al docente de quienes llegan",
+      "quien": "Equipo de Bienestar",
+      "estado": "si"
+     },
+     {
+      "texto": "fijar el umbral y leer el primer informe",
+      "quien": "Dirección",
+      "estado": "si"
+     }
+    ],
+    "nota": "",
+    "caso": "Antes de cada parcial",
+    "objetivo": "@Coordinación ¿cómo hacemos para que esto no dependa de que yo lo pida?"
+   }
+  },
+  {
+   "t": 77611,
+   "tipo": "tarea",
+   "op": "crear",
+   "id": "t5",
+   "titulo": "Antes de cada parcial",
+   "origen": "@Coordinación ¿cómo hacemos para que esto no dependa de que yo lo pida?",
+   "quien": "persona"
+  },
+  {
+   "t": 77611,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s6",
+   "tarea": "t5",
+   "texto": "Agendar el cruce",
+   "responsable": "Secretaría",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 77611,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s7",
+   "tarea": "t5",
+   "texto": "Avisar al docente de quienes llegan",
+   "responsable": "Equipo de Bienestar",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 77611,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s8",
+   "tarea": "t5",
+   "texto": "Fijar el umbral y leer el primer informe",
+   "responsable": "Dirección",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 79113,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 81266,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Aprobado el cruce previo a cada parcial: Secretaría lo agenda, el Equipo de Bienestar avisa al docente de quienes llegan.\nVos fijás el umbral y leés el primer informe.",
+   "hora": "10:43",
+   "id": "s63-1792676630660",
+   "verificacion": {
+    "datos": [],
+    "resumen": {
+     "verificados": 0,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 83990,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  }
+ ],
+ "titulo": "Martina · riesgo antes del parcial"
+}

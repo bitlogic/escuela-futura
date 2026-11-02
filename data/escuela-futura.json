@@ -1,6 +1,6 @@
 {
   "aviso": "Datos sintéticos. Escuela Futura y todas las personas son ficticias.",
-  "hoy": "2026-10-30",
+  "hoy": "2026-11-05",
   "escuela": "Escuela Futura",
   "cursos": [
     {
@@ -21,7 +21,7 @@
       ],
       "proxima_evaluacion": {
         "evaluacion": "Parcial 2",
-        "fecha": "2026-11-03",
+        "fecha": "2026-11-10",
         "temas": [
           "Genética mendeliana: cruzamientos",
           "Herencia ligada al sexo",
@@ -44,6 +44,11 @@
           "ultimas_5_semanas": {
             "presentes": 2,
             "clases": 10
+          },
+          "desde_cambio": {
+            "desde": "2026-08-18",
+            "presentes": 5,
+            "clases": 22
           }
         },
         "semanas": [
@@ -260,7 +265,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-30",
+        "ultimo_ingreso": "2026-11-05",
         "ingresos_ultimos_30_dias": 12,
         "entregas_pendientes": 0
       },
@@ -274,7 +279,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-22"
+        "ultima_consulta": "2026-10-28"
       },
       "notas": [
         {
@@ -384,7 +389,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-26",
+        "ultimo_ingreso": "2026-11-01",
         "ingresos_ultimos_30_dias": 19,
         "entregas_pendientes": 0
       },
@@ -398,7 +403,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-24"
+        "ultima_consulta": "2026-10-30"
       },
       "notas": [
         {
@@ -508,7 +513,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-29",
+        "ultimo_ingreso": "2026-11-04",
         "ingresos_ultimos_30_dias": 11,
         "entregas_pendientes": 0
       },
@@ -522,7 +527,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-22"
+        "ultima_consulta": "2026-10-28"
       },
       "notas": [
         {
@@ -632,7 +637,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-28",
+        "ultimo_ingreso": "2026-11-03",
         "ingresos_ultimos_30_dias": 18,
         "entregas_pendientes": 0
       },
@@ -646,7 +651,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-19"
+        "ultima_consulta": "2026-10-25"
       },
       "notas": [
         {
@@ -756,7 +761,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-26",
+        "ultimo_ingreso": "2026-11-01",
         "ingresos_ultimos_30_dias": 18,
         "entregas_pendientes": 1
       },
@@ -770,7 +775,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-16"
+        "ultima_consulta": "2026-10-22"
       },
       "notas": [
         {
@@ -880,7 +885,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-28",
+        "ultimo_ingreso": "2026-11-03",
         "ingresos_ultimos_30_dias": 21,
         "entregas_pendientes": 0
       },
@@ -894,7 +899,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-19"
+        "ultima_consulta": "2026-10-25"
       },
       "notas": [
         {
@@ -1004,7 +1009,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-29",
+        "ultimo_ingreso": "2026-11-04",
         "ingresos_ultimos_30_dias": 22,
         "entregas_pendientes": 0
       },
@@ -1018,7 +1023,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-15"
+        "ultima_consulta": "2026-10-21"
       },
       "notas": [
         {
@@ -1128,7 +1133,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-27",
+        "ultimo_ingreso": "2026-11-02",
         "ingresos_ultimos_30_dias": 17,
         "entregas_pendientes": 0
       },
@@ -1142,7 +1147,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-29"
+        "ultima_consulta": "2026-11-04"
       },
       "notas": [
         {
@@ -1252,7 +1257,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-28",
+        "ultimo_ingreso": "2026-11-03",
         "ingresos_ultimos_30_dias": 23,
         "entregas_pendientes": 1
       },
@@ -1266,7 +1271,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-25"
+        "ultima_consulta": "2026-10-31"
       },
       "notas": [
         {
@@ -1376,7 +1381,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-28",
+        "ultimo_ingreso": "2026-11-03",
         "ingresos_ultimos_30_dias": 23,
         "entregas_pendientes": 0
       },
@@ -1390,7 +1395,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-16"
+        "ultima_consulta": "2026-10-22"
       },
       "notas": [
         {
@@ -1500,7 +1505,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-28",
+        "ultimo_ingreso": "2026-11-03",
         "ingresos_ultimos_30_dias": 15,
         "entregas_pendientes": 0
       },
@@ -1514,7 +1519,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-25"
+        "ultima_consulta": "2026-10-31"
       },
       "notas": [
         {
@@ -1624,7 +1629,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-27",
+        "ultimo_ingreso": "2026-11-02",
         "ingresos_ultimos_30_dias": 11,
         "entregas_pendientes": 1
       },
@@ -1638,7 +1643,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-20"
+        "ultima_consulta": "2026-10-26"
       },
       "notas": [
         {
@@ -1748,7 +1753,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-30",
+        "ultimo_ingreso": "2026-11-05",
         "ingresos_ultimos_30_dias": 19,
         "entregas_pendientes": 1
       },
@@ -1762,7 +1767,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-21"
+        "ultima_consulta": "2026-10-27"
       },
       "notas": [
         {
@@ -1872,7 +1877,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-29",
+        "ultimo_ingreso": "2026-11-04",
         "ingresos_ultimos_30_dias": 10,
         "entregas_pendientes": 1
       },
@@ -1886,7 +1891,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-26"
+        "ultima_consulta": "2026-11-01"
       },
       "notas": [
         {
@@ -1996,7 +2001,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-30",
+        "ultimo_ingreso": "2026-11-05",
         "ingresos_ultimos_30_dias": 17,
         "entregas_pendientes": 1
       },
@@ -2010,7 +2015,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-19"
+        "ultima_consulta": "2026-10-25"
       },
       "notas": [
         {
@@ -2120,7 +2125,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-27",
+        "ultimo_ingreso": "2026-11-02",
         "ingresos_ultimos_30_dias": 14,
         "entregas_pendientes": 1
       },
@@ -2134,7 +2139,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-16"
+        "ultima_consulta": "2026-10-22"
       },
       "notas": [
         {
@@ -2244,7 +2249,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-29",
+        "ultimo_ingreso": "2026-11-04",
         "ingresos_ultimos_30_dias": 26,
         "entregas_pendientes": 0
       },
@@ -2258,7 +2263,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-18"
+        "ultima_consulta": "2026-10-24"
       },
       "notas": [
         {
@@ -2368,7 +2373,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-26",
+        "ultimo_ingreso": "2026-11-01",
         "ingresos_ultimos_30_dias": 15,
         "entregas_pendientes": 0
       },
@@ -2382,7 +2387,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-21"
+        "ultima_consulta": "2026-10-27"
       },
       "notas": [
         {
@@ -2492,7 +2497,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-28",
+        "ultimo_ingreso": "2026-11-03",
         "ingresos_ultimos_30_dias": 19,
         "entregas_pendientes": 0
       },
@@ -2506,7 +2511,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-15"
+        "ultima_consulta": "2026-10-21"
       },
       "notas": [
         {
@@ -2616,7 +2621,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-27",
+        "ultimo_ingreso": "2026-11-02",
         "ingresos_ultimos_30_dias": 22,
         "entregas_pendientes": 0
       },
@@ -2630,7 +2635,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-17"
+        "ultima_consulta": "2026-10-23"
       },
       "notas": [
         {
@@ -2740,7 +2745,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-26",
+        "ultimo_ingreso": "2026-11-01",
         "ingresos_ultimos_30_dias": 18,
         "entregas_pendientes": 0
       },
@@ -2754,7 +2759,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-21"
+        "ultima_consulta": "2026-10-27"
       },
       "notas": [
         {
@@ -2864,7 +2869,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-30",
+        "ultimo_ingreso": "2026-11-05",
         "ingresos_ultimos_30_dias": 22,
         "entregas_pendientes": 0
       },
@@ -2878,7 +2883,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-21"
+        "ultima_consulta": "2026-10-27"
       },
       "notas": [
         {
@@ -2988,7 +2993,7 @@
         ]
       },
       "campus": {
-        "ultimo_ingreso": "2026-10-28",
+        "ultimo_ingreso": "2026-11-03",
         "ingresos_ultimos_30_dias": 12,
         "entregas_pendientes": 0
       },
@@ -3002,7 +3007,7 @@
             "ejercicios_totales": 10
           }
         ],
-        "ultima_consulta": "2026-10-28"
+        "ultima_consulta": "2026-11-03"
       },
       "notas": [
         {
@@ -3035,26 +3040,59 @@
       "nivel": "pregrado",
       "duracion": "3 años",
       "modalidad": "presencial",
+      "horario": "mañana",
       "cupo": 60,
-      "inscriptos_2026": 52
+      "inscriptos_2026": 52,
+      "preinscriptos_2027": 41,
+      "becas": {
+        "parciales_disponibles": 6,
+        "otorgadas_2027": 2,
+        "requisito": "promedio de secundario 7 o más y situación económica acreditada"
+      }
     },
     {
       "programa": "Profesorado de Biología",
       "nivel": "grado",
       "duracion": "4 años",
       "modalidad": "presencial",
+      "horario": "tarde",
       "cupo": 40,
-      "inscriptos_2026": 31
+      "inscriptos_2026": 31,
+      "preinscriptos_2027": 18,
+      "becas": {
+        "parciales_disponibles": 4,
+        "otorgadas_2027": 1,
+        "requisito": "promedio de secundario 7 o más y situación económica acreditada"
+      }
     },
     {
       "programa": "Tecnicatura en Gestión Ambiental",
       "nivel": "pregrado",
       "duracion": "2,5 años",
       "modalidad": "híbrida",
+      "horario": "tarde",
       "cupo": 40,
-      "inscriptos_2026": 19
+      "inscriptos_2026": 19,
+      "preinscriptos_2027": 12,
+      "becas": {
+        "parciales_disponibles": 4,
+        "otorgadas_2027": 0,
+        "requisito": "promedio de secundario 7 o más y situación económica acreditada"
+      }
     }
   ],
+  "demanda_detalle": {
+    "cursada_nocturna": {
+      "ingresantes_2026_que_trabajan_de_dia": 9,
+      "aspirantes_2027_que_preguntaron_por_horario_nocturno": 7,
+      "docentes_disponibles_de_noche": "sin relevar"
+    },
+    "bioinformatica": {
+      "consultas_aspirantes_2026": 11,
+      "ingresantes_2026_que_la_mencionaron": 7,
+      "docentes_con_formacion": 2
+    }
+  },
   "demanda": [
     {
       "tema": "Bioinformática",
@@ -3077,24 +3115,60 @@
       "fuente": "Bienestar"
     }
   ],
+  "inscripcion_2027": {
+    "cierre": "2026-11-20",
+    "proxima_visita_guiada": "2026-11-12",
+    "preinscriptos": 71,
+    "trabados": 3,
+    "consultas_frecuentes": [
+      {
+        "tema": "becas",
+        "consultas": 19
+      },
+      {
+        "tema": "bioinformática",
+        "consultas": 11
+      },
+      {
+        "tema": "horario nocturno",
+        "consultas": 7
+      },
+      {
+        "tema": "visitar el laboratorio",
+        "consultas": 5
+      }
+    ]
+  },
   "aspirantes": [
     {
       "nombre": "Ramiro B.",
-      "carrera": "Biotecnología",
+      "carrera": "Tecnicatura en Biotecnología",
       "estado": "consultó por becas",
-      "fecha": "2026-10-20"
+      "fecha": "2026-10-20",
+      "detalle": "Preguntó si hay beca parcial; promedio de secundario 8,2; nadie le respondió todavía.",
+      "dias_sin_respuesta": 16,
+      "contacto": "mail"
     },
     {
       "nombre": "Paula G.",
       "carrera": "Profesorado de Biología",
       "estado": "inscripción iniciada, falta documentación",
-      "fecha": "2026-10-24"
+      "fecha": "2026-10-24",
+      "detalle": "Falta el título secundario legalizado; el resto está.",
+      "documentos_faltantes": [
+        "título secundario legalizado"
+      ],
+      "dias_sin_respuesta": 0,
+      "contacto": "mail"
     },
     {
       "nombre": "Ezequiel R.",
-      "carrera": "Biotecnología",
+      "carrera": "Tecnicatura en Biotecnología",
       "estado": "pidió visitar la escuela",
-      "fecha": "2026-10-28"
+      "fecha": "2026-10-28",
+      "detalle": "Pidió visitar el laboratorio; quiere decidir entre Biotecnología y Gestión Ambiental.",
+      "dias_sin_respuesta": 8,
+      "contacto": "WhatsApp"
     }
   ]
 }

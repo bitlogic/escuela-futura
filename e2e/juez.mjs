@@ -13,12 +13,20 @@ export const RUBRICA = [
   { clave: 'hilo_claro', titulo: 'Se sigue un solo hilo (Martina) sin perderse; se entiende en cada momento qué se pidió, en qué están y si se cumplió' },
   { clave: 'legible_auditorio', titulo: 'En las capturas, el chat y el mapa se leen desde el fondo de un auditorio: texto grande, poco ruido, el momento de la decisión es el pico visual' },
   { clave: 'no_guionado', titulo: 'No parece guionado ni un teatro: los agentes hablan distinto entre sí, con datos, y lo que pasa se ve ocurrir' },
+  { clave: 'tablero_personas', titulo: 'En el Tablero se entiende que lo aprobado quedó como tareas en manos de personas (con responsable), y que ningún agente cerró nada' },
+  { clave: 'datos_verificados', titulo: 'Se ve que las cifras están comprobadas contra la fuente por código (los tilde y el chip "✓ N datos"); que no haya ninguna sin comprobar es lo deseable, no un defecto' },
+  { clave: 'alcance_y_objecion', titulo: 'El equipo se amplía solo cuando los datos lo piden (una cuarta disciplina entra sin que la convoquen) y la propuesta trae su propia objeción ("Riesgo de equivocarnos")' },
+  { clave: 'redisena_proceso', titulo: 'Cuando se le pide que esto no dependa de que lo pidan, el equipo propone cambiar el proceso de la institución (una rutina con responsables personas, para decidir), no solo resolver el caso' },
 ];
 
 export function armarPrompt({ transcript, capturas }) {
   return `Sos el jurado de una demo en vivo que se va a dar frente a un auditorio de docentes y directivos de educación superior (Innova Educa 21, Córdoba). La demo muestra "Escuela Futura", una escuela ficticia donde seis agentes de IA trabajan junto a una persona que decide. La tesis de la charla es: "No se puede formar personas para trabajar con agentes desde una institución que no trabaja con agentes." Lo que la demo tiene que dejar claro: los agentes se reparten el trabajo, se avisan entre ellos, proponen y esperan; una persona decide y se reserva el vínculo; cuando se les pide hacer algo con consecuencias, dicen que no; y cuando se les pregunta por qué, dicen lo que saben y lo que no.
 
 Te doy el transcript completo del canal (con los tiempos y las herramientas que usó cada agente) y ${capturas.length} captura(s) de la pantalla que vio el auditorio en los momentos clave, en orden: ${capturas.map((c) => c.nombre).join(', ')}.
+
+Dos cosas que son por diseño y no cuentan como defecto: la demo sigue un solo hilo (una sola estudiante en riesgo, las otras 23 vienen bien) porque en seis minutos no entra más de un caso; y la decisión se toma en un panel grande sobre el mapa de la escuela, que después queda en el Tablero como tareas con responsable. Sí contá como defecto que las voces suenen a plantilla o que un texto parezca pegado de un prompt.
+
+Tres cosas más que la demo quiere mostrar: (a) un verificador por código, no por modelo, cruza cada cifra y fecha de los agentes con los datos de sus herramientas; en el transcript cada mensaje trae "[datos: N con fuente; sin comprobar: …]" y en pantalla las cifras comprobadas llevan un tilde y las dudosas una marca; (b) el equipo crece cuando un dato lo pide (Advisor le pregunta a Admisiones qué dijo la estudiante al ingresar, y eso entra en la propuesta) y la propuesta incluye su propia objeción ("Riesgo de equivocarnos"); (c) al final la persona pide que esto no dependa de que lo pida, y Coordinación propone rediseñar el proceso (una rutina antes de cada parcial, con responsables personas) que también se decide en el panel y queda en el Tablero.
 
 Puntuá cada criterio de 1 (no se ve) a 5 (clarísimo), con una justificación de una o dos frases que cite el transcript o la captura. Sé exigente: un 5 es "un director que nunca vio agentes lo entiende desde la última fila". Después, un veredicto.
 

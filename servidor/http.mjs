@@ -26,7 +26,17 @@ export function sanearDecision(d) {
   return acciones.length ? { acciones, nota: corto(d.nota), caso: corto(d.caso), objetivo: String(d.objetivo || '').slice(0, 300) } : null;
 }
 
-export function crearHttp({ bus, reiniciar, info, log = () => {}, corridasDir = join(STAGE, 'corridas'), tablero = null }) {
+/** La ficha de cada agente para la vista: lo que hay en pack/ más la descripción de cada herramienta. Solo lectura. */
+export function fichasDeAgentes(pack, herramientas = [], lugares = {}) {
+  const porNombre = new Map(herramientas.map((h) => [h.name, h]));
+  return {
+    instrucciones: pack.instrucciones,
+    agentes: pack.agentes.map((a) => ({ id: a.id, nombre: a.nombre, descripcion: a.descripcion, prompt: a.prompt,
+      herramientas: a.herramientas.map((n) => { const h = porNombre.get(n); return { nombre: n, descripcion: h ? h.description : '', lugar: lugares[n] || null }; }) })),
+  };
+}
+
+export function crearHttp({ bus, reiniciar, info, log = () => {}, corridasDir = join(STAGE, 'corridas'), tablero = null, renombrar = null, fichas = null }) {
   const clientes = new Set();
   const leerIndice = () => { try { return JSON.parse(readFileSync(join(corridasDir, 'index.json'), 'utf8')); } catch { return { predeterminada: null, corridas: [] }; } };
   bus.suscribir((frame) => { const d = `event: eventos\ndata: ${JSON.stringify(frame)}\n\n`; for (const c of clientes) c.write(d); });
@@ -76,6 +86,16 @@ export function crearHttp({ bus, reiniciar, info, log = () => {}, corridasDir = 
         return json(res, 200, { ok: true });
       }
       if (ruta === '/api/estado' && req.method === 'GET') return json(res, 200, { vivo: true, ...info, ...bus.estado() });
+      if (ruta === '/api/agentes' && req.method === 'GET') return json(res, fichas ? 200 : 404, fichas ? (typeof fichas === 'function' ? fichas() : fichas) : { error: 'Sin fichas.' });   // la ficha de cada agente (solo lectura)
+      // Quién decide: el nombre que firma los mensajes de la persona y que los agentes conocen como Dirección
+      if (ruta === '/api/persona' && req.method === 'POST') {
+        const nombre = String((await leerJson(req)).nombre || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+        if (!nombre) return json(res, 400, { error: 'Falta el nombre.' });
+        if (!renombrar) return json(res, 404, { error: 'No se puede cambiar.' });
+        renombrar(nombre);
+        for (const c of clientes) c.write(`event: estado\ndata: ${JSON.stringify({ vivo: true, ...info })}\n\n`);   // las otras pestañas se enteran
+        return json(res, 200, { ok: true, persona: nombre });
+      }
       if (ruta === '/api/corrida' && req.method === 'GET') return json(res, 200, bus.corrida());
       // Corridas grabadas: el índice (stage/corridas/index.json) y guardar la actual con un título
       if (ruta === '/api/corridas' && req.method === 'GET') return json(res, 200, leerIndice());

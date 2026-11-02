@@ -20,6 +20,8 @@ export function crearSeguimiento({ agenteDe = () => null, esPropuesta = () => fa
   function decidir(p, t, texto, decision) {
     p.estado = 'decidido'; p.decision = texto; p.tUltimo = t; hito(p, t, 'decision', texto);
     p.plan = planDe(decision, accionesDe(p.propuesta), texto, typeof nombrePersona === 'function' ? nombrePersona() : nombrePersona);   // función: el nombre llega después (lo manda el servidor)
+    p.decisionTipo = tipoDeDecision(decision, p.plan, texto);
+    p.decisionNota = decision && decision.nota ? String(decision.nota) : '';   // la nota de la tarjeta: la vista la muestra después de un recargo o en grabación
   }
   function aplicar(ev) {
     const t = typeof ev.t === 'number' ? ev.t : undefined;
@@ -38,7 +40,12 @@ export function crearSeguimiento({ agenteDe = () => null, esPropuesta = () => fa
     const p = (() => { const x = actual(); return x && x.estado !== 'cerrado' ? x : conPropuesta(); })(); if (!p) return;
     const id = ev.quien; if (!id) return;
     if (t !== undefined) p.tUltimo = t;
-    if (ev.tipo === 'inicio') { p.vivos[id] = { desde: t ?? 0, herramienta: null, tHerr: 0 }; if (p.agentes[id]) p.agentes[id] = 'trabajando'; return; }
+    if (ev.tipo === 'inicio') {
+      p.vivos[id] = { desde: t ?? 0, herramienta: null, tHerr: 0 }; if (p.agentes[id]) p.agentes[id] = 'trabajando';
+      // Coordinación arranca con todas las respuestas: desde acá está preparando la propuesta, aunque un aviso tardío despierte a alguien
+      if (id === 'coordinacion' && p.repartido && Object.keys(p.agentes).length && Object.values(p.agentes).every((e) => e === 'respondio')) p.preparando = true;
+      return;
+    }
     if (ev.tipo === 'herramienta') { if (p.vivos[id]) { p.vivos[id].herramienta = ev.texto || ev.herramienta || ''; p.vivos[id].tHerr = t ?? 0; } return; }
     if (ev.tipo === 'fin') {
       delete p.vivos[id];
@@ -77,6 +84,16 @@ export function crearSeguimiento({ agenteDe = () => null, esPropuesta = () => fa
     reiniciar() { pedidos = []; },
   };
 }
+
+/** Qué decidió la persona: 'aprobada' (todo tal cual), 'ajustes' (se reservó o descartó algo) o 'descartada' (nada). */
+export function tipoDeDecision(decision, plan, texto = '') {
+  const estados = decision && Array.isArray(decision.acciones) ? decision.acciones.map((a) => a && a.estado).filter(Boolean) : null;
+  if (estados && estados.length) return estados.every((e) => e === 'no') ? 'descartada' : estados.every((e) => e === 'si') ? 'aprobada' : 'ajustes';
+  if (plan && plan.length && plan.every((x) => x.estado === 'descartada')) return 'descartada';
+  if ((plan && plan.some((x) => x.estado === 'descartada')) || /\b(la|lo|los|las)? ?(hago|llamo|hablo|tomo|veo) yo\b|me (la|lo) reservo|\bno\b/i.test(String(texto).normalize('NFD').replace(/[\u0300-\u036f]/g, ''))) return 'ajustes';
+  return 'aprobada';
+}
+export const ETIQUETA_DECISION = { aprobada: 'Aprobada', ajustes: 'Aprobada con ajustes', descartada: 'Descartada' };
 
 /**
  * El plan de acción que deja una decisión: [{ accion, responsable, estado: 'pendiente'|'descartada' }].
@@ -130,15 +147,21 @@ export function actividadDe(p, { nombreDe = (id) => id, ahora = 0, mostrarHerram
     if (h.tipo === 'cierre') return p.objetivo ? 'Coordinación cerró: lo aprobado lo hacen personas' : `${nombreDe(h.de || 'coordinacion')} respondió`;
     return h.texto;
   };
-  const trabajando = Object.keys(p.vivos).map(nombreDe);
+  // Mientras los delegados trabajan, Coordinación no cuenta (espera): "Trabajando: 3 agentes", no 4
+  const vivos = Object.keys(p.vivos); const otros = vivos.filter((id) => id !== 'coordinacion');
+  const trabajando = (p.repartido && otros.some((id) => p.agentes[id]) ? otros : vivos).map(nombreDe);
+  const hPropuesta = p.hitos.find((h) => h.tipo === 'propuesta');
+  const preparacion = hPropuesta ? hora(hPropuesta.t) : null;   // tiempo de preparación: del objetivo a la propuesta
+  const decision = p.decisionTipo ? { tipo: p.decisionTipo, texto: ETIQUETA_DECISION[p.decisionTipo] } : null;
   if (p.estado === 'cerrado') {
     // Ciclo de vida completo: de la primera a la última línea, con lo que decidiste y lo que quedó
     const items = p.hitos.filter((h) => ['recibido', 'reparto', 'propuesta', 'decision', 'cierre'].includes(h.tipo)).map((h) => ({ t: hora(h.t), estado: 'ok', texto: textoHito(h), detalle: h.tipo === 'decision' || h.tipo === 'cierre' ? h.texto : h.tipo === 'reparto' ? `${Object.keys(p.agentes).length} agentes, ${Object.values(p.agentes).filter((e) => e === 'respondio').length} respondieron${p.avisos ? `, ${p.avisos} aviso${p.avisos > 1 ? 's' : ''} entre ellos` : ''}` : null }));
     const dur = hora(p.tFin);
     const pendientes = (p.plan || []).filter((x) => x.estado === 'pendiente').length;
     return {
-      badge: { texto: p.objetivo ? `Objetivo cumplido en ${dur}` : `Respondido en ${dur}`, tono: 'ok' },
-      items, plan: p.plan || null,
+      // Cerrar la conversación no cumple el objetivo: el badge dice qué se decidió; la ejecución la mide el Tablero (la vista lo completa)
+      badge: p.objetivo ? (decision ? { texto: decision.texto, tono: 'ok' } : { texto: 'Respondido', tono: 'ok' }) : { texto: `Respondido en ${dur}`, tono: 'ok' },
+      items, plan: p.plan || null, preparacion, decision, total: dur,
       siguiente: pendientes ? `${pendientes === 1 ? 'Queda 1 acción' : `Quedan ${pendientes} acciones`} del plan: las hacen personas, y las marcás vos cuando estén hechas.` : p.objetivo ? 'Nada más para decidir. Podés darle otro objetivo a Coordinación o preguntarle a un agente por qué.' : null,
     };
   }
@@ -147,9 +170,14 @@ export function actividadDe(p, { nombreDe = (id) => id, ahora = 0, mostrarHerram
     const herr = v.herramienta && ahora - v.tHerr < mostrarHerramienta ? v.herramienta : null;
     items.push({ t: null, estado: 'on', vivo: id, texto: herr ? `${nombreDe(id)} · ${herr}` : `${nombreDe(id)} ${palabraDe(id, v.desde, ahora)}…` });
   }
-  if (p.estado === 'propuesta') items.push({ t: null, estado: 'espera', texto: 'Esperando tu decisión' });
-  const badge = p.estado === 'propuesta' ? { texto: 'Esperando tu decisión', tono: 'espera' }
-    : trabajando.length ? { texto: trabajando.length > 2 ? `Trabajando: ${trabajando.length} agentes` : 'Trabajando: ' + trabajando.join(', '), tono: 'curso' }   // con tres nombres no entra en la cabecera
-    : p.estado === 'decidido' ? { texto: 'Cerrando', tono: 'curso' } : { texto: 'En curso', tono: 'curso' };
-  return { badge, items: items.slice(-7), plan: p.plan || null };
+  if (p.estado === 'propuesta') items.push({ t: null, estado: 'espera', texto: 'Pendiente de tu revisión' });
+  // Trabajo de los agentes: Analizando → Preparando propuesta → Propuesta preparada (= pendiente de tu revisión). Decisión: Aprobada / con ajustes / Descartada.
+  const delegados = Object.keys(p.agentes);
+  const todosRespondieron = delegados.length > 0 && delegados.every((id) => p.agentes[id] === 'respondio');
+  const badge = p.estado === 'propuesta' ? { texto: 'Pendiente de tu revisión', tono: 'espera' }
+    : p.estado === 'decidido' ? (decision ? { texto: decision.texto, tono: 'ok' } : { texto: 'Decidida', tono: 'ok' })
+    : p.objetivo && todosRespondieron && (p.preparando || !trabajando.length) ? { texto: 'Preparando propuesta', tono: 'curso' }   // todos contestaron y nadie sigue trabajando (los avisos entre agentes cuentan como trabajo)
+    : trabajando.length || p.repartido ? { texto: 'Analizando', tono: 'curso' }
+    : { texto: 'Enviado', tono: 'curso' };
+  return { badge, items: items.slice(-7), plan: p.plan || null, preparacion, decision, trabajando };
 }

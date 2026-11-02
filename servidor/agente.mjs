@@ -1,9 +1,13 @@
 // Un turno de un agente contra la API de Anthropic: arma el system (instrucciones + persona), ofrece sus
 // herramientas más enviar_mensaje, y corre el bucle de tool use. La conversación de cada agente se guarda
 // entre turnos (solo se agrega al final; nunca se edita). Lo que el agente escribe fuera de enviar_mensaje
-// no va al chat: se muestra como "piensa" en el mapa.
+// no va al chat: se muestra como "piensa" en el mapa. Cada mensaje que manda pasa por el verificador
+// (verificador.mjs): sus cifras y fechas se cruzan con los resultados de sus herramientas y con lo que le dijeron
+// otros, y el resultado viaja con el evento `dice` (la vista pone los tilde; el E2E cuenta lo que no cerró).
 
 import { HERRAMIENTA_LUGAR, textoHerramienta } from '../stage/herramientas.js';
+import { marcaDe } from '../stage/chat.js';
+import { fuenteDe, verificar, dudosos } from './verificador.mjs';
 
 export const ENVIAR_MENSAJE = {
   name: 'enviar_mensaje',
@@ -36,6 +40,9 @@ export function formatearLote(lote) {
 export function crearCorredor({ cliente, modelo, effort = 'medium', instrucciones, agentes, herramientas, ejecutar, maxTokens = 8000, enParalelo = 4, fallbacks = true, log = () => {} }) {
   const porId = new Map(agentes.map((a) => [a.id, a]));
   const conversaciones = new Map();
+  const fuentes = new Map();   // por agente: { propias: [fuenteDe(tool_result)], ajenas: [{ texto, datos }] } para el verificador
+  const fuentesDe = (id) => { if (!fuentes.has(id)) fuentes.set(id, { propias: [], ajenas: [] }); return fuentes.get(id); };
+  const recibidos = (id, ms) => { const f = fuentesDe(id); for (const m of ms) f.ajenas.push({ texto: m.texto, datos: m.verificacion ? m.verificacion.datos : undefined }); };
   const defs = new Map(herramientas.map((h) => [h.name, { name: h.name, description: h.description, input_schema: h.inputSchema }]));
 
   // Semáforo chiquito: no más de `enParalelo` llamadas a la vez
@@ -45,7 +52,8 @@ export function crearCorredor({ cliente, modelo, effort = 'medium', instruccione
 
   const controladores = new Set();
   function configDe(a) {
-    const system = [{ type: 'text', text: `${instrucciones}\n\n---\n\n${a.prompt}`, cache_control: { type: 'ephemeral' } }];
+    const instr = typeof instrucciones === 'function' ? instrucciones() : instrucciones;   // función: el nombre de quien decide puede cambiar en caliente
+    const system = [{ type: 'text', text: `${instr}\n\n---\n\n${a.prompt}`, cache_control: { type: 'ephemeral' } }];
     const tools = [...a.herramientas.map((n) => { const d = defs.get(n); if (!d) throw new Error(`${a.id}: herramienta desconocida ${n}`); return d; }), ENVIAR_MENSAJE];
     return { system, tools };
   }
@@ -69,6 +77,7 @@ export function crearCorredor({ cliente, modelo, effort = 'medium', instruccione
     const mensajes = conversaciones.get(id);
     const ac = new AbortController(); controladores.add(ac);
     let mando = false, textoFinal = '', empujado = false;
+    recibidos(id, lote.mensajes);
     try {
       mensajes.push({ role: 'user', content: formatearLote(lote) });
       for (let i = 0; i < 12; i++) {
@@ -88,15 +97,20 @@ export function crearCorredor({ cliente, modelo, effort = 'medium', instruccione
         for (const u of usos) {
           let content, is_error = false;
           try {
-            if (u.name === 'enviar_mensaje') { content = ctx.enviar(String(u.input.texto || '')); mando = true; }
-            else {
+            if (u.name === 'enviar_mensaje') {
+              const texto = String(u.input.texto || '');
+              const verificacion = verificar(texto, fuentesDe(id));   // cifras y fechas contra las fuentes: código, no modelo
+              const d = dudosos(verificacion); if (d.length) log('datos', a.nombre, 'sin comprobar:', d.join(', '));
+              content = ctx.enviar(texto, { verificacion, marca: marcaDe(texto) }); mando = true;   // marca: 'limite' (dice que no) o 'no_se' (dice lo que no sabe), para la vista
+            } else {
               ctx.emitir({ tipo: 'herramienta', herramienta: u.name, lugar: HERRAMIENTA_LUGAR[u.name] || null, texto: textoHerramienta(u.name, u.input) });
               content = ejecutar(u.name, u.input || {}, a.id);
+              fuentesDe(id).propias.push(fuenteDe(content));
             }
           } catch (e) { content = e.message; is_error = true; }
           resultados.push({ type: 'tool_result', tool_use_id: u.id, content, ...(is_error ? { is_error } : {}) });
         }
-        const nuevos = ctx.nuevos();
+        const nuevos = ctx.nuevos(); recibidos(id, nuevos);
         const bloques = nuevos.length ? [...resultados, { type: 'text', text: 'Mensajes nuevos mientras trabajabas:\n' + nuevos.map((m) => `[${m.hora}] ${m.nombre}: ${m.texto}`).join('\n') }] : resultados;
         mensajes.push({ role: 'user', content: bloques });
       }
@@ -107,7 +121,7 @@ export function crearCorredor({ cliente, modelo, effort = 'medium', instruccione
 
   return {
     correrTurno,
-    reiniciar() { conversaciones.clear(); for (const c of controladores) c.abort(); controladores.clear(); },
+    reiniciar() { conversaciones.clear(); fuentes.clear(); for (const c of controladores) c.abort(); controladores.clear(); },
     conversacion: (id) => conversaciones.get(id) || [],
   };
 }

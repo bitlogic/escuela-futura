@@ -11,10 +11,13 @@
 <style>
   @font-face { font-family: "Silkscreen"; src: url("assets/Silkscreen-Regular.ttf"); font-weight: 400; font-display: block; }
   @font-face { font-family: "Silkscreen"; src: url("assets/Silkscreen-Bold.ttf"); font-weight: 700; font-display: block; }
+  @font-face { font-family: "Plain"; src: url("assets/Plain-Regular.otf"); font-weight: 400; font-display: block; }
+  @font-face { font-family: "Plain"; src: url("assets/Plain-Medium.otf"); font-weight: 500 600; font-display: block; }
+  @font-face { font-family: "Plain"; src: url("assets/Plain-Bold.otf"); font-weight: 700; font-display: block; }
   :root { color-scheme: dark; --ink: #1a1a2e; --texto: #f4efe2; --acento: #ff7a3d; --fondo-pagina: #0b0b12; --panel: #10101b; --tarjeta: #181826; --linea: #2c2f48; --tenue: #8f93b0; --persona-fondo: rgba(255,122,61,.14);
     --mono: "Silkscreen", "Press Start 2P", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-  :root[data-tema="claro"] { color-scheme: light; --texto: #121212; --acento: #c2410c; --fondo-pagina: #e9e2d3; --panel: #f9f4ea; --tarjeta: #ffffff; --linea: #d6cdb9; --tenue: #585c72; --persona-fondo: rgba(194,65,12,.12); }
+    --sans: "Plain", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  :root[data-tema="claro"] { color-scheme: light; --texto: #121212; --acento: #c2410c; --fondo-pagina: #e9e2d3; --panel: #f9f4ea; --tarjeta: #fbf8f1; --linea: #d6cdb9; --tenue: #585c72; --persona-fondo: rgba(194,65,12,.12); }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: var(--fondo-pagina); overflow: hidden; font-family: var(--sans); color: var(--texto); cursor: default; }
   /* Tablero fijo de 1920×1080 escalado a la ventana (es estático: no necesita layout fluido) */
@@ -22,8 +25,8 @@
   .px { clip-path: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px), 0 4px, 4px 4px); }
 
   header { position: absolute; left: 46px; right: 46px; top: 26px; height: 64px; display: flex; align-items: center; justify-content: space-between; z-index: 2; }   /* encima de #arbol, que si no se queda con los clics del conmutador */
-  header h1 { margin: 0; font: 700 38px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
-  header h1 span { color: var(--acento); }
+  header h1 { margin: 0; font: 700 32px var(--sans); letter-spacing: 0; }   /* sans: el mono pixel es para etiquetas */
+  header h1 span { color: inherit; }   /* el naranja es de la persona */
   /* Mismo conmutador y mismo lugar que en index.html (fijo a la ventana, fuera del escenario escalado). Embebido no se muestra: lo pone la vista madre. */
   #vistas { position: fixed; right: 14px; top: 10px; z-index: 60; display: flex; background: var(--ink); padding: 4px; gap: 4px; }
   body.embebido #vistas { display: none; }
@@ -53,6 +56,8 @@
   .etiqueta { position: absolute; top: 16px; right: 20px; background: var(--c); padding: 5px 12px; font: 700 16px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink); }
 
   .linea { position: absolute; background: var(--tenue) }
+  header .pista { font: 600 18px var(--sans); color: var(--tenue); }
+  .tarjeta:hover { outline: 3px solid var(--c); outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -60,6 +65,7 @@
 <div id="escenario">
   <header>
     <div><h1>Escuela <span>Futura</span> · Organigrama</h1></div>
+    <div class="pista">Clic en un agente para ver su ficha: rol, herramientas y lo que se le pide.</div>
   </header>
   <div id="arbol" style="position:absolute;inset:0;top:44px"></div>
 </div>
@@ -105,6 +111,10 @@ function tarjetaAgente(a, x, y, w, h) {
   const cab = el('div', 'cab'); const f = el('div', 'cara px'); const viva = nuevaCara(hojas[MODELOS[a.id]], f); cab.appendChild(f); t.addEventListener('mouseenter', () => { pedido = viva; });
   const nom = el('div'); nom.append(el('div', 'nombre', a.nombre), el('div', 'area', a.area)); cab.appendChild(nom);
   t.append(cab, el('div', 'rol', a.rol));
+  // Clic: la ficha del agente (agente.html), con su prompt y sus herramientas
+  t.style.cursor = 'pointer'; t.title = `Ver la ficha de ${a.nombre}`; t.setAttribute('role', 'link'); t.tabIndex = 0;
+  const abrir = () => { if (embebido) parent.postMessage({ tipo: 'agente', id: a.id }, '*'); else location.href = `agente.html?id=${a.id}`; };
+  t.addEventListener('click', abrir); t.addEventListener('keydown', (e) => { if (e.key === 'Enter') abrir(); });
   arbol.appendChild(t); return t;
 }
 function silueta() {   // persona genérica en pixel-art, del color de acento del tema
@@ -177,7 +187,8 @@ addEventListener('keydown', (e) => {
   if (e.key === 'Escape' || e.key === 'o') irEscuela();
   if (e.key === 'b') $('#v-tab').click();
   if (e.key === 't') { aplicarTema(tema === 'oscuro' ? 'claro' : 'oscuro'); if (embebido) parent.postMessage({ tipo: 'tema', tema }, '*'); }
-  if (e.key === 'f' && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+  if (e.key === 'c' && embebido) parent.postMessage({ tipo: 'chat' }, '*');   // el chat lo abre y cierra la vista madre
+  if (e.key === 'f') { if (embebido) parent.postMessage({ tipo: 'pantalla' }, '*'); else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
 });
 </script>
 </body>

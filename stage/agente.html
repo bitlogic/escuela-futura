@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="es" data-tema="oscuro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agente · Escuela Futura</title>
+<script>
+  (function () { try { var q = new URLSearchParams(location.search).get('tema'); var t = q || localStorage.getItem('tema'); if (t === 'claro' || t === 'oscuro') document.documentElement.dataset.tema = t; } catch (e) {} })();
+</script>
+<style>
+  @font-face { font-family: "Silkscreen"; src: url("assets/Silkscreen-Bold.ttf"); font-weight: 700; font-display: block; }
+  @font-face { font-family: "Plain"; src: url("assets/Plain-Regular.otf"); font-weight: 400; font-display: block; }
+  @font-face { font-family: "Plain"; src: url("assets/Plain-Medium.otf"); font-weight: 500 600; font-display: block; }
+  @font-face { font-family: "Plain"; src: url("assets/Plain-Bold.otf"); font-weight: 700; font-display: block; }
+  :root { color-scheme: dark; --ink: #1a1a2e; --texto: #f4efe2; --suave: #9a9eba; --tenue: #8f93b0; --acento: #ff7a3d; --azul: #3e6be8; --ok: #5fae6a; --fondo: #0b0b12; --panel: #10101b; --tarjeta: #181826; --linea: #2c2f48; --campo: #1b1b2b; --codigo: #22223a;
+    --mono: "Silkscreen", "Press Start 2P", ui-monospace, Menlo, monospace; --sans: "Plain", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  :root[data-tema="claro"] { color-scheme: light; --texto: #121212; --suave: #5c5f73; --tenue: #585c72; --acento: #c2410c; --azul: #2f54c8; --ok: #2f7a3b; --fondo: #e9e2d3; --panel: #f9f4ea; --tarjeta: #fbf8f1; --linea: #d6cdb9; --campo: #fbf8f1; --codigo: #efe8d8; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--fondo); font-family: var(--sans); color: var(--texto); }
+  body { display: flex; flex-direction: column; }
+  .px { clip-path: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px), 0 4px, 4px 4px); }
+  /* El mismo conmutador que en la escuela; embebido no se muestra (lo pone la vista madre) */
+  #vistas { position: fixed; right: 14px; top: 10px; z-index: 60; display: flex; background: var(--ink); padding: 4px; gap: 4px; }
+  body.embebido #vistas { display: none; }
+  #vistas button { font: 700 18px var(--mono); letter-spacing: .08em; text-transform: uppercase; background: transparent; color: #f4efe2; border: 0; padding: 8px 14px; cursor: pointer; }
+  #vistas button:hover { background: #2c2f48; }
+
+  /* Las caras de los seis, arriba: la pestaña del agente que se está leyendo */
+  #equipo { flex: none; display: flex; flex-wrap: wrap; gap: 10px; padding: 62px 48px 0; border-bottom: 3px solid var(--linea); background: var(--panel); }   /* debajo del conmutador de vistas (propio o de la vista madre), en una sola fila */
+  #equipo button { display: flex; align-items: center; gap: 12px; background: transparent; border: 0; border-bottom: 4px solid transparent; padding: 10px 16px 14px; cursor: pointer; font: 700 18px var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--suave); margin-bottom: -3px; }
+  #equipo button canvas { width: 36px; height: 36px; image-rendering: pixelated; background: var(--c); }
+  #equipo button.on { color: var(--c); border-bottom-color: var(--c); }
+  #equipo button:hover { color: var(--texto); }
+
+  /* La ficha: a la izquierda quién es y qué puede hacer; a la derecha, lo que se le pide (el prompt) */
+  #ficha { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(360px, 460px) minmax(0, 1fr); gap: 0; }
+  #quien { padding: 36px 40px 40px 48px; border-right: 3px solid var(--linea); overflow-y: auto; scrollbar-width: thin; }
+  #cara { width: 192px; height: 192px; image-rendering: pixelated; background: var(--c); display: block; }
+  #nombre { margin: 22px 0 4px; font: 700 44px/1.1 var(--sans); color: var(--texto); }
+  #area { font: 700 16px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--c); margin-bottom: 18px; }
+  #rol { font: 600 22px/1.4 var(--sans); color: var(--texto); margin: 0 0 28px; max-width: 42ch; }
+  .dato { display: flex; gap: 10px; align-items: baseline; font: 600 18px/1.4 var(--sans); color: var(--suave); margin-bottom: 8px; }
+  .dato b { color: var(--texto); font-weight: 700; flex: none; width: 86px; }
+  h3 { margin: 30px 0 10px; font: 700 15px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--tenue); }
+  .herr { display: flex; flex-direction: column; gap: 10px; }
+  .herr .h { background: var(--tarjeta); border: 2px solid var(--linea); padding: 12px 14px; }
+  .herr .h code { font: 600 17px var(--sans); color: var(--texto); background: var(--codigo); padding: 2px 8px; }
+  .herr .h .d { margin-top: 6px; font: 600 17px/1.4 var(--sans); color: var(--suave); }
+  .herr .h .l { margin-top: 4px; font: 600 14px var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--tenue); }
+  #prompt { padding: 36px 56px 60px 48px; overflow-y: auto; scrollbar-width: thin; }
+  #prompt .cab { display: flex; align-items: baseline; gap: 16px; margin-bottom: 18px; }
+  #prompt .cab h2 { margin: 0; font: 700 28px var(--sans); white-space: nowrap; }
+  #prompt .cab .lectura { white-space: nowrap; }
+  #prompt .cab .lectura { font: 700 14px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--tenue); border: 2px solid var(--linea); padding: 4px 10px; }
+  #prompt .cab .archivo { margin-left: auto; font: 600 15px var(--sans); color: var(--tenue); }
+  .md { max-width: 78ch; font: 500 20px/1.5 var(--sans); color: var(--texto); }
+  .md h2 { margin: 34px 0 10px; font: 700 24px var(--sans); color: var(--texto); }
+  .md h2:first-child { margin-top: 0; }
+  .md p { margin: 0 0 12px; }
+  .md ul, .md ol { margin: 0 0 12px; padding-left: 26px; } .md li { margin: 4px 0; }
+  .md code { font: 600 .9em var(--sans); background: var(--codigo); padding: 1px 6px; }
+  .md .ok, .md .no { display: block; padding: 10px 14px; margin: 6px 0; border: 2px solid var(--linea); background: var(--tarjeta); }
+  .md .ok { border-color: var(--ok); } .md .no { border-color: var(--linea); color: var(--suave); }
+  details { margin-top: 36px; border-top: 3px solid var(--linea); padding-top: 18px; }
+  summary { cursor: pointer; font: 700 20px var(--sans); color: var(--texto); }
+  summary small { font: 600 16px var(--sans); color: var(--tenue); margin-left: 10px; }
+  details .md { margin-top: 16px; }
+  #vacio { padding: 60px 48px; font: 600 24px var(--sans); color: var(--suave); }
+  @media (max-width: 1100px) { #ficha { grid-template-columns: 1fr; } #quien { border-right: 0; border-bottom: 3px solid var(--linea); } }
+</style>
+</head>
+<body>
+<div id="vistas" class="px"><button id="v-escuela">Escuela</button><button id="v-org">Organigrama <kbd>o</kbd></button><button id="v-tab">Tablero <kbd>b</kbd></button></div>
+<nav id="equipo" aria-label="Agentes"></nav>
+<div id="ficha" hidden>
+  <aside id="quien">
+    <canvas id="cara" class="px" width="16" height="16"></canvas>
+    <h1 id="nombre"></h1>
+    <div id="area"></div>
+    <p id="rol"></p>
+    <div class="dato"><b>Lugar</b><span id="lugar"></span></div>
+    <div class="dato"><b>Habla</b><span id="habla">Solo por <code>enviar_mensaje</code>, con @menciones</span></div>
+    <div class="dato"><b>Decide</b><span>Nunca: propone; una persona aprueba</span></div>
+    <h3 id="h-herr">Herramientas</h3>
+    <div id="herramientas" class="herr"></div>
+  </aside>
+  <main id="prompt">
+    <div class="cab"><h2>Lo que se le pide</h2><span class="lectura">Solo lectura</span><span class="archivo" id="archivo"></span></div>
+    <div id="cuerpo" class="md"></div>
+    <details><summary>Reglas del equipo, comunes a los seis <small>pack/instructions.md</small></summary><div id="instrucciones" class="md"></div></details>
+  </main>
+</div>
+<div id="vacio" hidden>No se pudieron cargar las fichas de los agentes.</div>
+
+<script type="module">
+import { MODELOS, cargarHojas, cara, aplicarColores } from './personajes.js';
+
+const $ = (s) => document.querySelector(s);
+const params = new URLSearchParams(location.search);
+const embebido = params.has('embebido');
+document.body.classList.toggle('embebido', embebido);
+let tema = document.documentElement.dataset.tema === 'claro' ? 'claro' : 'oscuro';
+function aplicarTema(t) { tema = t === 'claro' ? 'claro' : 'oscuro'; document.documentElement.dataset.tema = tema; aplicarColores(tema); try { localStorage.setItem('tema', tema); } catch {} }
+aplicarTema(tema);
+const irA = (cual) => { if (embebido) parent.postMessage({ tipo: 'vista', cual }, '*'); else location.href = cual === 'escuela' ? 'index.html' : cual === 'org' ? 'organigrama.html' : 'tablero.html'; };
+$('#v-escuela').onclick = () => irA('escuela'); $('#v-org').onclick = () => irA('org'); $('#v-tab').onclick = () => irA('tab');
+addEventListener('message', (e) => { const d = e.data; if (d && d.tipo === 'tema') aplicarTema(d.tema); if (d && d.tipo === 'agente' && d.id) elegir(d.id); });
+
+// Dónde trabaja cada uno (lo mismo que agentes.json dice como "casa")
+const LUGAR = { coordinacion: 'Sala de Coordinación', tutor: 'Aula de Biología 1', advisor: 'Secretaría', bienestar: 'Oficina de Bienestar', admisiones: 'Entrada · Admisiones', academia: 'Biblioteca · Academia' };
+const SALA = { coordinacion: 'Coordinación', 'aula-bio1': 'el aula', biblioteca: 'la biblioteca', secretaria: 'Secretaría', admisiones: 'Admisiones', academia: 'Academia', bienestar: 'Bienestar' };
+
+// Las fichas: del servidor si está (lo que corre ahora), si no el export estático (grabación, hosting sin servidor)
+async function cargarFichas() {
+  for (const u of ['/api/agentes', 'agentes-detalle.json']) { try { const r = await fetch(u, { cache: 'no-store' }); if (r.ok) return await r.json(); } catch {} }
+  return null;
+}
+// Un markdown mínimo: ## títulos, listas con - o 1., negritas, `código`, y los bloques "Así sí / Así no" como tarjetas
+function md(texto) {
+  const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const inline = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '<code>$1</code>');
+  const out = []; let lista = null;
+  const cerrar = () => { if (lista) { out.push(`</${lista}>`); lista = null; } };
+  for (const linea of String(texto || '').split('\n')) {
+    const l = linea.trimEnd();
+    if (!l.trim()) { cerrar(); continue; }
+    let m;
+    if ((m = l.match(/^(#{1,3})\s+(.*)$/))) { cerrar(); out.push(`<h2>${inline(m[2])}</h2>`); continue; }
+    if ((m = l.match(/^\s*[-•]\s+(.*)$/))) { if (lista !== 'ul') { cerrar(); out.push('<ul>'); lista = 'ul'; } out.push(`<li>${inline(m[1])}</li>`); continue; }
+    if ((m = l.match(/^\s*\d+\.\s+(.*)$/))) { if (lista !== 'ol') { cerrar(); out.push('<ol>'); lista = 'ol'; } out.push(`<li>${inline(m[1])}</li>`); continue; }
+    if (lista && /^\s{2,}\S/.test(l)) { out[out.length - 1] = out[out.length - 1].replace(/<\/li>$/, ' ' + inline(l.trim()) + '</li>'); continue; }
+    cerrar();
+    if ((m = l.match(/^Así sí(.*?):\s*(.*)$/))) { out.push(`<span class="ok"><strong>Así sí${inline(m[1])}:</strong> ${inline(m[2])}</span>`); continue; }
+    if ((m = l.match(/^Así no(.*?):\s*(.*)$/))) { out.push(`<span class="no"><strong>Así no${inline(m[1])}:</strong> ${inline(m[2])}</span>`); continue; }
+    out.push(`<p>${inline(l)}</p>`);
+  }
+  cerrar(); return out.join('\n');
+}
+
+const fichas = await cargarFichas();
+if (!fichas) { $('#vacio').hidden = false; }
+else {
+  const hojas = await cargarHojas();
+  const el = (tag, clase, texto) => { const e = document.createElement(tag); if (clase) e.className = clase; if (texto != null) e.textContent = texto; return e; };
+  const nav = $('#equipo');
+  const ORDEN = ['coordinacion', 'tutor', 'advisor', 'bienestar', 'admisiones', 'academia'];   // el orden del organigrama, no el alfabético del pack
+  fichas.agentes.sort((a, b) => (ORDEN.indexOf(a.id) + 99) % 99 - (ORDEN.indexOf(b.id) + 99) % 99);
+  for (const a of fichas.agentes) {
+    const b = el('button'); b.dataset.id = a.id; b.style.setProperty('--c', `var(--ag-${a.id})`); b.type = 'button';
+    b.appendChild(cara(hojas[MODELOS[a.id]], 2)); b.appendChild(el('span', null, a.nombre)); b.onclick = () => elegir(a.id, true);
+    nav.appendChild(b);
+  }
+  $('#ficha').hidden = false;
+  window.elegir = function elegir(id, empujar = false) {
+    const a = fichas.agentes.find((x) => x.id === id) || fichas.agentes[0]; if (!a) return;
+    for (const b of nav.querySelectorAll('button')) b.classList.toggle('on', b.dataset.id === a.id);
+    document.title = `${a.nombre} · Escuela Futura`;
+    $('#quien').style.setProperty('--c', `var(--ag-${a.id})`); $('#cara').replaceWith(Object.assign(cara(hojas[MODELOS[a.id]], 12), { id: 'cara', className: 'px' }));
+    $('#nombre').textContent = a.nombre; $('#area').textContent = a.id === 'coordinacion' ? 'Coordina al equipo' : 'Agente'; $('#rol').textContent = a.descripcion;
+    $('#lugar').textContent = LUGAR[a.id] || '';
+    const H = $('#herramientas'); H.replaceChildren();
+    for (const h of a.herramientas) { const d = el('div', 'h'); d.appendChild(el('code', null, h.nombre)); d.appendChild(el('div', 'd', h.descripcion)); d.appendChild(el('div', 'l', h.lugar ? `En el plano va a ${SALA[h.lugar] || h.lugar}` : h.nombre.endsWith('_tarea') ? 'Tablero · no se mueve' : '')); H.appendChild(d); }
+    $('#h-herr').textContent = `${a.herramientas.length} herramientas (más enviar_mensaje)`;
+    $('#archivo').textContent = `pack/agents/${a.id}.persona.md · se edita ahí y se reinicia el servidor`;
+    $('#cuerpo').innerHTML = md(a.prompt);
+    $('#instrucciones').innerHTML = md(fichas.instrucciones);
+    $('#prompt').scrollTop = 0;
+    if (empujar && !embebido) history.replaceState(null, '', `?id=${a.id}${tema === 'claro' ? '&tema=claro' : ''}`);
+  };
+  elegir(params.get('id') || 'coordinacion');
+}
+addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') irA('escuela');
+  if (e.key === 'o') irA('org'); if (e.key === 'b') irA('tab');
+  if (e.key === 't') { aplicarTema(tema === 'oscuro' ? 'claro' : 'oscuro'); if (embebido) parent.postMessage({ tipo: 'tema', tema }, '*'); }
+  if (e.key === 'c' && embebido) parent.postMessage({ tipo: 'chat' }, '*');
+  if (e.key === 'f') { if (embebido) parent.postMessage({ tipo: 'pantalla' }, '*'); else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
+});
+</script>
+</body>
+</html>

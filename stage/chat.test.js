@@ -59,7 +59,7 @@ test('hilo: respeta el tope y limpiar reinicia', () => {
   assert.ok(h.agregar({ clave: 'k0', autor: 'A', texto: 'otra vez' }));
 });
 
-import { destinatario, riesgoDe, nombreDeCaso, esPropuesta, propuesta, redactarDecision, cuerpoDeCaso, parsearAcciones } from './chat.js';
+import { destinatario, riesgoDe, nombreDeCaso, esPropuesta, propuesta, redactarDecision, cuerpoDeCaso, parsearAcciones, marcaDe } from './chat.js';
 
 test('destinatario: las @menciones iniciales se separan del texto', () => {
   assert.deepEqual(destinatario('@Coordinación @Bienestar Martina: 2 de 10 clases'), { para: ['Coordinación', 'Bienestar'], resto: 'Martina: 2 de 10 clases' });
@@ -68,9 +68,9 @@ test('destinatario: las @menciones iniciales se separan del texto', () => {
 });
 
 test('bloques: fichas por estudiante, rótulos y casos con nombre y riesgo', () => {
-  const b = bloques('Martina R.: 2 de 10 clases desde el 18/8, riesgo alto. Me preocupa.\nTraducción: no puede rendir el 3/11.\nLos otros 21 vienen bien.\nCon lo de Advisor, cambio: primero la deuda.');
+  const b = bloques('Martina R.: 2 de 10 clases desde el 18/8, riesgo alto. Me preocupa.\nPendiente: no puede rendir el 3/11.\nLos otros 21 vienen bien.\nCon lo de Advisor, cambio: primero la deuda.');
   assert.deepEqual(b[0], { tipo: 'ficha', nombre: 'Martina R.', texto: '2 de 10 clases desde el 18/8, riesgo alto. Me preocupa.', riesgo: 'alto' });
-  assert.deepEqual(b[1], { tipo: 'rotulo', rotulo: 'Traducción', texto: 'no puede rendir el 3/11.' });
+  assert.deepEqual(b[1], { tipo: 'rotulo', rotulo: 'Pendiente', texto: 'no puede rendir el 3/11.' });
   assert.equal(b[2].tipo, 'p');
   assert.equal(b[3].tipo, 'p');   // "Con lo de Advisor, cambio:" no es un estudiante
   assert.deepEqual(bloques('Me preocupa Joaquín: 0 de 8 clases, riesgo alto.')[0], { tipo: 'ficha', nombre: 'Joaquín', texto: '0 de 8 clases, riesgo alto.', riesgo: 'alto' });
@@ -123,11 +123,11 @@ test('propuesta: las acciones salen de la línea "Acciones:" o de la última ora
 
 test('redactarDecision por acción: sí, lo hago yo, no, y la nota', () => {
   const casos = propuesta('1. Martina R., riesgo alto: x.\n  Acciones: plan de pagos (Secretaría) · práctica guiada (docente) · llamada (Bienestar)').casos;
-  assert.equal(redactarDecision(casos, { 1: { acciones: { 0: 'si', 1: 'si', 2: 'yo' } } }), 'Plan de pagos y práctica guiada, sí. Llamada: la hago yo.');
+  assert.equal(redactarDecision(casos, { 1: { acciones: { 0: 'si', 1: 'si', 2: 'yo' } } }), 'Plan de pagos y práctica guiada, sí. La llamada la hago yo.');
   assert.equal(redactarDecision(casos, { 1: { acciones: { 0: 'si', 2: 'no' }, nota: 'la práctica la vemos después del parcial' } }), 'Plan de pagos, sí. Llamada, no. La práctica la vemos después del parcial.');
   assert.equal(redactarDecision(casos, { 1: { acciones: {} } }), '');
   const dos = propuesta('1. Martina R.: x.\n  Acciones: llamada (Bienestar)\n2. Tomás G.: y.\n  Acciones: tutoría (docente)').casos;
-  assert.equal(redactarDecision(dos, { 1: { acciones: { 0: 'yo' } }, 2: { acciones: { 0: 'si' } } }), 'Martina R.: Llamada: la hago yo. Tomás G.: Tutoría, sí.');
+  assert.equal(redactarDecision(dos, { 1: { acciones: { 0: 'yo' } }, 2: { acciones: { 0: 'si' } } }), 'Martina R.: La llamada la hago yo. Tomás G.: Tutoría, sí.');
 });
 
 test('dos líneas seguidas con el mismo nombre son una sola ficha', () => {
@@ -145,4 +145,29 @@ test('propuesta: las líneas sueltas después de los casos son notas y no se pie
   assert.deepEqual(propuesta('1. Martina R., riesgo alto: x.\nNota: Bienestar cambió el orden por el aviso de Advisor.\nPendiente: y. ¿Aprobás?').notas, ['Bienestar cambió el orden por el aviso de Advisor.']);
   const sin = propuesta('1. Martina R., riesgo alto: x.\nLos datos no explican por qué. ¿Aprobás, editás o rechazás?');   // sin rótulo, la última línea con pregunta sigue siendo el pendiente
   assert.equal(sin.pendiente, 'Los datos no explican por qué.'); assert.deepEqual(sin.notas, []);
+});
+
+test('propuesta: la línea "Riesgo de equivocarnos" es la objeción propia, aparte de la Nota y el Pendiente', () => {
+  const p = propuesta('@Dirección Propuesta para decidir: riesgo en Biología 1\n1. Martina R., riesgo alto: 3 cuotas desde el 10/8 (Advisor); 5 de 22 clases (Bienestar).\n   Acciones: plan de pagos (Secretaría) · llamada (Bienestar)\nNota: lo de Advisor cambia el orden.\nRiesgo de equivocarnos: si la deuda no es la causa, el plan de pagos no la trae de vuelta.\nPendiente: por qué dejó de venir. ¿Qué aprobás?');
+  assert.equal(p.casos.length, 1); assert.deepEqual(p.notas, ['lo de Advisor cambia el orden.']);
+  assert.equal(p.riesgoPropio, 'si la deuda no es la causa, el plan de pagos no la trae de vuelta.');
+  assert.equal(p.pendiente, 'por qué dejó de venir.'); assert.equal(p.pregunta, '¿Qué aprobás?');
+  assert.equal(p.casos[0].acciones.length, 2);
+});
+
+test('propuesta: un caso puede ser una rutina y no una persona ("Antes de cada parcial: …")', () => {
+  const p = propuesta('@Dirección Propuesta para decidir: que esto no dependa de que lo pidas\n1. Antes de cada parcial: dos semanas antes, Bienestar, Tutor y Advisor cruzan asistencia, práctica y pagos de todo el curso.\n   Acciones: agendar la revisión (Secretaría) · fijar el umbral de aviso (Dirección)\nPendiente: el umbral. ¿Lo aprobás?');
+  assert.equal(p.casos[0].nombre, 'Antes de cada parcial'); assert.equal(p.casos[0].riesgo, null);
+  assert.deepEqual(p.casos[0].acciones.map((a) => a.quien), ['Secretaría', 'Dirección']);
+  assert.equal(nombreDeCaso('Martina R., riesgo alto: x'), 'Martina R.');
+  assert.equal(nombreDeCaso('Tomás: x'), 'Tomás');
+  assert.equal(nombreDeCaso('sin nombre'), null);
+});
+
+test('marcaDe: el límite y el no sé, con o sin @mención; lo demás, nada', () => {
+  assert.equal(marcaDe('@Dirección Eso no lo puedo hacer yo: eximir la deuda lo firma Secretaría.'), 'limite');
+  assert.equal(marcaDe('No lo sé. La deuda arranca el 10/8.'), 'no_se');
+  assert.equal(marcaDe('@Alfredo No sé si fue por la deuda.'), 'no_se');
+  assert.equal(marcaDe('Martina: 5 de 22 clases.'), null);
+  assert.equal(marcaDe('Dale. Reparto y vuelvo con una propuesta.'), null);
 });

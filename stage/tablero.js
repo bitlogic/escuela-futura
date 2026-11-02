@@ -1,26 +1,31 @@
 // El Tablero (sin DOM): tareas y subtareas, estados y permisos, reconstruido a partir de eventos `tarea`.
 // Lo usan el servidor (servidor/tablero.mjs: valida, emite al bus) y la vista (stage/tablero.html e index.html:
-// reproducen los eventos, en vivo o de una grabación). Regla de la casa: los agentes crean y pasan a revisión;
-// las personas avanzan y cierran. Nada llega a "lista" sin una persona.
+// reproducen los eventos, en vivo o de una grabación). Regla de la casa: los agentes crean, hacen el trabajo que una
+// persona les asigna (lo toman, lo entregan En revisión) y verifican; las personas asignan, avanzan y cierran.
+// Nada llega a "lista" sin una persona.
 //
 // Eventos (todos con tipo: 'tarea', t, quien = 'persona' | id de agente):
 //   { op: 'crear',   id, titulo, origen }                                 una Tarea (un caso)
-//   { op: 'sub',     id, tarea, texto, responsable, estado?, nota? }      una SubTarea (una acción) dentro de una Tarea
+//   { op: 'sub',     id, tarea, texto, responsable, agente?, estado?, nota? }  una SubTarea (una acción) dentro de una Tarea
 //   { op: 'mover',   id, estado, nota? }                                  cambia el estado de una SubTarea
-//   { op: 'asignar', id, responsable }                                    cambia el responsable de una SubTarea
+//   { op: 'asignar', id, responsable, agente? }                           cambia el responsable (una persona, un área, o un agente: `agente` es su id)
 
 export const ESTADOS = ['pendiente', 'progreso', 'revision', 'lista'];
 export const ETIQUETAS = { pendiente: 'Pendiente', progreso: 'En progreso', revision: 'En revisión', lista: 'Lista', descartada: 'Descartada' };
 export const esPersona = (quien) => !quien || quien === 'persona' || String(quien).startsWith('persona');
 
-/** ¿Puede `quien` llevar una subtarea de `desde` a `hasta`? Los agentes solo a revisión, o de revisión a pendiente. */
+/** ¿Puede `quien` llevar una subtarea de `desde` a `hasta`? Los agentes la toman (pendiente → en progreso), la entregan
+ * (→ en revisión) o la devuelven (revisión → pendiente). Lista es de las personas. */
 export function puedeMover(quien, desde, hasta) {
   if (!ETIQUETAS[hasta] || desde === hasta) return false;
   if (esPersona(quien)) return true;
+  if (hasta === 'progreso') return desde === 'pendiente';
   if (hasta === 'revision') return desde === 'pendiente' || desde === 'progreso';
   if (hasta === 'pendiente') return desde === 'revision';
   return false;
 }
+/** Los agentes que pueden ser responsables de una acción (trabajo interno: un borrador, una práctica, un plan). */
+export const AGENTES = { tutor: 'Tutor', advisor: 'Advisor', bienestar: 'Bienestar', admisiones: 'Admisiones', academia: 'Academia' };   // Coordinación reparte, no entrega
 
 /** Estado de una Tarea, derivado de sus subtareas (las descartadas no cuentan). */
 export function estadoDeTarea(t) {
@@ -41,12 +46,12 @@ export function crearTablero() {
     if (ev.op === 'crear') { if (tareas.some((x) => x.id === ev.id)) return false; tareas.push({ id: ev.id, titulo: String(ev.titulo || ''), origen: String(ev.origen || ''), creadaPor: quien, t, subtareas: [] }); return true; }
     if (ev.op === 'sub') {
       const tarea = tareas.find((x) => x.id === ev.tarea); if (!tarea || sub(ev.id)) return false;
-      tarea.subtareas.push({ id: ev.id, texto: String(ev.texto || ''), responsable: String(ev.responsable || ''), estado: ETIQUETAS[ev.estado] ? ev.estado : 'pendiente', creadaPor: quien, nota: ev.nota ? String(ev.nota) : '', t, tMov: t });
+      tarea.subtareas.push({ id: ev.id, texto: String(ev.texto || ''), responsable: String(ev.responsable || ''), agente: AGENTES[ev.agente] ? ev.agente : null, estado: ETIQUETAS[ev.estado] ? ev.estado : 'pendiente', creadaPor: quien, nota: ev.nota ? String(ev.nota) : '', t, tMov: t });
       return true;
     }
     const x = sub(ev.id); if (!x) return false;
     if (ev.op === 'mover') { if (!puedeMover(quien, x.s.estado, ev.estado)) return false; x.s.estado = ev.estado; x.s.tMov = t; if (ev.nota) x.s.nota = String(ev.nota); x.s.movidaPor = quien; return true; }
-    if (ev.op === 'asignar') { if (!esPersona(quien)) return false; x.s.responsable = String(ev.responsable || ''); return true; }
+    if (ev.op === 'asignar') { if (!esPersona(quien)) return false; x.s.responsable = String(ev.responsable || ''); x.s.agente = AGENTES[ev.agente] ? ev.agente : null; return true; }
     return false;
   }
   return {
@@ -56,6 +61,8 @@ export function crearTablero() {
     subtarea: (id) => (sub(id) || {}).s || null,
     /** Busca una subtarea por su texto (sin tildes, por inclusión), para las herramientas de los agentes. */
     buscar(texto) { const n = norm(texto); const hits = []; for (const t of tareas) for (const s of t.subtareas) if (norm(s.texto).includes(n) || n.includes(norm(s.texto))) hits.push(s); return hits; },
+    /** Las acciones asignadas a un agente (su trabajo pendiente o en curso). */
+    asignadasA(agenteId) { return this.subtareas.filter((s) => s.agente === agenteId && (s.estado === 'pendiente' || s.estado === 'progreso')); },
     /** Las subtareas, aplanadas, con su tarea. */
     get subtareas() { return tareas.flatMap((t) => t.subtareas.map((s) => ({ ...s, tarea: t }))); },
     reiniciar() { tareas = []; },
@@ -71,7 +78,9 @@ const norm = (x) => String(x || '').toLowerCase().normalize('NFD').replace(/[̀-
 export function eventosDeDecision(decision, { nombrePersona = 'Dirección', ids = contador() } = {}) {
   if (!decision || !Array.isArray(decision.acciones) || !decision.acciones.length) return [];
   const idT = ids('t');
-  const evs = [{ tipo: 'tarea', op: 'crear', id: idT, titulo: String(decision.caso || 'Caso').trim(), origen: String(decision.objetivo || '').trim(), quien: 'persona' }];
+  const caso = String(decision.caso || '').trim(), objetivo = String(decision.objetivo || '').trim();
+  const titulo = caso && !/^caso\s*\d*$/i.test(caso) ? caso : objetivo ? (objetivo.length > 60 ? objetivo.slice(0, 57).replace(/\s+\S*$/, '') + '…' : objetivo) : 'Caso';   // sin nombre de caso, el objetivo
+  const evs = [{ tipo: 'tarea', op: 'crear', id: idT, titulo, origen: objetivo, quien: 'persona' }];
   for (const a of decision.acciones) {
     if (!a || !a.texto) continue;
     const estado = a.estado === 'no' ? 'descartada' : 'pendiente';

@@ -17,7 +17,7 @@
 
   /* Colores por función, no por tono. El oscuro es el tema original; el claro usa el papel crema del brand kit. */
   :root { color-scheme: dark;
-    --fondo-pagina: #0b0b12; --panel: #10101b; --panel-borde: #2c2f48; --texto: #f4efe2; --texto-suave: #9a9eba; --texto-tenue: #8f93b0; --texto-apagado: #6b6f8a; --hora: #a7abc9;
+    --fondo-pagina: #0b0b12; --sobre-color: var(--ink); --panel: #10101b; --panel-borde: #2c2f48; --texto: #f4efe2; --texto-suave: #9a9eba; --texto-tenue: #8f93b0; --texto-apagado: #6b6f8a; --hora: #a7abc9;
     --acento: #ff7a3d; --ok: #5fae6a; --azul: #3e6be8; --sobre-azul: #f4efe2; --mencion: #ffb48a; --rechazo: #d9604c; --medio: #e0b84a;
     --campo: #1b1b2b; --manija: #4a4f78; --boton: #2c2f48; --boton-hover: #3c4066; --boton-texto: #f4efe2;
     --globo-fondo: #f4efe2; --globo-texto: #1a1a2e; --globo-borde: #1a1a2e; --etiqueta-fondo: #1a1a2e; --etiqueta-texto: #f4efe2; --cartel-fondo: #1a1a2e; --cartel-texto: #dfe2f5;
@@ -27,8 +27,8 @@
     --sans: "Plain", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
   :root[data-tema="claro"] { color-scheme: light;
     --fondo-pagina: #e9e2d3; --panel: #f9f4ea; --panel-borde: #d6cdb9; --texto: #121212; --texto-suave: #5c5f73; --texto-tenue: #585c72; --texto-apagado: #6f738a; --hora: #5c5f73;
-    --acento: #c2410c; --ok: #2f7a3b; --azul: #2f54c8; --sobre-azul: #f9f4ea; --mencion: #b4431a; --rechazo: #c2452f; --medio: #c9a02e;
-    --campo: #ffffff; --manija: #b9af9a; --boton: #e6dfcd; --boton-hover: #d8cfb9; --boton-texto: #121212;
+    --acento: #c2410c; --ok: #2f7a3b; --azul: #2f54c8; --sobre-azul: #f9f4ea; --mencion: #b4431a; --rechazo: #c2452f; --medio: #c9a02e; --sobre-color: #f9f4ea;   /* texto sobre naranja, verde o rojo: en claro esos colores son oscuros y la tinta no contrasta (3,3:1) */
+    --campo: #fbf8f1; --manija: #b9af9a; --boton: #e6dfcd; --boton-hover: #d8cfb9; --boton-texto: #121212;
     --globo-fondo: #f4efe2; --globo-texto: #1a1a2e; --globo-borde: #1a1a2e; --etiqueta-fondo: #1a1a2e; --etiqueta-texto: #f4efe2; --cartel-fondo: #1a1a2e; --cartel-texto: #f4efe2; }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: var(--fondo-pagina); overflow: hidden; font-family: var(--mono); cursor: default; }
@@ -36,7 +36,7 @@
   /* Layout fluido: el chat es una columna real; la escuela ocupa el resto y se escala por aspecto. */
   #escenario { position: fixed; inset: 0; display: flex; background: var(--fondo-pagina); }
   #mundo { position: relative; flex: 1; min-width: 0; min-height: 0; overflow: hidden; background: var(--fondo-pagina); }
-  #mapa { position: absolute; left: 0; top: 0; --u: 1.25; }
+  #mapa { position: absolute; left: 0; top: 0; --u: 1.25; z-index: 1; }   /* contexto propio: los globos y rótulos (z-index altos) no pisan al Tablero ni al organigrama */
   canvas#lienzo { position: absolute; left: 0; top: 0; width: 100%; height: 100%; image-rendering: auto; }
   #capa { position: absolute; inset: 0; pointer-events: none; }
 
@@ -44,39 +44,38 @@
   #chat { position: relative; flex: none; width: clamp(360px, var(--cw, 31vw), 55vw); display: flex; flex-direction: column; background: var(--panel); border-right: 4px solid var(--panel-borde); color: var(--texto); }
   #chat { container-type: inline-size; font-family: var(--sans); }
   #chat-cab .canal { font-family: var(--mono); }
-  #escenario.decidiendo #chat { width: clamp(360px, max(var(--cw, 31vw), 48vw), 55vw); }
   /* Chat colapsado: la escuela ocupa todo; la pestaña del borde lo vuelve a abrir (azul si hay una decisión esperando) */
   #escenario.sin-chat #chat, #escenario.sin-chat #manija { display: none; }
   #pestana { position: fixed; left: 0; top: 50%; transform: translateY(-50%); z-index: 60; display: none; writing-mode: vertical-rl; transform-origin: center; padding: 14px 8px; background: var(--ink); color: #f4efe2; border: 0; font: 700 16px var(--sans); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; opacity: .55; transition: opacity .15s; }
   #escenario.sin-chat ~ #pestana { display: block; }
   #pestana:hover, #pestana.espera { opacity: 1; }
-  #pestana.espera { background: var(--azul); color: var(--sobre-azul); animation: parpadeo 1.2s steps(2) infinite; }
+  #pestana.espera { background: var(--azul); color: var(--sobre-azul); animation: respiro 2.2s cubic-bezier(.25, 1, .5, 1) infinite; }
   #pestana kbd { font: inherit; opacity: .6; margin-top: 8px; }   /* mientras hay una propuesta sin responder, la tarjeta de decisión toma la escena */
   @container (max-width: 560px) { #chat-cab { font-size: calc(24px * var(--esc)); padding: calc(18px * var(--esc)) calc(20px * var(--esc)); gap: 6px 12px; flex-wrap: wrap; letter-spacing: 0; } #chat-cab .canal { min-width: 0; white-space: nowrap; } .r { display: grid; grid-template-columns: calc(40px * var(--esc)) minmax(0, 1fr); column-gap: 12px; row-gap: 0; } .r .av { grid-row: 1 / 3; } .r b { font-size: calc(17px * var(--esc)); } #riel .r:nth-last-child(n+4) { display: none; } #chat-estado { white-space: nowrap; font-size: calc(16px * var(--esc)); } #msgs, #trabajando { padding-left: calc(20px * var(--esc)); padding-right: calc(20px * var(--esc)); } #redactar { padding-left: calc(20px * var(--esc)); padding-right: calc(20px * var(--esc)); } #texto { font-size: calc(24px * var(--esc)); text-overflow: ellipsis; } }
   #chat-cab { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: calc(22px * var(--esc)) calc(28px * var(--esc)); border-bottom: 4px solid var(--panel-borde); font-weight: 700; font-size: calc(24px * var(--esc)); letter-spacing: 0; }
   #chat-cab .canal { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #chat-cab .canal b { color: var(--acento); }
-  #chat-estado { flex: none; white-space: nowrap; display: flex; align-items: center; gap: 10px; font-size: calc(16px * var(--esc)); letter-spacing: .06em; text-transform: uppercase; color: var(--texto-tenue); }
+  body.quieto #chat-estado { opacity: .35; }   /* "En vivo / Grabación" es del operador: con el mouse quieto se apaga */
+  #chat-estado { flex: none; white-space: nowrap; display: flex; align-items: center; gap: 10px; font-size: calc(16px * var(--esc)); transition: opacity .4s; letter-spacing: .06em; text-transform: uppercase; color: var(--texto-tenue); }
   #chat-estado::before { content: ''; width: 12px; height: 12px; background: var(--texto-apagado); }
-  #chat-estado.vivo { color: var(--ok); } #chat-estado.vivo::before { background: var(--ok); animation: parpadeo 1.2s steps(2) infinite; }
+  #chat-estado.vivo { color: var(--ok); } #chat-estado.vivo::before { background: var(--ok); animation: respiro 2.2s cubic-bezier(.25, 1, .5, 1) infinite; }
   /* La franja del objetivo: una línea con lo que pidió la persona, su estado, y una sola línea viva con lo que pasa ahora */
   #objetivo { flex: none; padding: calc(12px * var(--esc)) calc(28px * var(--esc)); border-bottom: 4px solid var(--panel-borde); display: flex; flex-direction: column; gap: calc(6px * var(--esc)); }
-  #objetivo .cab { display: flex; align-items: center; gap: 12px; min-width: 0; }
-  #objetivo .rot { flex: none; font: 700 calc(15px * var(--esc)) var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--texto-tenue); }
-  #objetivo .txt { flex: 1; min-width: 0; font: 700 calc(21px * var(--esc))/1.25 var(--sans); color: var(--texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #objetivo .cab { display: flex; align-items: center; gap: 8px 12px; min-width: 0; flex-wrap: wrap; }   /* si el badge no entra al lado del objetivo, baja a su propia línea */
+  #objetivo .rot { flex: none; font: 700 calc(16px * var(--esc)) var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--texto-tenue); }
+  #objetivo .txt { flex: 1; min-width: 0; font: 700 calc(21px * var(--esc))/1.25 var(--sans); color: var(--texto); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }   /* hasta dos líneas: "Antes del par…" no se leía */
   #objetivo.vacio .txt { white-space: normal; font-weight: 600; color: var(--texto-suave); }
-  #objetivo .badge { flex: none; display: inline-flex; align-items: center; gap: 8px; font: 700 calc(15px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 4px 10px; background: var(--panel-borde); color: var(--texto); white-space: nowrap; }
-  #objetivo .badge.espera { background: var(--azul); color: var(--sobre-azul); } #objetivo .badge.ok { background: var(--ok); color: var(--ink); }
-  #objetivo .badge.curso::before, #objetivo .badge.espera::before { content: ''; width: 10px; height: 10px; background: currentColor; animation: parpadeo 1.2s steps(2) infinite; }
+  #objetivo .badge { flex: none; display: inline-flex; align-items: center; gap: 8px; margin-left: auto; font: 700 calc(16px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 4px 10px; background: var(--panel-borde); color: var(--texto); white-space: nowrap; }
+  #objetivo .badge.espera { background: var(--azul); color: var(--sobre-azul); } #objetivo .badge.ok { background: var(--ok); color: var(--sobre-color); } #objetivo .badge.ejec { background: var(--panel-borde); color: var(--texto); }
+  #objetivo .badge.curso::before, #objetivo .badge.espera::before { content: ''; width: 10px; height: 10px; background: currentColor; animation: respiro 2.2s cubic-bezier(.25, 1, .5, 1) infinite; }
   #objetivo .viva { display: flex; align-items: center; gap: 10px; min-width: 0; font: 600 calc(19px * var(--esc))/1.3 var(--sans); color: var(--texto-suave); }
   #objetivo .viva::before { content: ''; flex: none; width: 12px; height: 12px; background: var(--panel-borde); }
   #objetivo .viva .lin { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  #objetivo .viva.on { color: var(--texto); } #objetivo .viva.on::before { background: var(--acento); animation: parpadeo .9s steps(2) infinite; }
-  #objetivo .viva.on .lin { animation: brillo 1.6s ease-in-out infinite; }
-  @keyframes brillo { 50% { opacity: .55; } }
-  #objetivo .viva.espera { color: var(--sobre-azul); background: var(--azul); padding: 6px 12px; font-weight: 700; } #objetivo .viva.espera::before { background: var(--sobre-azul); animation: parpadeo 1.2s steps(2) infinite; }
+  #objetivo .viva.on { color: var(--texto); } #objetivo .viva.on::before { background: var(--acento); animation: respiro 2.2s cubic-bezier(.25, 1, .5, 1) infinite; }
+  #objetivo .viva.espera { color: var(--sobre-azul); background: var(--azul); padding: 6px 12px; font-weight: 700; } #objetivo .viva.espera::before { background: var(--sobre-azul); animation: respiro 2.2s cubic-bezier(.25, 1, .5, 1) infinite; }
   #objetivo .viva.ok { color: var(--texto); } #objetivo .viva.ok::before { background: var(--ok); clip-path: polygon(0 55%, 15% 40%, 40% 65%, 85% 10%, 100% 25%, 40% 95%); width: 14px; height: 14px; }
-  #objetivo .accion { flex: none; font: 700 calc(15px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 7px 11px; background: var(--acento); color: var(--ink); border: 0; cursor: pointer; }
+  #objetivo .viva.ejec { color: var(--texto); } #objetivo .viva.ejec::before { background: var(--texto-suave); }
+  #objetivo .accion { flex: none; font: 700 calc(16px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 7px 11px; background: var(--texto); color: var(--panel); border: 0; cursor: pointer; }
   #objetivo .accion:disabled { opacity: .45; cursor: default; }
   /* El cierre, al final del stream: objetivo cumplido y el plan de acción que dejó la decisión (lo marca la persona) */
   .fin { border: 3px solid var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); padding: calc(12px * var(--esc)) calc(16px * var(--esc)); display: flex; flex-direction: column; gap: calc(8px * var(--esc)); }
@@ -85,11 +84,11 @@
   .fin .cab small { font-weight: 600; color: var(--texto-suave); font-size: calc(17px * var(--esc)); margin-left: auto; }
   .fin .plan { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: calc(4px * var(--esc)); }
   .fin .plan .fila { display: flex; align-items: center; gap: 10px; font: 600 calc(19px * var(--esc))/1.3 var(--sans); color: var(--texto); }
-  .fin .plan .fila .ok { flex: none; width: calc(24px * var(--esc)); height: calc(24px * var(--esc)); border: 2px solid var(--texto-suave); background: transparent; color: var(--ink); font: 700 calc(16px * var(--esc)) var(--sans); cursor: pointer; display: grid; place-items: center; }
+  .fin .plan .fila .ok { flex: none; width: calc(24px * var(--esc)); height: calc(24px * var(--esc)); border: 2px solid var(--texto-suave); background: transparent; color: var(--sobre-color); font: 700 calc(16px * var(--esc)) var(--sans); cursor: pointer; display: grid; place-items: center; }
   .fin .plan .fila.hecha .ok { background: var(--ok); border-color: var(--ok); }
   .fin .plan .fila .que { flex: none; } .fin .plan .fila .quien { flex: 1; min-width: 0; color: var(--texto-suave); }
   .fin .plan .fila .est { margin-left: auto; font: 700 calc(13px * var(--esc)) var(--sans); letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; background: var(--panel-borde); color: var(--texto-suave); }
-  .fin .plan .fila.hecha { color: var(--texto-suave); } .fin .plan .fila.hecha .que { text-decoration: line-through; } .fin .plan .fila.hecha .est { background: var(--ok); color: var(--ink); }
+  .fin .plan .fila.hecha { color: var(--texto-suave); } .fin .plan .fila.hecha .que { text-decoration: line-through; } .fin .plan .fila.hecha .est { background: var(--ok); color: var(--sobre-color); }
   .fin .plan .fila.descartada { opacity: .5; } .fin .plan .fila.descartada .que { text-decoration: line-through; }
   .fin .nota { font: 600 calc(16px * var(--esc))/1.3 var(--sans); color: var(--texto-suave); }
   #trabajando:empty { display: none; }
@@ -97,37 +96,88 @@
   #msgs .vacio { color: var(--texto-suave); font: 600 calc(24px * var(--esc))/1.4 var(--sans); text-align: center; margin: auto calc(28px * var(--esc)); }
   /* El stream: todos los mensajes, en orden, con desplazamiento; el último se ve más grande */
   #flujo { flex: 1; min-height: 0; overflow-y: auto; padding: calc(18px * var(--esc)) calc(28px * var(--esc)) calc(14px * var(--esc)); display: flex; flex-direction: column; gap: calc(16px * var(--esc)); scrollbar-width: thin; }
-  #nuevo { position: absolute; right: calc(28px * var(--esc)); bottom: calc(14px * var(--esc)); display: none; padding: 8px 12px; background: var(--acento); color: var(--ink); border: 0; font: 700 calc(16px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; cursor: pointer; }
+  #nuevo { position: absolute; right: calc(28px * var(--esc)); bottom: calc(14px * var(--esc)); display: none; padding: 8px 12px; background: var(--texto); color: var(--panel); border: 0; font: 700 calc(16px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; cursor: pointer; }
   #nuevo.visible { display: block; }
   .f { --t: calc(25px * var(--esc)); scroll-margin-top: calc(14px * var(--esc)); display: grid; grid-template-columns: calc(44px * var(--esc)) minmax(0, 1fr); column-gap: calc(14px * var(--esc)); row-gap: 4px; }
   .f.nuevo { animation: entra .4s steps(6) both; }
+  /* Tres planos en el stream: la persona (naranja, y azul al decidir), las respuestas al hilo (a pleno) y lo lateral: los repartos de Coordinación y los avisos entre agentes, sangrados y en menor */
+  .f.lateral { --t: calc(21px * var(--esc)); grid-template-columns: calc(32px * var(--esc)) minmax(0, 1fr); column-gap: calc(10px * var(--esc)); margin-left: calc(58px * var(--esc)); }
+  .f.lateral .av { width: calc(32px * var(--esc)); height: calc(32px * var(--esc)); }
+  .f.lateral .nom { font-size: calc(16px * var(--esc)); }
+  .f.lateral .cuerpo { color: var(--texto-suave); font-weight: 600; }
+  .f.persona .cuerpo { font-weight: 700; }
+  /* La traza: qué ejecutó el agente antes de responder (sus herramientas), en una línea muda arriba del mensaje */
+  .f .traza { grid-column: 2; display: flex; align-items: center; gap: 8px; font: 600 calc(17px * var(--esc))/1.3 var(--sans); color: var(--texto-tenue); min-width: 0; }
+  .f .traza::before { content: ''; flex: none; width: 11px; height: 11px; background: var(--ok); clip-path: polygon(0 55%, 15% 40%, 40% 65%, 85% 10%, 100% 25%, 40% 95%); }
+  .f .traza span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* Ejecutando: mientras un agente trabaja, una fila viva al final del stream con lo que está haciendo */
+  .f.ejecutando { --t: calc(21px * var(--esc)); grid-template-columns: calc(32px * var(--esc)) minmax(0, 1fr); column-gap: calc(10px * var(--esc)); margin-left: calc(58px * var(--esc)); }
+  .f.ejecutando .av { width: calc(32px * var(--esc)); height: calc(32px * var(--esc)); }
+  .f.ejecutando .cuerpo { display: flex; align-items: center; gap: 10px; color: var(--texto-suave); font-weight: 600; font-style: italic; }
+  .f.ejecutando .cuerpo::before { content: ''; flex: none; width: 11px; height: 11px; background: var(--c); animation: respiro 2.2s cubic-bezier(.25, 1, .5, 1) infinite; }
+  @media (prefers-reduced-motion: reduce) { .f.ejecutando .cuerpo::before { animation: none; } }
   .f .av { grid-row: 1 / 3; width: calc(44px * var(--esc)); height: calc(44px * var(--esc)); background: var(--c); overflow: hidden; align-self: start; }
   .f .av img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
   .f .nom { font-weight: 700; font-size: calc(18px * var(--esc)); letter-spacing: .05em; text-transform: uppercase; color: var(--c); align-self: end; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .f .nom small { font-size: calc(15px * var(--esc)); color: var(--hora); letter-spacing: .04em; }
-  .f .nom .chip { font-size: calc(13px * var(--esc)); letter-spacing: .05em; padding: 2px 8px; background: var(--acento); color: var(--ink); }
-  .f .cuerpo { font: 600 var(--t)/1.36 var(--sans); color: var(--texto); overflow-wrap: anywhere; }
+  .f .nom .ficha-link { cursor: pointer; } .f .nom .ficha-link:hover { text-decoration: underline; text-underline-offset: .2em; }
+  .f .nom small { font-size: calc(16px * var(--esc)); color: var(--hora); letter-spacing: .04em; }
+  .f .nom .chip { font-size: calc(16px * var(--esc)); letter-spacing: .05em; padding: 2px 8px; background: var(--c); color: var(--sobre-color); }   /* el chip lleva el color del agente que avisa: el naranja es de la persona */
+  .f .nom .chip.limite { background: var(--rechazo); color: var(--sobre-color); }   /* el agente dice que no */
+  .f .nom .chip.no_se { background: var(--panel-borde); color: var(--texto); }   /* el agente dice lo que no sabe */
+  .f .cuerpo { grid-column: 2; font: 600 var(--t)/1.36 var(--sans); color: var(--texto); overflow-wrap: anywhere; }   /* siempre en la columna del texto: con la traza arriba, el cuerpo pasa a una tercera fila */
+  .f .av { grid-row: 1 / span 3; }
   .f .cuerpo p { margin: 0 0 .4em; } .f .cuerpo > :last-child { margin-bottom: 0; }
   .f .cuerpo .it { margin: .7em 0 .1em; font-weight: 700; }
   .f .cuerpo .it i { font-style: normal; color: var(--c); margin-right: .45em; }
   .f .cuerpo .de { margin: 0 0 .1em; padding-left: 1.35em; color: var(--texto-suave); font-weight: 600; }
   .f .a { color: var(--mencion); }
-  .f .nom .para { font-size: calc(15px * var(--esc)); color: var(--texto-suave); letter-spacing: .04em; text-transform: none; font-weight: 600; }
+  .f .nom .para { font-size: calc(16px * var(--esc)); color: var(--texto-suave); letter-spacing: .04em; text-transform: none; font-weight: 600; }
   .f .nom .para b { color: var(--mencion); font-weight: 700; }
-  /* Fichas: una fila por estudiante, con el nombre en rótulo y el riesgo como badge; rótulos: "Traducción", "Pendiente" */
+  /* Fichas: una fila por estudiante, con el nombre en rótulo y el riesgo como badge; rótulos: "Pendiente", "Nota" */
   .f .cuerpo .fi, .f .cuerpo .ro { margin: 0 0 .55em; }
   .f .cuerpo .fi .enc { display: flex; align-items: center; gap: .5em; flex-wrap: wrap; margin-bottom: .12em; }
   .f .cuerpo .fi .enc b { font: 700 calc(var(--t) * .72) var(--sans); letter-spacing: .04em; text-transform: uppercase; color: var(--c); }
-  .f .cuerpo .ro .enc { display: inline-block; font: 700 calc(var(--t) * .5) var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--texto); background: var(--panel-borde); padding: 3px 9px; margin: 0 .5em .2em 0; vertical-align: middle; }
-  .riesgo { display: inline-block; font: 700 calc(var(--t) * .5) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 3px 8px; color: var(--ink); vertical-align: middle; }
+  .f .cuerpo .ro .enc { display: inline-block; font: 700 calc(var(--t) * .62) var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--texto); background: var(--panel-borde); padding: 3px 9px; margin: 0 .5em .2em 0; vertical-align: middle; }
+  .riesgo { display: inline-block; font: 700 calc(var(--t) * .62) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 3px 8px; color: var(--sobre-color); vertical-align: middle; }
   .riesgo.alto { background: var(--rechazo); } .riesgo.medio { background: var(--medio); } .riesgo.bajo { background: var(--ok); }
+  /* El verificador: cada cifra con fuente lleva un tilde chico; lo que no se pudo comprobar, un lavado y un signo. El chip del encabezado da la cuenta. */
+  .dato.ok { text-decoration: underline; text-decoration-color: var(--ok); text-decoration-thickness: 3px; text-underline-offset: .14em; white-space: nowrap; }
+  .dato.ok::after { content: '✓'; font-size: .66em; font-weight: 700; vertical-align: super; color: var(--ok); margin-left: .1em; }   /* el juez veía los tilde chicos desde el fondo: más grandes y subrayado lleno */
+  .dato.dudoso { background: color-mix(in srgb, var(--medio) 45%, transparent); padding: 0 .15em; white-space: nowrap; }
+  .dato.dudoso::after { content: '?'; font-size: .55em; vertical-align: super; font-weight: 700; margin-left: .08em; }
+  .f .nom .chip.datos { background: var(--ok); } .f .nom .chip.datos.dudoso { background: var(--medio); }
+  .tarjeta .cab .datos { flex: none; font: 700 calc(16px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 5px 10px; background: var(--ok); color: var(--sobre-color); }
+  .tarjeta .cab .datos.dudoso { background: var(--medio); }
+  #panel-decision .tarjeta .cab .datos { font-size: calc(18px * var(--esc)); padding: 8px 12px; }
+  /* El panel de decisión: mientras la propuesta espera, la tarjeta sale del chat y toma la escena sobre el mapa (atenuado detrás) */
+  #panel-decision { position: absolute; left: 3%; right: 3%; top: 4%; bottom: 4%; display: none; flex-direction: column; z-index: 40; background: var(--panel); border: 4px solid var(--azul); padding: calc(22px * var(--esc)) calc(36px * var(--esc)); overflow: auto; font-family: var(--sans); color: var(--texto); --tp: 33; --t: calc(var(--tp) * 1px * var(--esc)); scrollbar-width: thin; }   /* --tp lo baja dibujarPanel() hasta que el panel entre entero, también a 1280×720 */
+  @media (max-height: 820px) { #panel-decision { top: 1.5%; bottom: 1.5%; left: 2%; right: 2%; padding: calc(16px * var(--esc)) calc(28px * var(--esc)); } }
+  #mundo.decidiendo #panel-decision { display: flex; }
+  #mundo.decidiendo #mapa { filter: brightness(.5) saturate(.6); transition: filter .3s; }
+  #panel-decision .tarjeta { border: 0; background: transparent; padding: 0; gap: calc(10px * var(--esc)); margin: auto 0; }
+  #panel-decision .tarjeta .cab .ico { width: calc(44px * var(--esc)); height: calc(44px * var(--esc)); font-size: calc(26px * var(--esc)); }
+  #panel-decision .tarjeta .cab h3 { font-size: calc(var(--t) * .5); color: var(--texto-suave); }   /* "Propuesta para decidir" es el rótulo; el caso es el título */
+  #panel-decision .tarjeta .desc { font: 700 calc(var(--t) * 1.15)/1.2 var(--sans); color: var(--texto); }
+  #panel-decision .tarjeta .pregunta-arriba { font: 700 calc(var(--t) * .78)/1.25 var(--sans); color: var(--azul-texto, var(--texto)); }
+  #panel-decision .tarjeta .estado { font-size: calc(20px * var(--esc)); padding: 8px 14px; }
+  #panel-decision .caso .evid { font-size: calc(var(--t) * .8); line-height: 1.3; }
+  #panel-decision .acc { padding: calc(6px * var(--esc)) 0; gap: calc(10px * var(--esc)); }
+  #panel-decision .acc .que { font-size: calc(var(--t) * .92); }
+  #panel-decision .caso .acciones button { font-size: calc(20px * var(--esc)); padding: calc(8px * var(--esc)) calc(15px * var(--esc)); }
+  #panel-decision .caso .nota { font-size: calc(var(--t) * .58); padding: calc(6px * var(--esc)) calc(10px * var(--esc)); }
+  #panel-decision .avisos { font-size: calc(var(--t) * .68); }
+  #panel-decision .tarjeta .pie { gap: calc(8px * var(--esc)); padding-top: calc(10px * var(--esc)); }
+  #panel-decision .tarjeta .pie button { font-size: calc(20px * var(--esc)); padding: calc(12px * var(--esc)) calc(20px * var(--esc)); }
+  /* En el chat, mientras el panel está abierto, la propuesta es una sola línea que lleva al panel */
+  .tarjeta.resumen { cursor: default; }
+  .tarjeta.resumen .cab h3 { text-transform: none; letter-spacing: 0; font-size: calc(var(--t) * .8); }
   /* Tarjeta de decisión: la propuesta como tarjeta de aprobación, caso por caso */
   .tarjeta { border: 3px solid var(--azul); background: color-mix(in srgb, var(--azul) 9%, transparent); padding: calc(12px * var(--esc)) calc(16px * var(--esc)); display: flex; flex-direction: column; gap: calc(10px * var(--esc)); font-size: calc(var(--t) * .88); line-height: 1.3; margin-top: .2em; }
   .tarjeta .cab { display: flex; align-items: center; gap: 12px; }
   .tarjeta .cab .ico { flex: none; width: calc(28px * var(--esc)); height: calc(28px * var(--esc)); background: var(--azul); color: var(--sobre-azul); display: grid; place-items: center; font: 700 calc(18px * var(--esc)) var(--sans); }
   .tarjeta .cab h3 { flex: 1; min-width: 0; margin: 0; font: 700 calc(var(--t) * .7) var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--texto); }
   .tarjeta .estado { flex: none; font: 700 calc(16px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 5px 10px; background: var(--azul); color: var(--sobre-azul); }
-  .tarjeta .estado.ok { background: var(--ok); color: var(--ink); } .tarjeta .estado.gris { background: var(--panel-borde); color: var(--texto); }
+  .tarjeta .estado.ok { background: var(--ok); color: var(--sobre-color); } .tarjeta .estado.gris { background: var(--panel-borde); color: var(--texto); }
   .tarjeta .desc { color: var(--texto-suave); font-weight: 600; }
   .caso { border-top: 2px solid var(--panel-borde); padding-top: calc(9px * var(--esc)); display: flex; flex-direction: column; gap: calc(6px * var(--esc)); }
   .caso .enc { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -135,30 +185,38 @@
   .caso .enc .n { font: 700 calc(var(--t) * .7) var(--sans); color: var(--azul); }
   .caso .enc .nombre { font-weight: 700; color: var(--texto); }
   .caso .txt { font-weight: 600; color: var(--texto); }
-  .caso .evid { font-weight: 600; color: var(--texto-suave); font-size: calc(var(--t) * .78); }
-  .caso .evid .enc, .caso .props { display: inline-block; font: 700 calc(var(--t) * .5) var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--texto); background: var(--panel-borde); padding: 3px 9px; margin: 0 .5em .2em 0; vertical-align: middle; }
+  .caso .evid { font-weight: 600; color: var(--texto); font-size: calc(var(--t) * .78); }   /* la evidencia es la tesis: no va en gris */
+  .caso .evid .enc, .caso .props { display: inline-block; font: 700 calc(var(--t) * .6) var(--sans); letter-spacing: 0; color: var(--texto); background: var(--panel-borde); padding: 3px 9px; margin: 0 .5em .2em 0; vertical-align: middle; }
   .caso .props { display: block; width: max-content; margin-top: calc(4px * var(--esc)); }
   .acc { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: calc(6px * var(--esc)) 0; border-top: 1px solid var(--panel-borde); }
   .acc .que { flex: 1 1 220px; min-width: 0; font-weight: 700; color: var(--texto); }
   .acc .que .quien { font-weight: 600; color: var(--texto-suave); margin-left: .4em; }
   .acc .acciones { margin-left: auto; }
-  .acc .acciones button.on.si { background: var(--ok); border-color: var(--ok); color: var(--ink); }
-  .acc .acciones button.on.yo { background: var(--acento); border-color: var(--acento); color: var(--ink); }
-  .acc .acciones button.on.no { background: var(--rechazo); border-color: var(--rechazo); color: var(--ink); }
+  .acc .acciones button.on.si { background: var(--ok); border-color: var(--ok); color: var(--sobre-color); }
+  .acc .acciones button.on.yo { background: var(--acento); border-color: var(--acento); color: var(--sobre-color); }
+  .acc .acciones button.on.no { background: var(--rechazo); border-color: var(--rechazo); color: var(--sobre-color); }
+  .acc.decidida .acciones button:disabled { opacity: 1; cursor: default; }   /* lo decidido se lee como chip, no como botón apagado */
+  .acc.decidida .acciones button.on.no + * , .acc.decidida .que { color: var(--texto); }
+  .acc.decidida .acciones button.on.no ~ * { text-decoration: none; }
   .caso.con-acciones .nota { display: block; }
   .caso .acciones { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   .caso .acciones button { font: 700 calc(16px * var(--esc)) var(--sans); letter-spacing: .05em; text-transform: uppercase; padding: 6px 10px; border: 2px solid var(--panel-borde); background: transparent; color: var(--texto); cursor: pointer; }
   .caso .acciones button:hover:not(:disabled) { border-color: var(--texto-suave); }
   .caso .acciones button:disabled { opacity: .45; cursor: default; }
-  .caso .acciones button.on.aprobado { background: var(--ok); border-color: var(--ok); color: var(--ink); }
+  .caso .acciones button.on.aprobado { background: var(--ok); border-color: var(--ok); color: var(--sobre-color); }
   .caso .acciones button.on.editado { background: var(--azul); border-color: var(--azul); color: var(--sobre-azul); }
-  .caso .acciones button.on.rechazado { background: var(--rechazo); border-color: var(--rechazo); color: var(--ink); }
+  .caso .acciones button.on.rechazado { background: var(--rechazo); border-color: var(--rechazo); color: var(--sobre-color); }
   .caso .nota { display: none; width: 100%; font: 600 calc(var(--t) * .72)/1.3 var(--sans); background: var(--campo); color: var(--texto); border: 2px solid var(--panel-borde); padding: 8px 10px; outline: none; border-radius: 0; }
   .caso .nota:focus { border-color: var(--azul); }
+  .caso .nota-txt { margin-top: 8px; font: 600 calc(var(--t) * .72)/1.35 var(--sans); color: var(--texto-suave); }
   .caso.editado .nota, .caso.rechazado .nota { display: block; }
   .tarjeta .pie { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; border-top: 2px solid var(--panel-borde); padding-top: calc(12px * var(--esc)); }
   .tarjeta .pie .pendiente { flex: 1 1 100%; color: var(--texto-suave); font-weight: 600; font-size: calc(var(--t) * .7); }
-  .tarjeta .pie .pendiente .enc { display: inline-block; font: 700 calc(var(--t) * .46) var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--texto); background: var(--panel-borde); padding: 3px 9px; margin-right: .5em; vertical-align: middle; }
+  .tarjeta .pie .pendiente .enc { display: inline-block; font: 700 calc(var(--t) * .5) var(--sans); letter-spacing: 0; color: var(--texto); background: var(--panel-borde); padding: 3px 9px; margin-right: .5em; vertical-align: middle; }
+  /* Lo que Coordinación advierte (Nota, Riesgo de equivocarnos, Pendiente), junto, antes de las acciones: así las filas de acción terminan en Enviar */
+  .avisos { display: flex; flex-direction: column; gap: calc(3px * var(--esc)); font-weight: 600; color: var(--texto-suave); font-size: calc(var(--t) * .7); line-height: 1.3; }
+  .avisos .lin b { color: var(--texto); font-weight: 700; margin-right: .35em; }
+  .acc .acciones button.no { margin-left: calc(10px * var(--esc)); }   /* "No" separado de "Lo hago yo": bajo presión, no se confunden */
   .tarjeta .pie button { font: 700 calc(17px * var(--esc)) var(--sans); letter-spacing: .06em; text-transform: uppercase; padding: 10px 16px; cursor: pointer; border: 2px solid transparent; }
   .tarjeta .pie .enviar { background: var(--azul); border-color: var(--azul); color: var(--sobre-azul); }
   .tarjeta .pie .enviar:disabled { opacity: .45; cursor: default; }
@@ -172,7 +230,8 @@
   @keyframes entra { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
   @keyframes sube { from { transform: translateY(16px); } to { transform: none; } }
   #trabajando { flex: none; min-height: calc(60px * var(--esc)); padding: calc(18px * var(--esc)) calc(28px * var(--esc)); border-top: 4px solid var(--panel-borde); font-size: calc(21px * var(--esc)); letter-spacing: .06em; text-transform: uppercase; color: var(--texto-tenue); display: flex; align-items: center; gap: 12px; }
-  #trabajando.on { color: var(--texto); } #trabajando.on::before { content: ''; flex: none; width: 12px; height: 12px; background: var(--acento); animation: parpadeo .9s steps(2) infinite; }
+  #trabajando.on { color: var(--texto); } #trabajando.error::before { background: var(--rechazo) !important; }   /* un error no se ve como un estado */
+  #trabajando.on::before { content: ''; flex: none; width: 12px; height: 12px; background: var(--texto-suave); animation: respiro 2.2s cubic-bezier(.25, 1, .5, 1) infinite; }
 
   /* La caja para escribir. Mientras hay una propuesta sin responder, pide la decisión. */
   #redactar { flex: none; display: flex; flex-direction: column; gap: 8px; padding: calc(14px * var(--esc)) calc(28px * var(--esc)) calc(22px * var(--esc)); position: relative; z-index: 35; }   /* por encima del chat: el menú de atajos se abre hacia arriba */
@@ -188,12 +247,13 @@
   #btn-mas.abierto, #herr button:hover:not(:disabled) { border-color: var(--texto-suave); }
   #para { height: calc(38px * var(--esc)); padding: 0 10px; max-width: 46%; text-overflow: ellipsis; }
   #para option { background: var(--panel); color: var(--texto); }
-  #btn-enviar { width: calc(42px * var(--esc)); height: calc(38px * var(--esc)); background: var(--acento) !important; border-color: var(--acento) !important; color: var(--ink) !important; font-size: calc(22px * var(--esc)) !important; display: grid; place-items: center; }
+  #btn-enviar { width: calc(42px * var(--esc)); height: calc(38px * var(--esc)); background: var(--acento) !important; border-color: var(--acento) !important; color: var(--sobre-color) !important; font-size: calc(22px * var(--esc)) !important; display: grid; place-items: center; }
   #redactar.esperando #btn-enviar { background: var(--azul) !important; border-color: var(--azul) !important; color: var(--sobre-azul) !important; }
   #herr button:disabled, #herr select:disabled { opacity: .45; cursor: default; }
   #atajos { position: absolute; left: -3px; right: -3px; bottom: calc(100% + 8px); background: var(--panel); border: 3px solid var(--panel-borde); padding: 6px; display: none; flex-direction: column; gap: 2px; z-index: 40; max-height: 60vh; overflow-y: auto; }
   #atajos.abierto { display: flex; }
-  #atajos .tit { font: 700 calc(14px * var(--esc)) var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--texto-apagado); padding: 6px 10px 4px; }
+  #atajos .tit:not(:first-child) { margin-top: 10px; border-top: 2px solid var(--panel-borde); padding-top: 10px; }
+  #atajos .tit { font: 700 calc(16px * var(--esc)) var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--texto-apagado); padding: 6px 10px 4px; }
   #atajos button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; width: 100%; padding: 10px 12px; border: 0; background: transparent; color: var(--texto); cursor: pointer; font: 700 calc(19px * var(--esc))/1.25 var(--sans); }
   #atajos button small { font-weight: 600; font-size: calc(15px * var(--esc)); color: var(--texto-suave); }
   #atajos button:hover, #atajos button:focus-visible { background: var(--boton); outline: none; }
@@ -224,8 +284,8 @@
 
   .pj { position: absolute; left: 0; top: 0; width: 0; height: 0; will-change: transform; }
   .tag { position: absolute; left: 0; top: calc(10px * var(--u)); transform: translateX(-50%); background: var(--etiqueta-fondo); color: var(--etiqueta-texto); padding: calc(3px * var(--u)) calc(8px * var(--u)); font-size: calc(15px * var(--u)); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
-  .pj.persona .tag { background: var(--acento); color: var(--ink); }   /* la persona que decide, en naranja como en el chat */
-  .tag.martina { background: var(--acento); color: var(--ink); }
+  .pj.persona .tag { background: var(--acento); color: var(--sobre-color); }   /* la persona que decide, en naranja como en el chat */
+  .tag.martina { background: var(--globo-fondo); color: var(--globo-texto); }   /* en papel: el naranja es de la persona */
   /* La decisión es el pico de la escena: cartel azul sobre el despacho de Dirección, el resto de los rótulos baja de intensidad */
   #cartel-decision { position: absolute; transform: translateX(-50%); display: none; align-items: center; gap: 12px; background: var(--azul); color: var(--sobre-azul); padding: calc(10px * var(--esc)) calc(18px * var(--esc)); font: 700 calc(19px * var(--esc)) var(--mono); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; z-index: 5000; }
   #cartel-decision::before { content: ''; width: 12px; height: 12px; background: var(--sobre-azul); animation: respiro 2.2s cubic-bezier(.25, 1, .5, 1) infinite; }
@@ -236,36 +296,71 @@
   .bub span { display: block; background: var(--globo-fondo); color: var(--globo-texto); padding: 12px 16px; font: 700 calc(25px * var(--esc))/1.3 var(--sans); clip-path: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px), 0 4px, 4px 4px); }
   .bub span i { font-style: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
   .bub.visible { opacity: 1; }
+  /* El globo de decisión (DESIGN.md: azul, 36px, hasta 620px): la persona decide y la escuela entera lo ve */
+  .bub.decision { background: var(--azul); max-width: calc(620px * var(--esc)); z-index: 6000; }
+  .bub.decision span { background: var(--azul); color: var(--sobre-azul); font-size: calc(34px * var(--esc)); line-height: 1.25; padding: calc(16px * var(--esc)) calc(22px * var(--esc)); }
+  .bub.decision::after { background: var(--azul); }
+  .bub.limite, .bub.limite::after { background: var(--rechazo); }   /* el agente dice que no: marco rojo */
+  .bub.no_se, .bub.no_se::after { background: var(--medio); }       /* el agente dice lo que no sabe: marco ámbar */
+  /* Las tareas en la escuela: cada acción aprobada es un papel sobre el escritorio de quien la tiene (el Tablero las detalla) */
+  .papel { position: absolute; left: 0; top: 0; width: calc(132px * var(--u)); background: var(--globo-fondo); color: var(--globo-texto); border: calc(2px * var(--u)) solid var(--globo-borde); padding: calc(4px * var(--u)) calc(7px * var(--u)); font: 700 calc(15px * var(--u))/1.2 var(--sans); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: auto; z-index: 900; }
+  .papel.progreso, .papel.revision { background: #cfe0f3; }
+  .papel.lista { background: var(--ok); color: var(--sobre-color); }
+  #capa.decision .papel { opacity: .5; }
+  #capa.decidido #cartel-decision { display: flex; background: var(--ok); color: var(--sobre-color); }
+  #capa.decidido #cartel-decision::before { background: var(--ink); animation: none; clip-path: polygon(0 55%, 15% 40%, 40% 65%, 85% 10%, 100% 25%, 40% 95%); }
   .bub::after { content: ''; position: absolute; left: 50%; bottom: -10px; width: 12px; height: 12px; margin-left: -6px; background: var(--globo-borde); clip-path: polygon(0 0, 100% 0, 100% 40%, 66% 40%, 66% 70%, 33% 70%, 33% 40%, 0 40%); }
   .pj.abajo .bub::after { bottom: auto; top: -10px; transform: scaleY(-1); }
 
   /* Conmutador de vistas (arriba a la derecha) y controles (aparecen al mover el mouse) */
   /* Fijo a la ventana y por encima del organigrama: ocupa exactamente el mismo lugar en las dos vistas (mismo CSS en organigrama.html) */
-  #vistas { position: fixed; right: 14px; top: 10px; z-index: 60; display: flex; background: var(--ink); padding: 4px; gap: 4px; opacity: 0; transition: opacity 200ms; pointer-events: none; }
-  #vistas.visible, #org.abierto ~ #vistas, #tab.abierto ~ #vistas { opacity: 1; pointer-events: auto; }
+  /* Arriba a la derecha de la columna que cambia: Escuela / Organigrama / Tablero, y el chat. Se apaga con el mouse quieto y durante una decisión. */
+  #arriba { position: absolute; right: 14px; top: 10px; z-index: 60; display: flex; gap: 8px; align-items: flex-start; transition: opacity .4s; }
+  body.quieto #arriba:not(:hover):not(.abierto) { opacity: .28; }   /* con el mouse quieto, la barra se apaga: la sala mira la escuela, no los controles */
+  #mundo.decidiendo #arriba:not(:hover):not(.abierto) { opacity: .15; pointer-events: none; }   /* durante la decisión, nada compite con el panel */
+  #vistas { display: flex; background: var(--ink); padding: 4px; gap: 4px; }
+  /* El perfil de quien decide: abre el menú de ajustes */
+  #perfil { display: flex; align-items: center; gap: 10px; background: var(--ink); color: #f4efe2; border: 0; padding: 4px 14px 4px 4px; cursor: pointer; font: 700 15px var(--sans); letter-spacing: .05em; text-transform: uppercase; height: 45px; }
+  #perfil img { width: 36px; height: 36px; image-rendering: pixelated; background: var(--acento); display: block; }
+  #perfil.abierto, #perfil:hover { background: #2c2f48; }
+  #perfil:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+  #ajustes { position: absolute; right: 0; top: calc(100% + 8px); width: 420px; background: var(--panel); border: 3px solid var(--panel-borde); padding: 6px 18px 14px; display: flex; flex-direction: column; color: var(--texto); font-family: var(--sans); z-index: 70; }
+  #ajustes[hidden] { display: none; }
+  #ajustes section { padding: 12px 0; border-bottom: 2px solid var(--panel-borde); display: flex; flex-direction: column; gap: 8px; }
+  #ajustes section:last-of-type { border-bottom: 0; }
+  #ajustes h4 { margin: 0; font: 700 13px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--texto-tenue); }
+  #ajustes .fila { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  #ajustes button, #ajustes select { font: 700 15px var(--sans); letter-spacing: .05em; text-transform: uppercase; background: var(--boton); color: var(--boton-texto); border: 0; padding: 9px 12px; cursor: pointer; white-space: nowrap; }
+  #ajustes select { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  #ritmo { flex: 1; }
+  #ajustes button:hover, #ajustes select:hover { background: var(--boton-hover); }
+  #ajustes button.on { background: var(--ok); color: var(--sobre-color); }
+  #ajustes button:disabled { opacity: .4; cursor: default; }
+  #ajustes button:focus-visible, #ajustes select:focus-visible, #ajustes input:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+  #ajustes.vivo #sec-repro { display: none; }   /* en vivo no hay reproducción: el tiempo es el de verdad */
+  #form-nombre { display: flex; gap: 6px; }
+  #nombre-director { flex: 1; min-width: 0; font: 600 18px var(--sans); background: var(--campo); color: var(--texto); border: 2px solid var(--panel-borde); padding: 8px 10px; outline: none; }
+  #nombre-director:focus { border-color: var(--acento); }
+  #ajustes .pista { margin: 0; font: 600 14px/1.35 var(--sans); color: var(--texto-suave); }
+  #ajustes .teclas { margin: 10px 0 0; font: 600 13px/1.6 var(--sans); color: var(--texto-apagado); }
+  #ajustes kbd { font: inherit; background: var(--panel-borde); padding: 1px 6px; }
   #vistas button { font: 700 18px var(--mono); letter-spacing: .08em; text-transform: uppercase; background: transparent; color: #f4efe2; border: 0; padding: 8px 14px; cursor: pointer; }
-  #vistas button.on { background: var(--acento); color: var(--ink); }
+  #vistas button.on { background: #f4efe2; color: #1a1a2e; }   /* la vista activa en papel sobre tinta: el naranja es de la persona */
   #vistas button:hover:not(.on) { background: #2c2f48; }
-  #vistas kbd { font: inherit; background: rgba(255,255,255,.14); padding: 2px 8px; margin-left: 8px; }
-  #barra { position: absolute; left: 0; right: 0; bottom: 14px; margin: 0 auto; width: max-content; max-width: calc(100% - 28px); display: flex; gap: 8px; align-items: center; background: var(--ink); padding: 8px; opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 20; flex-wrap: wrap; justify-content: center; }
-  #barra.visible { opacity: 1; pointer-events: auto; }
-  #barra button, #barra select { font: 700 calc(17px * var(--esc)) var(--mono); letter-spacing: .05em; text-transform: uppercase; background: #2c2f48; color: #f4efe2; border: 0; padding: 10px 13px; cursor: pointer; }
-  #barra .sep { width: 4px; height: 28px; background: #4a4f78; }
-  #barra button:focus-visible, #barra select:focus-visible, #vistas button:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
-  #barra button:hover, #barra select:hover { background: #3c4066; }
-  #barra button.on { background: var(--ok); color: var(--ink); }
-  #barra button:disabled { opacity: .4; cursor: default; }
-  @keyframes parpadeo { 50% { opacity: .2; } }
-  @media (prefers-reduced-motion: reduce) { .bub { transition: none; } .f.nuevo { animation: none; } .f.decision.nuevo .cuerpo { animation: none; } #decidir::before, #cartel-decision::before, #objetivo .badge::before, #objetivo .viva::before, #objetivo .viva .lin { animation: none; } #chat-estado.vivo::before, #trabajando.on::before { animation: none; } }
-  #org, #tab { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; z-index: 50; display: none; background: var(--fondo-pagina); }
-  #org.abierto, #tab.abierto { display: block; }
-  #vistas button.espera { background: var(--azul); color: var(--sobre-azul); animation: parpadeo 1.2s steps(2) infinite; }
+  #vistas kbd { font: inherit; background: #2c2f48; padding: 2px 8px; margin-left: 8px; display: none; }   /* las teclas son ayuda del operador: solo al pasar el mouse */
+  #arriba:hover #vistas kbd { display: inline; }
+  #vistas .sep { width: 3px; margin: 4px 2px; background: #4a4f78; }
+  #vistas button.chat.on { background: #2c2f48; color: #f4efe2; }   /* el chat abierto se marca distinto de la vista activa */
+  #vistas button.chat:not(.on) { opacity: .75; }
+  #vistas button:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+  @media (max-width: 1500px) { #vistas button { font-size: 14px; padding: 7px 10px; } #vistas kbd { display: none; } #perfil { font-size: 13px; height: 39px; } #perfil img { width: 30px; height: 30px; } }   /* proyector a 1280×720: una sola línea */
+  @media (prefers-reduced-motion: reduce) { .bub { transition: none; } .f.nuevo { animation: none; } .f.decision.nuevo .cuerpo { animation: none; } #decidir::before, #cartel-decision::before, #objetivo .badge::before, #objetivo .viva::before { animation: none; } #chat-estado.vivo::before, #trabajando.on::before { animation: none; } }
+  #org, #tab, #agn { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; z-index: 50; display: none; background: var(--fondo-pagina); }   /* dentro de #mundo: el chat sigue a la izquierda */
+  #org.abierto, #tab.abierto, #agn.abierto { display: block; }
+  #vistas button.espera { background: var(--azul); color: var(--sobre-azul); }
 </style>
 </head>
 <body>
-<iframe id="org" title="Organigrama"></iframe>
-<iframe id="tab" title="Tablero"></iframe>
-<div id="vistas" class="px"><button id="v-escuela" class="on">Escuela</button><button id="v-org">Organigrama <kbd>o</kbd></button><button id="v-tab">Tablero <kbd>b</kbd></button></div>
 <div id="escenario">
   <aside id="chat">
     <div id="chat-cab"><span class="canal"><b>#</b>coordinacion</span><span id="chat-estado">Grabación</span></div>
@@ -274,7 +369,7 @@
     <div id="trabajando"></div>
     <div id="manija" title="Arrastrá para mover el chat ( [ y ] )"></div>
     <form id="redactar" autocomplete="off">
-      <div id="decidir">Esperando tu decisión <small>· aprobá, editá o rechazá cada caso</small></div>
+      <div id="decidir">Pendiente de tu revisión <small>· por acción: aprobar, hacerla vos, o no</small></div>
       <div id="compositor">
         <textarea id="texto" rows="1" disabled aria-label="Escribir en #coordinacion" spellcheck="false"></textarea>
         <div id="herr">
@@ -292,20 +387,36 @@
       <canvas id="lienzo"></canvas>
       <div id="capa"></div>
     </div>
-    <div id="barra">
-      <button id="btn-prev" title="Paso anterior (←)">‹</button>
-      <button id="btn-play" title="Play / pausa (espacio)">Pausa</button>
-      <button id="btn-next" title="Paso siguiente (→)">›</button>
-      <select id="velocidad" title="Velocidad"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
-      <span class="sep"></span>
-      <button id="btn-grab" title="Reproducir la corrida grabada (g)">Grabación</button>
-      <select id="corridas" title="Qué corrida grabada reproducir" hidden></select>
-      <button id="btn-vivo" title="Conectar al servidor de la escuela (v)">En vivo</button>
-      <button id="btn-reiniciar" title="Sesión nueva: borra la corrida actual (r)">Reiniciar</button>
-      <button id="btn-guardar" title="Descargar la corrida actual como JSON">Guardar corrida</button>
-      <span class="sep"></span>
-      <button id="btn-tema" title="Tema claro / oscuro (t)">Claro</button>
-      <button id="btn-chat" title="Mostrar u ocultar el chat (c)">Chat</button>
+    <div id="panel-decision" class="px" aria-live="polite"></div>
+    <iframe id="org" title="Organigrama"></iframe>
+    <iframe id="tab" title="Tablero"></iframe>
+    <iframe id="agn" title="Ficha del agente"></iframe>
+    <div id="arriba"><div id="vistas" class="px"><button id="v-escuela" class="on">Escuela</button><button id="v-org">Organigrama <kbd>o</kbd></button><button id="v-tab">Tablero <kbd>b</kbd></button><span class="sep"></span><button id="v-chat" class="chat on" title="Mostrar u ocultar el chat (c)">Chat <kbd>c</kbd></button></div>
+    <button id="perfil" class="px" title="Ajustes y quién decide" aria-haspopup="true" aria-expanded="false"><img id="perfil-cara" alt=""><span id="perfil-nombre">Dirección</span></button>
+    <div id="ajustes" class="px" hidden>
+      <section>
+        <h4>Quién decide</h4>
+        <form id="form-nombre" autocomplete="off"><input id="nombre-director" maxlength="40" aria-label="Nombre de quien decide"><button type="submit">Guardar</button></form>
+        <p class="pista">Firma tus mensajes y es tu personaje en Dirección. Los agentes te mencionan como @Dirección.</p>
+      </section>
+      <section>
+        <h4>Vista</h4>
+        <div class="fila"><button id="btn-tema" title="Tema claro / oscuro (t)">Claro</button><button id="btn-chat" title="Mostrar u ocultar el chat (c)">Chat</button></div>
+        <div class="fila"><label for="ritmo" class="pista" style="margin:0">Ritmo en vivo</label><select id="ritmo" title="Cuánto espacio dejar entre mensaje y mensaje de los agentes, para leer y narrar"><option value="0">Normal (como llegan)</option><option value="4000">Pausado (4 s entre mensajes)</option><option value="7000">Lento (7 s entre mensajes)</option><option value="11000">Muy lento (11 s)</option></select></div>
+        <p class="pista">El servidor va a su velocidad; la vista retiene cada mensaje de los agentes el tiempo elegido antes de mostrarlo, en orden. Los tiempos de la franja siguen siendo los reales.</p>
+      </section>
+      <section>
+        <h4>Sesión</h4>
+        <div class="fila"><button id="btn-vivo" title="Conectar al servidor de la escuela (v)">En vivo</button><button id="btn-grab" title="Reproducir la corrida grabada (g)">Grabación</button></div>
+        <select id="corridas" title="Qué corrida grabada reproducir" hidden></select>
+        <div class="fila"><button id="btn-reiniciar" title="Sesión nueva: borra la corrida actual (r)">Reiniciar</button><button id="btn-guardar" title="Guardar la corrida actual (en vivo: en stage/corridas; en grabación: descarga el JSON)">Guardar corrida</button></div>
+      </section>
+      <section id="sec-repro">
+        <h4>Reproducción</h4>
+        <div class="fila"><button id="btn-prev" title="Paso anterior (←)">‹</button><button id="btn-play" title="Play / pausa (espacio)">Pausa</button><button id="btn-next" title="Paso siguiente (→)">›</button><select id="velocidad" title="Velocidad"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></div>
+      </section>
+      <p class="teclas"><kbd>o</kbd> organigrama · <kbd>b</kbd> tablero · <kbd>c</kbd> chat · <kbd>t</kbd> tema · <kbd>v</kbd> en vivo · <kbd>g</kbd> grabación · <kbd>r</kbd> reiniciar · <kbd>f</kbd> pantalla completa · <kbd>espacio</kbd> play · <kbd>← →</kbd> paso</p>
+    </div>
     </div>
   </div>
 </div>
@@ -314,10 +425,10 @@
 <script type="module">
 import { crearOficina, W, H, CARTELES, MARTINA, DECISION } from './oficina.js';
 import { MODELOS, cara, aplicarColores } from './personajes.js';
-import { crearHilo, trozos, bloques, primeraLinea, destinatario, esPropuesta, propuesta, redactarDecision, cuerpoDeCaso } from './chat.js';
+import { crearHilo, trozos, bloques, primeraLinea, destinatario, esPropuesta, propuesta, redactarDecision, cuerpoDeCaso, marcaDe, TEXTO_MARCA } from './chat.js';
 import { completarHerramienta } from './herramientas.js';
-import { crearSeguimiento, actividadDe } from './seguimiento.js';
-import { crearTablero } from './tablero.js';
+import { crearSeguimiento, actividadDe, ETIQUETA_DECISION, palabraDe } from './seguimiento.js';
+import { crearTablero, ETIQUETAS as ETIQUETAS_TAREA } from './tablero.js';
 
 const $ = (id) => document.getElementById(id);
 const mundo = $('mundo'), mapa = $('mapa');
@@ -328,6 +439,7 @@ let CONFIG = { agentes: [], personas: { nombre: 'Dirección', casa: 'direccion' 
 let ofi = null, fichas = null;
 let eventos = [], indice = 0, reloj = 0, reproduciendo = false, velocidad = 1, ultimoFrame = 0;
 let temporizadores = [], decisionPendiente = false, modoVivo = false, silencioso = false;
+let ritmoMs = 0, colaEventos = [], ultimoDiceEn = -Infinity;   // el ritmo en vivo (ver recibir/drenarEventos)
 const programar = (ms, fn) => { const t = { t: reloj + ms, fn }; temporizadores.push(t); return t; };
 
 // ── Tema ─────────────────────────────────────────────────────────────────────
@@ -352,7 +464,33 @@ const el_ = (tag, clase, texto) => { const e = document.createElement(tag); if (
 const VACIO = '<div class="vacio">Todavía no habló nadie. La escuela está en silencio.</div>';
 function chatLimpiar() { hilo.limpiar(); vistos.clear(); enfocadas.clear(); $('msgs').innerHTML = VACIO; }
 function cara_(id) { const av = document.createElement('div'); av.className = 'av px'; const im = document.createElement('img'); im.src = urlDeCara(id); im.alt = ''; av.appendChild(im); return av; }
-function conMenciones(el, linea) { for (const t of trozos(linea)) { if (t.mencion) { const a = document.createElement('span'); a.className = 'a'; a.textContent = t.texto; el.appendChild(a); } else el.appendChild(document.createTextNode(t.texto)); } return el; }
+function conMenciones(el, linea) { for (const t of trozos(linea)) { if (t.mencion) { const a = document.createElement('span'); a.className = 'a'; a.textContent = t.texto; el.appendChild(a); } else conDatos(el, t.texto); } return el; }
+// El verificador (servidor/verificador.mjs) manda con cada mensaje qué cifras tienen fuente y cuáles no: acá se subrayan en el texto.
+let marcasDatos = null;   // los datos del mensaje que se está dibujando
+const ESTADO_DATO = { verificado: ['ok', 'Comprobado contra los datos de la herramienta'], citado: ['', 'Lo dijo otro agente o la persona; está en el canal (sin tilde: no es un dato comprobado acá)'], derivado: ['', 'Cálculo del agente (no se comprueba)'], no_comprobado: ['dudoso', 'Los números existen, pero no como par: el cruce es del agente'], sin_fuente: ['dudoso', 'No aparece en ninguna fuente'] };
+const PEOR_DATO = ['verificado', 'citado', 'derivado', 'no_comprobado', 'sin_fuente'];
+const escapar = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function conDatos(el, texto) {
+  if (!marcasDatos || !marcasDatos.length) { el.appendChild(document.createTextNode(texto)); return; }
+  const estados = new Map(); for (const d of marcasDatos) { const prev = estados.get(d.texto); estados.set(d.texto, !prev || PEOR_DATO.indexOf(d.estado) > PEOR_DATO.indexOf(prev) ? d.estado : prev); }
+  const re = new RegExp(`(?<![\\p{L}\\d.,/@-])(${[...estados.keys()].sort((a, b) => b.length - a.length).map(escapar).join('|')})(?![\\p{L}\\d/])`, 'gu');
+  let i = 0;
+  for (const m of texto.matchAll(re)) {
+    if (m.index > i) el.appendChild(document.createTextNode(texto.slice(i, m.index)));
+    const [clase, titulo] = ESTADO_DATO[estados.get(m[1])] || ['', '']; const sp = el_('span', 'dato ' + clase, m[1]); sp.title = titulo; el.appendChild(sp);
+    i = m.index + m[0].length;
+  }
+  if (i < texto.length) el.appendChild(document.createTextNode(texto.slice(i)));
+}
+const dudososDe = (v) => (v && v.datos ? v.datos.filter((d) => d.estado === 'sin_fuente' || d.estado === 'no_comprobado').map((d) => d.texto) : []);
+const conFuenteDe = (v) => (v && v.resumen ? (v.resumen.verificados || 0) : 0);   // el tilde y la cuenta son solo de lo comprobado contra la fuente; lo citado no suma
+function chipDatos(v, clase) {   // "✓ 4 datos" o "✓ 4 datos · 1 sin comprobar"
+  if (!v || !v.datos || !v.datos.length) return null; const n = conFuenteDe(v), d = dudososDe(v);
+  if (!n && !d.length) return null;
+  const c = el_('span', clase + (d.length ? ' dudoso' : ''), `${n ? '✓ ' + n + (n === 1 ? ' dato' : ' datos') : ''}${d.length ? (n ? ' · ' : '') + d.length + ' sin comprobar' : ''}`);
+  c.title = d.length ? 'Sin comprobar contra la fuente: ' + d.join(', ') : 'Cifras y fechas comprobadas por código contra los datos de las herramientas y el canal';
+  return c;
+}
 const colorDe = (id) => `var(--ag-${id || 'persona'})`;   // el color sale de las variables del tema, así cambia sin redibujar
 let fijado = null;   // la propuesta queda en foco mientras se espera la decisión, aunque sigan llegando mensajes
 
@@ -360,7 +498,9 @@ let fijado = null;   // la propuesta queda en foco mientras se espera la decisi�
 const seg = crearSeguimiento({ agenteDe, esPropuesta, accionesDe: (t) => propuesta(t).casos.flatMap((c) => c.acciones || []), nombrePersona: () => (CONFIG && CONFIG.personas && CONFIG.personas.nombre) || 'Dirección' });
 const nombreDe = (id) => (CONFIG.agentes.find((a) => a.id === id) || {}).nombre || id;
 function dibujarObjetivo() {
-  const el = $('objetivo'); const p = seg.actual; el.replaceChildren();
+  const el = $('objetivo'); let p = seg.actual; el.replaceChildren();
+  // Una pregunta ya respondida no tapa el objetivo: la franja vuelve a mostrar el objetivo y cómo va su ejecución
+  if (p && !p.objetivo && p.estado === 'cerrado') { const o = [...seg.pedidos].reverse().find((x) => x.objetivo); if (o) p = o; }
   const cab = el_('div', 'cab');
   if (!p) {
     el.className = 'vacio';
@@ -371,23 +511,41 @@ function dibujarObjetivo() {
     cab.appendChild(b); el.appendChild(cab); return;
   }
   el.className = p.estado === 'cerrado' ? 'cumplido' : p.estado === 'propuesta' ? 'esperando' : 'curso';
-  const { badge, items, plan } = actividadDe(p, { nombreDe, ahora: reloj });
+  const { items, preparacion, decision } = actividadDe(p, { nombreDe, ahora: reloj }); let { badge } = actividadDe(p, { nombreDe, ahora: reloj });
+  // Tres planos, una fuente de verdad cada uno: el trabajo de los agentes (seguimiento), tu decisión (la tarjeta) y la ejecución (el Tablero).
+  const acciones = p.objetivo ? tablero.subtareas.filter((x) => x.estado !== 'descartada' && x.t >= p.t0) : [];
+  const hechas = acciones.filter((x) => x.estado === 'lista').length, enCurso = acciones.filter((x) => x.estado === 'progreso' || x.estado === 'revision').length;
+  const cumplido = p.objetivo && p.estado === 'cerrado' && acciones.length > 0 && hechas === acciones.length;
+  if (cumplido) badge = { texto: 'Objetivo cumplido', tono: 'ok' };
+  else if (p.objetivo && p.estado === 'cerrado' && acciones.length) badge = { texto: 'En ejecución', tono: 'ejec', titulo: decision ? decision.texto : '' };
   cab.appendChild(el_('span', 'rot', p.objetivo ? 'Objetivo' : 'Pedido'));
   const txt = conMenciones(el_('div', 'txt'), p.texto); txt.title = p.texto; cab.appendChild(txt);
-  if (badge) cab.appendChild(el_('span', 'badge px ' + badge.tono, badge.texto));
+  if (badge) { const b = el_('span', 'badge px ' + badge.tono, badge.texto); if (badge.titulo) b.title = badge.titulo; cab.appendChild(b); }
   el.appendChild(cab);
   // Una sola línea viva: qué está pasando ahora mismo
   const vivos = items.filter((x) => x.estado === 'on'), espera = items.find((x) => x.estado === 'espera');
   let viva;
-  if (p.estado === 'cerrado') {
-    const acciones = tablero.subtareas.filter((x) => x.estado !== 'descartada' && x.t >= p.t0).length;
-    viva = { clase: 'ok', texto: p.objetivo ? (acciones ? `Cumplido. ${acciones === 1 ? '1 acción' : acciones + ' acciones'} en el Tablero, en manos de personas.` : 'Cumplido. Podés dar otro objetivo o preguntarle a un agente por qué.') : 'Respondido.', tablero: acciones > 0 };
-  } else if (espera) viva = { clase: 'espera', texto: 'Esperando tu decisión: aprobá, reservate o rechazá cada acción.' };
+  if (cumplido) viva = { clase: 'ok', texto: `Las ${acciones.length} acciones están hechas. Podés dar otro objetivo.`, tablero: true };
+  else if (p.estado === 'cerrado' && acciones.length) viva = { clase: 'ejec', texto: hechas || enCurso ? `${hechas} de ${acciones.length} acciones hechas${enCurso ? `, ${enCurso} en curso` : ''} · Ver Tablero` : `${acciones.length} acciones en manos de personas · Ver Tablero`, tablero: true };   // recién nacidas no son "0 hechas": están en manos de personas
+  else if (p.estado === 'cerrado') viva = { clase: 'ok', texto: p.objetivo ? 'Sin acciones en el Tablero. Podés dar otro objetivo.' : 'Respondido.' };
+  else if (espera) viva = { clase: 'espera', texto: preparacion ? `Propuesta preparada · tiempo de preparación ${preparacion}` : 'Propuesta preparada' };
+  else if (p.estado === 'decidido') viva = { clase: 'on', texto: 'Coordinación asigna lo aprobado…' };
   else if (vivos.length) viva = { clase: 'on', texto: vivos.slice(0, 2).map((x) => x.texto).join('  ·  ') + (vivos.length > 2 ? `  ·  +${vivos.length - 2}` : '') };
-  else if (p.estado === 'decidido') viva = { clase: 'on', texto: 'Coordinación cierra…' };
-  else { const faltan = Object.entries(p.agentes).filter(([, e]) => e !== 'respondio').map(([id]) => nombreDe(id)); viva = { clase: '', texto: faltan.length ? 'Esperando a ' + faltan.join(', ') : 'En curso' }; }
+  else { const faltan = Object.entries(p.agentes).filter(([, e]) => e !== 'respondio').map(([id]) => nombreDe(id)); viva = { clase: faltan.length || !p.repartido ? '' : 'on', texto: faltan.length ? 'Esperando a ' + faltan.join(', ') : p.repartido ? 'Coordinación prepara la propuesta…' : 'Enviado' }; }
   const v = el_('div', 'viva ' + viva.clase); v.appendChild(el_('span', 'lin', viva.texto)); el.appendChild(v);
   if (viva.tablero) { v.style.cursor = 'pointer'; v.title = 'Abrir el Tablero (b)'; v.onclick = () => vista('tab'); }
+}
+// Los agentes que trabajan ahora (del seguimiento del pedido en curso): id → { desde, herramienta, tHerr }
+function vivosAhora() { const p = seg.actual; return p && p.estado !== 'cerrado' ? p.vivos : {}; }
+let ultimaFirmaVivos = '';
+const firmaVivos = () => Object.entries(vivosAhora()).map(([id, v]) => id + ':' + (v.herramienta && reloj - v.tHerr < 6000 ? v.herramienta : palabraDe(id, v.desde, reloj))).join('|');
+// "Reviso la asistencia de Biología 1", "Reviso la actividad en el campus de Biología 1" → "Revisó la asistencia y la actividad en el campus de Biología 1"
+function textoTraza(herramientas) {
+  const partes = herramientas.map((h) => h.replace(/^(Reviso|Busco|Anoto|Entrego)\s+/, '')); const verbo = /^Busco/.test(herramientas[0]) ? 'Buscó' : /^(Anoto|Entrego)/.test(herramientas[0]) ? 'Anotó' : 'Revisó';
+  const sufijo = (() => { const m = partes[0].match(/\s(de [^,]+)$/); return m && partes.every((p) => p.endsWith(m[1])) ? m[1] : null; })();
+  const objetos = sufijo ? partes.map((p) => p.slice(0, -sufijo.length - 1)) : partes;
+  const lista = objetos.length <= 1 ? objetos.join('') : objetos.slice(0, -1).join(', ') + ' y ' + objetos[objetos.length - 1];
+  return `${verbo} ${lista}${sufijo ? ' ' + sufijo : ''}`;
 }
 const vistos = new Set();   // mensajes ya dibujados: solo los nuevos entran con animación
 const enfocadas = new Set();   // propuestas a las que ya se desplazó el stream (una vez por propuesta)
@@ -401,35 +559,69 @@ function chatDibujar(animar = true) {
   const entradas = ms.map((m) => ({ t: typeof m.t === 'number' ? m.t : 0, tipo: 'm', m }));
   entradas.sort((a, b) => a.t - b.t);
   const flujo = el_('div'); flujo.id = 'flujo';
-  let irA = null, hayNuevo = false;
+  let hayNuevo = false;
   const ultimoMsg = ms[ms.length - 1];
   for (const e of entradas) {
     const m = e.m, id = idDe(m), clave = m.clave || m.seq;
     const nuevo = !vistos.has(clave); if (nuevo) { vistos.add(clave); hayNuevo = true; }
-    const f = el_('div', 'f' + (id ? '' : ' persona') + (m.decision ? ' decision' : '') + (m === ultimoMsg ? ' ultimo' : '') + (nuevo && animar ? ' nuevo' : '')); f.style.setProperty('--c', colorDe(id));
-    const nom = el_('div', 'nom'); nom.appendChild(el_('span', null, m.autor || 'Alguien'));
     const { para, resto } = destinatario(m.texto);
+    // Lateral: un agente le habla a otro agente que no es Coordinación (avisos, preguntas) o Coordinación reparte el trabajo. El hilo principal es lo que va a Coordinación o a la persona.
+    const paraIds = para.map(agenteDe).filter(Boolean), paraPersona = para.some((n) => /^direcci[oó]n$|^directora?$/i.test(n) || sinTildes(n) === sinTildes(CONFIG.personas.nombre));
+    const lateral = !!id && !paraPersona && !esPropuesta(m.texto) && (id === 'coordinacion' ? paraIds.length > 0 : paraIds.length > 0 && !paraIds.includes('coordinacion'));
+    const f = el_('div', 'f' + (id ? '' : ' persona') + (lateral ? ' lateral' : '') + (m.decision ? ' decision' : '') + (m === ultimoMsg ? ' ultimo' : '') + (nuevo && animar ? ' nuevo' : '')); f.style.setProperty('--c', colorDe(id));
+    const nom = el_('div', 'nom'); const quienEs = el_('span', null, m.autor || 'Alguien'); nom.appendChild(quienEs);
+    if (id) { quienEs.classList.add('ficha-link'); quienEs.title = `Ver la ficha de ${m.autor}: rol, herramientas y lo que se le pide`; quienEs.onclick = () => verAgente(id); }
     if (para.length) { const pa = el_('span', 'para'); pa.append('→ '); para.forEach((n, k) => { const b = el_('b', null, /^direcci[oó]n$|^directora?$/i.test(n) ? CONFIG.personas.nombre : n); pa.append(k ? ', ' : '', b); }); nom.appendChild(pa); }
-    if (id && id !== 'coordinacion' && para.some((n) => { const a = agenteDe(n); return a && a !== 'coordinacion'; })) nom.appendChild(el_('span', 'chip px', 'le avisa sin que se lo pidan'));   // el aviso entre agentes
+    if (id && id !== 'coordinacion' && para.some((n) => { const a = agenteDe(n); return a && a !== 'coordinacion'; })) nom.appendChild(el_('span', 'chip px', /[¿?]/.test(resto) ? 'le pregunta sin que se lo pidan' : 'le avisa sin que se lo pidan'));   // el aviso (o la pregunta) entre agentes
+    const marca = id ? (m.marca || marcaDe(m.texto)) : null; if (marca) nom.appendChild(el_('span', 'chip px ' + marca, TEXTO_MARCA[marca]));   // los dos momentos de honestidad: dice que no, dice lo que no sabe
     const cuerpo = el_('div', 'cuerpo');
-    const tarjeta = !m.persona && esPropuesta(m.texto) ? tarjetaDecision(m) : null;
-    if (tarjeta) { cuerpo.appendChild(tarjeta); if (decisionPendiente && fijado === m && !enfocadas.has(clave)) { enfocadas.add(clave); irA = f; } }
-    else for (const b of bloques(resto)) cuerpo.appendChild(bloque(b));
-    f.append(cara_(id), nom, cuerpo); flujo.appendChild(f);
+    const enPanel = decisionPendiente && fijado === m;   // se decide en el panel sobre la escuela; acá queda una línea
+    const tarjeta = !m.persona && esPropuesta(m.texto) ? (enPanel ? resumenDecision(m) : tarjetaDecision(m)) : null;
+    if (tarjeta) cuerpo.appendChild(tarjeta);
+    else if (m.persona) for (const l of resto.split('\n')) { if (l.trim()) cuerpo.appendChild(conMenciones(el_('div', 'p'), l.trim())); }   // lo que escribe la persona va tal cual: "Llamada: la hago yo" no es una ficha
+    else { marcasDatos = m.verificacion ? m.verificacion.datos : null; for (const b of bloques(resto)) cuerpo.appendChild(bloque(b)); marcasDatos = null; const ch = !tarjeta && chipDatos(m.verificacion, 'chip datos px'); if (ch) nom.appendChild(ch); }
+    f.append(cara_(id), nom);
+    if (m.herramientas && m.herramientas.length && !lateral) { const tr = el_('div', 'traza'); const sp = el_('span', null, textoTraza(m.herramientas)); sp.title = m.herramientas.join(' · '); tr.appendChild(sp); f.appendChild(tr); }   // qué ejecutó antes de responder
+    f.appendChild(cuerpo); flujo.appendChild(f);
   }
+  // Ejecutando: los agentes que están en un turno ahora mismo, al final del stream, con lo que hacen
+  for (const [vid, v] of Object.entries(vivosAhora())) {
+    const f = el_('div', 'f ejecutando'); f.style.setProperty('--c', colorDe(vid));
+    const nom = el_('div', 'nom'); nom.appendChild(el_('span', null, nombreDe(vid)));
+    const herr = v.herramienta && reloj - v.tHerr < 6000 ? v.herramienta.replace(/^(\w)/, (c) => c.toLowerCase()).replace(/^(reviso|busco)/, (w) => w === 'busco' ? 'busca' : 'revisa') : palabraDe(vid, v.desde, reloj) + '…';
+    f.append(cara_(vid), nom, el_('div', 'cuerpo', herr)); flujo.appendChild(f);
+  }
+  ultimaFirmaVivos = firmaVivos();
   $('redactar').classList.toggle('con-tarjeta', decisionPendiente && !!fijado);
   const pill = el_('button', 'px', '↓ Nuevo'); pill.id = 'nuevo'; pill.type = 'button'; pill.onclick = () => { flujo.scrollTo({ top: flujo.scrollHeight, behavior: 'smooth' }); pill.classList.remove('visible'); };
   flujo.addEventListener('scroll', () => { if (flujo.scrollTop + flujo.clientHeight >= flujo.scrollHeight - 80) pill.classList.remove('visible'); }, { passive: true });
   cont.replaceChildren(flujo, pill);
   // Los saltos son instantáneos (con desplazamiento suave, dos redibujos seguidos leían una posición a mitad de camino)
-  if (irA) { const alinear = () => irA.scrollIntoView({ block: 'start', behavior: 'instant' }); alinear(); requestAnimationFrame(alinear); setTimeout(alinear, 250); }   // la propuesta se lee desde arriba; se realinea tras el reflow (el chat se ensancha al decidir)
-  else if (pegado || !decisionPendiente) flujo.scrollTo({ top: flujo.scrollHeight, behavior: 'instant' });   // el stream sigue lo último; solo mientras leés una propuesta no te mueve
+  if (pegado) flujo.scrollTo({ top: flujo.scrollHeight, behavior: 'instant' });   // el stream sigue lo último
   else { flujo.scrollTo({ top: scrollAntes, behavior: 'instant' }); if (hayNuevo) pill.classList.add('visible'); }   // si subiste a leer, no te movemos
+  dibujarPanel();
+}
+// El panel de decisión sobre la escuela: la tarjeta completa, grande, mientras la propuesta espera (en grabación, sin botones)
+function dibujarPanel() {
+  const pd = $('panel-decision'); const abierto = decisionPendiente && !!fijado;
+  mundo.classList.toggle('decidiendo', abierto);
+  if (!abierto) { pd.replaceChildren(); return; }
+  const t = tarjetaDecision(fijado); pd.replaceChildren(t || el_('div', 'vacio', 'Propuesta sin casos.'));
+  // Tiene que entrar entera, también a 1280×720: la letra baja de a un punto hasta que el pie (Enviar decisión) quede a la vista
+  pd.style.setProperty('--tp', '33');
+  for (let tp = 33; tp > 22 && pd.scrollHeight > pd.clientHeight + 2; tp--) pd.style.setProperty('--tp', String(tp));
+}
+function resumenDecision(m) {
+  const p = propuesta(m.texto); const t = el_('div', 'tarjeta resumen px'); const cab = el_('div', 'cab');
+  cab.appendChild(cara_('coordinacion')); cab.appendChild(el_('h3', null, 'Propuesta para decidir' + (p.titulo ? ': ' + p.titulo : '')));
+  t.appendChild(cab); return t;
 }
 let ultimoDibujoObjetivo = 0, dibujarObjetivoPendiente = false;
 function latirObjetivo() {   // mientras alguien piensa, las palabras giran: se redibuja cada medio segundo
   if (dibujarObjetivoPendiente) { dibujarObjetivoPendiente = false; dibujarObjetivo(); }
-  const p = seg.actual; if (!p || !Object.keys(p.vivos).length || performance.now() - ultimoDibujoObjetivo < 500) return;
+  if (performance.now() - ultimoDibujoObjetivo < 500) return;
+  if (firmaVivos() !== ultimaFirmaVivos) { ultimoDibujoObjetivo = performance.now(); chatDibujar(false); }   // las filas "ejecutando" del chat
+  const p = seg.actual; if (!p || !Object.keys(p.vivos).length) return;
   ultimoDibujoObjetivo = performance.now(); dibujarObjetivo();
 }
 const badgeRiesgo = (r) => { const b = el_('span', 'riesgo px ' + r, 'riesgo ' + r); return b; };
@@ -458,31 +650,49 @@ function tarjetaDecision(m) {
   const abierta = decisionPendiente && fijado === m;                      // todavía espera esta decisión
   const puedo = abierta && !!enviarMensaje && !enviandoDecision;          // en vivo y con conexión se decide desde la tarjeta
   const t = el_('div', 'tarjeta px');
-  const cab = el_('div', 'cab'); cab.appendChild(el_('div', 'ico px', '?')); cab.appendChild(el_('h3', null, 'Propuesta para decidir'));
-  const estado = el_('span', 'estado px'); 
-  if (!abierta) { estado.textContent = 'Decidido'; estado.classList.add('ok'); }
-  else if (enviandoDecision) estado.textContent = 'Enviando…';
-  else if (puedo) estado.textContent = 'Esperando tu decisión';
-  else { estado.textContent = modoVivo ? 'Esperando tu decisión' : 'Grabación'; if (!modoVivo) estado.classList.add('gris'); }
-  cab.appendChild(estado); t.appendChild(cab);
+  const cab = el_('div', 'cab'); cab.appendChild(cara_('coordinacion')); cab.appendChild(el_('h3', null, 'Propuesta para decidir'));   // la propone un agente: su cara, no un "?"
+  { const ch = chipDatos(m.verificacion, 'datos px'); if (ch) cab.appendChild(ch); }   // cuántas cifras de la propuesta tienen fuente (el verificador)
+  marcasDatos = m.verificacion ? m.verificacion.datos : null;
+  // El estado solo cuando ya se decidió o se está enviando: "Pendiente de tu revisión" ya lo dicen la franja y la caja
+  if (!abierta) { const estado = el_('span', 'estado px ok'); const ped = seg.pedidos.find((x) => x.propuesta === m.texto); estado.textContent = ped && ped.decisionTipo ? ETIQUETA_DECISION[ped.decisionTipo] : 'Decidida'; cab.appendChild(estado); }
+  else if (enviandoDecision) cab.appendChild(el_('span', 'estado px', 'Enviando…'));
+  t.appendChild(cab);
   if (p.titulo) t.appendChild(conMenciones(el_('div', 'desc'), p.titulo.charAt(0).toUpperCase() + p.titulo.slice(1)));
+  // La pregunta va arriba, con los verbos de los botones; si hay acciones es siempre la misma, así la sala sabe qué se decide antes de leer
+  const conAcciones = p.casos.some((c) => c.acciones && c.acciones.length);
+  if (abierta) t.appendChild(el_('div', 'pregunta-arriba', conAcciones ? '¿Qué aprobás, qué hacés vos y qué no?' : p.pregunta || '¿Qué aprobás?'));
   for (const c of p.casos) {
     const dc = d[c.n]; const conAcc = c.acciones && c.acciones.length > 0;
     const caso = el_('div', 'caso' + (conAcc ? ' con-acciones' : dc ? ' ' + dc.estado : ''));
-    const enc = el_('div', 'enc'); enc.appendChild(el_('span', 'n', c.n + '.')); enc.appendChild(el_('span', 'nombre', c.nombre)); if (c.riesgo) enc.appendChild(badgeRiesgo(c.riesgo));
+    const enc = el_('div', 'enc'); if (p.casos.length > 1) enc.appendChild(el_('span', 'n', c.n + '.')); enc.appendChild(el_('span', 'nombre', c.nombre)); if (c.riesgo) enc.appendChild(badgeRiesgo(c.riesgo));
     caso.appendChild(enc); caso.dataset.n = c.n;
     if (conAcc) {
       // Lo que encontraron (mudo) y, aparte, cada acción propuesta con quién la hace: eso es lo que se decide
-      const ev = el_('div', 'evid'); ev.appendChild(el_('span', 'enc px', 'Lo que encontraron')); conMenciones(ev, cuerpoDeCaso(c.evidencia, c.nombre)); caso.appendChild(ev);
+      const esRutina = !c.riesgo && c.nombre.split(' ').length >= 3;   // "Antes de cada parcial": el caso es un proceso, no una persona
+      const ev = el_('div', 'evid'); ev.appendChild(el_('span', 'enc px', esRutina ? 'Cómo funcionaría' : 'Lo que encontraron')); conMenciones(ev, cuerpoDeCaso(c.evidencia, c.nombre)); if (abierta) caso.appendChild(ev);   // decidida, la tarjeta se queda con las acciones: la evidencia ya está en el chat
+      if (abierta && c === p.casos[0] && (p.notas.length || p.riesgoPropio || p.pendiente)) {   // lo que Coordinación advierte, junto y antes de las acciones
+        const av = el_('div', 'avisos');
+        for (const n of p.notas || []) { const l = el_('div', 'lin'); l.appendChild(el_('b', null, 'Nota:')); conMenciones(l, n); av.appendChild(l); }
+        if (p.riesgoPropio) { const l = el_('div', 'lin'); l.appendChild(el_('b', null, 'Riesgo de equivocarnos:')); conMenciones(l, p.riesgoPropio); av.appendChild(l); }
+        if (p.pendiente) { const l = el_('div', 'lin'); l.appendChild(el_('b', null, 'Pendiente:')); conMenciones(l, p.pendiente); av.appendChild(l); }
+        caso.appendChild(av);
+      }
       caso.appendChild(el_('span', 'props px', 'Qué proponen'));
       if (!dc || !dc.acciones) d[c.n] = { acciones: {}, nota: (dc && dc.nota) || '' };
+      // Ya decidida (en vivo o en una grabación), cada acción muestra lo que se decidió, sin botones: el plan sale del seguimiento
+      const plan = abierta ? null : (seg.pedidos.find((x) => x.propuesta === m.texto) || {}).plan;
       c.acciones.forEach((a, i) => {
         const fila = el_('div', 'acc'); const que = el_('div', 'que'); que.textContent = a.texto.charAt(0).toUpperCase() + a.texto.slice(1); if (a.quien) que.appendChild(el_('span', 'quien', '· ' + a.quien)); fila.appendChild(que);
         const acc = el_('div', 'acciones'); const est = d[c.n].acciones[i];
-        for (const [v, rot] of [['si', 'Aprobar'], ['yo', 'Lo hago yo'], ['no', 'No']]) {
+        const yaEsMia = new RegExp(`direcci[oó]n|^${(CONFIG.personas.nombre || 'Dirección').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i').test(a.quien || '');   // si la acción ya es de Dirección, "Lo hago yo" es lo mismo que Aprobar
+        if (abierta) for (const [v, rot] of [['si', 'Aprobar'], ['yo', 'Lo hago yo'], ['no', 'No']]) {
+          if (v === 'yo' && yaEsMia) continue;
           const b = el_('button', v + (est === v ? ' on' : ''), rot); b.type = 'button'; b.disabled = !puedo;
           b.onclick = () => { if (d[c.n].acciones[i] === v) delete d[c.n].acciones[i]; else d[c.n].acciones[i] = v; chatDibujar(false); };
           acc.appendChild(b);
+        } else {
+          const fp = plan && plan[i]; const v = est || (fp ? (fp.estado === 'descartada' ? 'no' : fp.responsable === CONFIG.personas.nombre ? 'yo' : 'si') : null);
+          if (v) { const chip = el_('button', v + ' on', v === 'si' ? 'Aprobada' : v === 'yo' ? 'La hago yo' : 'No'); chip.type = 'button'; chip.disabled = true; acc.appendChild(chip); fila.classList.add('decidida'); }
         }
         fila.appendChild(acc); caso.appendChild(fila);
       });
@@ -495,17 +705,22 @@ function tarjetaDecision(m) {
       }
       enc.appendChild(acc); caso.appendChild(conMenciones(el_('div', 'txt'), cuerpoDeCaso(c.texto, c.nombre)));
     }
+    if (!abierta) { const ped = seg.pedidos.find((x) => x.propuesta === m.texto); const n = (d[c.n] && d[c.n].nota) || (c === p.casos[0] && ped && ped.decisionNota) || ''; if (n) { const nt = el_('div', 'ro nota-txt'); nt.appendChild(el_('span', 'enc px', 'Tu nota')); nt.appendChild(document.createTextNode(' ' + n)); caso.appendChild(nt); } t.appendChild(caso); continue; }   // decidida: la nota es texto, no una caja
     const nota = el_('input', 'nota'); nota.type = 'text'; nota.value = (d[c.n] && d[c.n].nota) || ''; nota.disabled = !puedo;
+    if (conAcc && !Object.values((d[c.n] && d[c.n].acciones) || {}).some((v) => v === 'yo' || v === 'no') && !nota.value) nota.style.display = 'none';   // la nota aparece recién cuando algo no se aprueba tal cual
     nota.placeholder = conAcc ? 'Algo más para Coordinación (opcional)' : dc && dc.estado === 'rechazado' ? 'Quién lo toma, o por qué (“lo llamo yo”)' : 'Qué cambia (“refuerzo sí, pero con el docente”)';
     nota.oninput = () => { if (d[c.n]) d[c.n].nota = nota.value; };
     nota.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); enviarDecision(m, p, d); } };
     caso.appendChild(nota); t.appendChild(caso);
   }
   const pie = el_('div', 'pie');
-  for (const n of p.notas || []) { const no = el_('div', 'pendiente'); no.appendChild(el_('span', 'enc px', 'Nota')); conMenciones(no, n); pie.appendChild(no); }   // lo que cambió por un aviso entre agentes
-  if (p.pendiente) { const pe = el_('div', 'pendiente'); pe.appendChild(el_('span', 'enc px', 'Pendiente')); conMenciones(pe, p.pendiente); pie.appendChild(pe); }
+  if (!p.casos.some((c) => c.acciones && c.acciones.length)) {   // sin acciones por fila, los avisos van al pie como antes
+    for (const n of p.notas || []) { const no = el_('div', 'pendiente'); no.appendChild(el_('span', 'enc px', 'Nota')); conMenciones(no, n); pie.appendChild(no); }
+    if (p.riesgoPropio) { const ri = el_('div', 'pendiente'); ri.appendChild(el_('span', 'enc px', 'Riesgo de equivocarnos')); conMenciones(ri, p.riesgoPropio); pie.appendChild(ri); }
+    if (p.pendiente) { const pe = el_('div', 'pendiente'); pe.appendChild(el_('span', 'enc px', 'Pendiente')); conMenciones(pe, p.pendiente); pie.appendChild(pe); }
+  }
+  marcasDatos = null;
   if (abierta) {
-    if (p.pregunta) pie.appendChild(el_('div', 'pregunta', p.pregunta));
     const marcados = p.casos.filter((c) => d[c.n] && (d[c.n].acciones ? Object.keys(d[c.n].acciones).length : true)).length;
     const env = el_('button', 'enviar px', enviandoDecision ? 'Enviando…' : marcados ? `Enviar decisión (${marcados} de ${p.casos.length})` : 'Enviar decisión'); env.type = 'button';
     env.disabled = !puedo || !marcados; env.onclick = () => enviarDecision(m, p, d); pie.appendChild(env);
@@ -525,15 +740,16 @@ function enviarDecision(m, p, d) {
 
 // Al cambiar el alto disponible (ventana, ancho del chat), si estabas al final seguís al final.
 new ResizeObserver(() => { const f = $('flujo'); if (f && f.scrollTop + f.clientHeight >= f.scrollHeight - 120) f.scrollTop = f.scrollHeight; }).observe($('msgs'));
-function chatAgregar({ clave, autor, texto, hora, t, persona, decision }) { if (hilo.agregar({ clave, autor, texto, hora, t, persona, decision }) && !silencioso) chatDibujar(); }
+function chatAgregar({ clave, autor, texto, hora, t, persona, decision, verificacion, marca, herramientas }) { if (hilo.agregar({ clave, autor, texto, hora, t, persona, decision, verificacion, marca, herramientas }) && !silencioso) chatDibujar(); }
+const trazas = new Map();   // por agente: las herramientas de su turno en curso, para la traza del mensaje con que responde
 let ultimoTrabajando = '', avisoHasta = 0;
-function aviso(t) { const el = $('trabajando'); el.textContent = t; el.classList.add('on'); avisoHasta = performance.now() + 5000; ultimoTrabajando = '\0'; }
+function aviso(t) { const el = $('trabajando'); el.textContent = t; el.classList.add('on'); el.classList.toggle('error', /no se pudo|no hay|sin conexi|no reconozco|no hay nadie/i.test(t)); avisoHasta = performance.now() + 5000; ultimoTrabajando = '\0'; }
 function actualizarTrabajando() {
   if (!fichas || performance.now() < avisoHasta) return;
   const ts = [...fichas.values()].filter((f) => f.trabajando).map((f) => f.nombre);
   const txt = '';   // quién trabaja se ve en el objetivo; esta línea queda para los avisos
   if (txt === ultimoTrabajando) return; ultimoTrabajando = txt;
-  const el = $('trabajando'); el.textContent = txt; el.classList.remove('on');
+  const el = $('trabajando'); el.textContent = txt; el.classList.remove('on', 'error');
 }
 
 // ── Textos sobre cada personaje ──────────────────────────────────────────────
@@ -555,7 +771,7 @@ function corto(t) {
   let x = limpiar(t).replace(/^@[^\s]+\s*/, '');
   const resto = String(CONFIG.personas.nombre || '').split(' ').slice(1).join(' ');   // "@Greyla Alvarez …": el apellido también sobra
   if (resto && x.startsWith(resto)) x = x.slice(resto.length).trim();
-  if (x.length > 140) { const corte = x.slice(0, 140); const punto = Math.max(corte.lastIndexOf('. '), corte.lastIndexOf('; ')); x = (punto > 70 ? corte.slice(0, punto + 1) : corte.replace(/\s+\S*$/, '')) + '…'; }
+  if (x.length > 140) { const corte = x.slice(0, 140); const punto = Math.max(corte.lastIndexOf('. '), corte.lastIndexOf('; ')); x = (punto > 70 ? corte.slice(0, punto) : corte.replace(/\s+\S*$/, '')).replace(/[.;,:]+$/, '') + '…'; }   // sin "....": el corte no agrega puntos a un punto
   return x;
 }
 const MAX_GLOBOS = 3;           // como mucho 3 globos a la vez; el resto espera su turno
@@ -563,8 +779,9 @@ let pendientes = [];
 const visibles = () => { let n = 0; for (const f of fichas.values()) if (f.actual) n++; return n; };
 function decir(f, texto, tipo = 'msg') {
   if (silencioso) return;   // al reponer una corrida de golpe no se habla: el chat ya tiene todo
-  const item = { texto: tipo === 'msg' ? corto(texto) : limpiar(texto), tipo };
-  item.ms = tipo === 'tool' ? 4800 : Math.max(3800, Math.min(10000, 1800 + item.texto.length * 52));
+  const item = { texto: tipo === 'tool' ? limpiar(texto) : corto(texto), tipo };
+  item.ms = tipo === 'tool' ? 4800 : tipo === 'decision' ? 9000 : tipo === 'limite' || tipo === 'no_se' ? 9000 : Math.max(3800, Math.min(8000, 1800 + item.texto.length * 52));
+  if (tipo === 'decision') { f.cola = []; if (f.actual) cerrar(f); }   // la decisión pasa por encima de lo que la persona estuviera diciendo
   f.cola = f.cola || [];
   if (tipo === 'tool' && f.actual && f.actual.tipo === 'tool') { f.cola = f.cola.filter((i) => i.tipo !== 'tool'); mostrar(f, item); return; }   // la herramienta nueva reemplaza a la vieja
   f.cola.push(item); if (f.cola.length > 3) f.cola.splice(0, f.cola.length - 3);
@@ -575,7 +792,7 @@ function intentar(f) {
   if (visibles() >= MAX_GLOBOS) { if (!pendientes.includes(f)) pendientes.push(f); return; }
   mostrar(f, f.cola.shift());
 }
-function mostrar(f, item) { f.actual = item; f.hasta = reloj + item.ms; f.textoVisible = true; const e = etiqueta(f); e.sp.textContent = item.texto; e.bub.classList.add('visible'); }
+function mostrar(f, item) { f.actual = item; f.hasta = reloj + item.ms; f.textoVisible = true; const e = etiqueta(f); e.sp.textContent = item.texto; for (const c of ['decision', 'limite', 'no_se']) e.bub.classList.toggle(c, item.tipo === c); e.bub.classList.add('visible'); }
 function cerrar(f) { f.actual = null; f.textoVisible = false; etiqueta(f).bub.classList.remove('visible'); if (f.cola && f.cola.length && !pendientes.includes(f)) pendientes.push(f); }
 function tickGlobos() {
   for (const f of fichas.values()) if (f.actual && reloj >= f.hasta) cerrar(f);
@@ -586,41 +803,78 @@ const esPersona = (d) => String(d || '').startsWith('persona:');
 
 // La decisión: mientras una propuesta espera, la caja de chat lo dice y la pantalla de Dirección se enciende.
 function nombrarPersona(nombre) {
-  CONFIG.personas.nombre = nombre;
+  CONFIG.personas.nombre = nombre; $('perfil-nombre').textContent = nombre;
   const p = fichas && fichas.get('persona:direccion'); if (p) { p.nombre = nombre; etiqueta(p).tag.textContent = nombre; }
+  if (!silencioso) { chatDibujar(false); dibujarObjetivo(); }
 }
 function esperarDecision(on) {
   const cambio = decisionPendiente !== !!on;
   decisionPendiente = !!on; ofi.esperandoDecision = !!on; $('redactar').classList.toggle('esperando', !!on); $('capa').classList.toggle('decision', !!on); $('pestana').classList.toggle('espera', !!on); $('v-escuela').classList.toggle('espera', !!on && vistaAbierta() !== 'escuela');
-  if (cambio) { $('escenario').classList.toggle('decidiendo', !!on); escalar(); actualizarEstado(); }
+  if (cambio) { $('escenario').classList.toggle('decidiendo', !!on); actualizarEstado(); }
   if (!on) { fijado = null; enviandoDecision = false; }
-  if ((cambio || on) && !silencioso) chatDibujar(false);   // con la propuesta ya fijada, la tarjeta se dibuja abierta
+  if ((cambio || on) && !silencioso) chatDibujar(false);   // con la propuesta ya fijada, el panel se dibuja abierto
+  else if (silencioso) dibujarPanel();
 }
 
+// Quién decide, elegido en esta pantalla: ?nombre= manda; si no, lo guardado desde el perfil; si no, nada (lo dice el servidor).
+function nombreElegido() { const q = (params.get('nombre') || '').trim().slice(0, 40); if (q) return q; try { return (localStorage.getItem('nombreDirector') || '').trim().slice(0, 40); } catch { return ''; } }
 // Un solo reloj en toda la vista: minutos:segundos desde el primer mensaje de la corrida (el mismo que la tarjeta del objetivo).
 let tInicio = null;
 function transcurrido(t) { if (typeof t !== 'number') return ''; if (tInicio === null) tInicio = t; const s = Math.max(0, Math.round((t - tInicio) / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
 const tablero = crearTablero();   // copia local: para contar las acciones del chat y para el Tablero embebido
+// ── Las tareas en la escuela: cada acción aprobada aparece como un papel sobre el escritorio de quien la tiene ──
+const papeles = new Map();   // id de la acción → { el, x, y } (coordenadas lógicas del plano)
+function casaDeResponsable(s) {
+  if (s.agente) { const a = CONFIG.agentes.find((x) => x.id === s.agente); return a ? a.casa : null; }
+  const r = sinTildes(s.responsable); if (!r) return null;
+  if (r.includes('secretar')) return 'secretaria'; if (r.includes('docente') || r.includes('tutor')) return 'aula-bio1'; if (r.includes('bienestar')) return 'bienestar';
+  if (r.includes('admisi')) return 'admisiones'; if (r.includes('academ')) return 'academia'; if (r.includes('coordinac')) return 'coordinacion';
+  return 'direccion';   // Dirección, o el nombre de quien decide
+}
+function dibujarPapeles() {
+  if (!ofi) return;
+  const porCasa = new Map();
+  for (const s of tablero.subtareas) { if (s.estado === 'descartada') continue; const c = casaDeResponsable(s); const sala = c && ofi.SALAS[c]; if (!sala || !sala.asiento) continue; if (!porCasa.has(c)) porCasa.set(c, []); porCasa.get(c).push(s); }
+  const vivos = new Set();
+  for (const [c, lista] of porCasa) {
+    const a = ofi.SALAS[c].asiento, derecha = a.x + 60 < W;   // a la derecha del escritorio, salvo en las salas del borde
+    lista.forEach((s, i) => {
+      let p = papeles.get(s.id);
+      if (!p) { p = { el: el_('div', 'papel px') }; $('capa').appendChild(p.el); papeles.set(s.id, p); }
+      p.el.className = 'papel px ' + s.estado; p.el.textContent = s.texto; p.el.title = `${s.texto} · ${s.responsable || 'sin responsable'} · ${ETIQUETAS_TAREA[s.estado] || s.estado}`;
+      p.x = (derecha ? a.x + 19 : a.x - 19 - 46) + i * 2; p.y = a.y - 36 + i * 9;   // apilados, corridos un poco cada uno
+      vivos.add(s.id);
+    });
+  }
+  for (const [id, p] of papeles) if (!vivos.has(id)) { p.el.remove(); papeles.delete(id); }
+  posicionarPapeles();
+}
+function posicionarPapeles() { for (const p of papeles.values()) p.el.style.transform = `translate(${(p.x * K).toFixed(0)}px, ${(p.y * K).toFixed(0)}px)`; }
 function aplicar(ev) {
-  if (ev.tipo === 'tarea') { tablero.aplicar(ev); tabEventos.push(ev); if (!silencioso) tabPost({ tipo: 'tablero', eventos: [ev], vivo: modoVivo && !!enviarMensaje }); else dibujarObjetivoPendiente = true; return; }
+  if (ev.tipo === 'tarea') { tablero.aplicar(ev); tabEventos.push(ev); dibujarPapeles(); if (!silencioso) { tabPost({ tipo: 'tablero', eventos: [ev], vivo: modoVivo && !!enviarMensaje }); dibujarObjetivo(); } else dibujarObjetivoPendiente = true; return; }   // la franja cuenta las acciones hechas
   { const antes = seg.actual && seg.actual.estado; seg.aplicar(ev.tipo === 'herramienta' ? completarHerramienta(ev) : ev); if (!silencioso) { dibujarObjetivo(); if ((seg.actual && seg.actual.estado) !== antes) actualizarEstado(); } }
   if (ev.tipo === 'persona') {
     // La persona que decide: habla por el chat y su personaje lo dice desde Dirección.
-    const p = fichas.get('persona:direccion'); if (p) decir(p, ev.texto);
+    const esDecision = decisionPendiente && (ev.decision || !/@|[¿?]/.test(ev.texto));   // la respuesta a la propuesta, no una consulta a un agente
+    const p = fichas.get('persona:direccion'); if (p) decir(p, ev.texto, esDecision ? 'decision' : 'msg');
     chatAgregar({ clave: ev.id, autor: CONFIG.personas.nombre, texto: ev.texto, hora: transcurrido(ev.t), t: ev.t, persona: true, decision: decisionPendiente });
+    if (esDecision && !silencioso) { $('capa').classList.add('decidido'); $('cartel-decision').textContent = 'Decidido'; programar(2600, () => { $('capa').classList.remove('decidido'); $('cartel-decision').textContent = 'Pendiente de tu revisión'; }); }
     esperarDecision(false);
     return;
   }
   const f = fichas.get(ev.quien) || ofi.agregar(ev.quien, { nombre: ev.quien.replace('agente:', 'Agente '), casa: 'pasillo' });
-  if (ev.tipo === 'inicio') { f.trabajando = true; return; }
+  if (ev.tipo === 'inicio') { f.trabajando = true; trazas.set(ev.quien, []); return; }
   if (ev.tipo === 'fin') { f.trabajando = false; if (silencioso) ofi.ir(f, f.casa); else programar(2800, () => { if (!f.trabajando) ofi.ir(f, f.casa); }); return; }
-  if (ev.tipo === 'herramienta') { const h = completarHerramienta(ev); if (h.lugar) ofi.ir(f, h.lugar); decir(f, h.texto, 'tool'); return; }
+  if (ev.tipo === 'herramienta') { const h = completarHerramienta(ev); if (h.lugar) ofi.ir(f, h.lugar); if (h.lugar) (trazas.get(ev.quien) || trazas.set(ev.quien, []).get(ev.quien)).push(h.texto); decir(f, h.texto, 'tool'); return; }
   if (ev.tipo === 'piensa') { decir(f, ev.texto, 'tool'); return; }
   if (ev.tipo === 'dice') {
     const destinos = ev.a || [];
     const agentes = destinos.filter(esAgente), personas = destinos.filter(esPersona);
-    decir(f, ev.texto);
-    chatAgregar({ clave: ev.id, autor: f.nombre, texto: ev.texto, hora: transcurrido(ev.t), t: ev.t });
+    const marca = ev.marca || marcaDe(ev.texto);
+    decir(f, esPropuesta(ev.texto) ? primeraLinea(ev.texto) : ev.texto, marca || 'msg');   // la propuesta entera va al panel; el globo dice solo el título; el "no" y el "no sé" llevan marco
+    const alHilo = personas.length || agentes.includes('coordinacion');   // la traza va con la respuesta al hilo, no con un aviso lateral
+    const herramientas = alHilo && trazas.get(ev.quien) && trazas.get(ev.quien).length ? trazas.get(ev.quien).splice(0) : undefined;
+    chatAgregar({ clave: ev.id, autor: f.nombre, texto: ev.texto, hora: transcurrido(ev.t), t: ev.t, verificacion: ev.verificacion || null, marca, herramientas });
     if (personas.length) {
       ofi.ir(f, CONFIG.personas.casa);   // va a presentar al despacho de Dirección
       if (esPropuesta(ev.texto)) { fijado = hilo.mensajes[hilo.mensajes.length - 1]; esperarDecision(true); }
@@ -635,7 +889,8 @@ function aplicar(ev) {
 
 function reiniciar() {
   if (ofi) ofi.quitarTodos();
-  chatLimpiar(); seg.reiniciar(); tInicio = null; tablero.reiniciar(); tabReiniciar(); dibujarObjetivo();
+  chatLimpiar(); seg.reiniciar(); tInicio = null; tablero.reiniciar(); tabReiniciar(); dibujarObjetivo(); trazas.clear();
+  for (const p of papeles.values()) p.el.remove(); papeles.clear();
   $('capa').querySelectorAll('.pj').forEach((n) => n.remove()); etiquetas.clear();
   fichas = ofi.personajes; pendientes = []; temporizadores = []; indice = 0; reloj = 0;
   esperarDecision(false);
@@ -664,6 +919,7 @@ function actualizarEstado() {
   { const c = $('chat-estado'); c.className = modoVivo && !textoEstado ? 'vivo' : ''; c.textContent = t; }
   $('btn-vivo').classList.toggle('on', modoVivo); $('btn-grab').classList.toggle('on', !modoVivo);
   for (const id of ['btn-prev', 'btn-play', 'btn-next', 'velocidad']) $(id).disabled = modoVivo;
+  $('ajustes').classList.toggle('vivo', modoVivo);
   const cerrado = seg.actual && seg.actual.estado === 'cerrado';
   $('texto').disabled = !enviarMensaje; $('texto').placeholder = '';
   for (const id of ['btn-mas', 'para', 'btn-enviar']) $(id).disabled = !enviarMensaje;
@@ -676,11 +932,15 @@ function posicionar() {
   const puestos = [];
   for (const p of fichas.values()) etiqueta(p);
   const orden = [...etiquetas].sort((a, b) => a[0].y - b[0].y);
+  const tags = [];   // rótulos ya puestos: si dos personajes quedan juntos (Admisiones visitando Dirección), el segundo baja un renglón
   for (const [p, e] of orden) {
     const sentado = p.sentado && !p.moviendo;
     const x = Math.round(p.x) * K, y = (Math.round(p.y) + (sentado ? 3 : 0)) * K;
     e.el.style.transform = `translate(${x}px, ${y}px)`;
-    e.el.style.zIndex = String(Math.round(p.y) + 1000);
+    e.el.style.zIndex = String(p.actual && p.actual.tipo === 'decision' ? 9000 : Math.round(p.y) + 1000);   // el globo de decisión, por encima de todos los rótulos
+    { const w = e.tag.offsetWidth, h = e.tag.offsetHeight, ty = y + 10 * K / 3; let fila = 0;
+      while (tags.some((q) => q.fila === fila && Math.abs(q.x - x) < (q.w + w) / 2 + 6 && Math.abs(q.y - ty) < h + 2)) fila++;
+      tags.push({ x, y: ty, w, fila }); e.tag.style.marginTop = fila ? `${fila * (h + 3)}px` : ''; }
     if (!e.bub.classList.contains('visible')) continue;
     const w = e.bub.offsetWidth, h = e.bub.offsetHeight;
     const cx0 = Math.max(w / 2 + 8, Math.min(W * K - w / 2 - 8, x));
@@ -706,7 +966,7 @@ function loop(ts) {
     avanzarHasta(reloj + dt * velocidad);
     if (indice >= eventos.length && !temporizadores.length && ![...fichas.values()].some((f) => f.actual)) { reproduciendo = false; $('btn-play').textContent = 'Otra vez'; }
   }
-  if (modoVivo) { reloj += dt; correrTemporizadores(); }
+  if (modoVivo) { reloj += dt; correrTemporizadores(); if (colaEventos.length) drenarEventos(); }
   if (ofi) { ofi.velocidad = modoVivo ? 1 : velocidad; tickGlobos(); ofi.cuadro(ts); posicionar(); actualizarTrabajando(); latirObjetivo(); }
   requestAnimationFrame(loop);
 }
@@ -724,6 +984,8 @@ $('btn-next').onclick = () => { if (modoVivo) return; setPlay(false); if (indice
 $('btn-prev').onclick = () => { if (modoVivo) return; setPlay(false); irAlPaso(indice - 2); };
 $('velocidad').onchange = (e) => { velocidad = Number(e.target.value); };
 $('btn-tema').onclick = () => aplicarTema(tema === 'oscuro' ? 'claro' : 'oscuro');
+$('ritmo').onchange = (e) => fijarRitmo(e.target.value);
+{ const q = params.get('ritmo'); const guardado = (() => { try { return localStorage.getItem('ritmo'); } catch { return null; } })(); fijarRitmo(q != null ? ({ normal: 0, pausado: 4000, lento: 7000, 'muy-lento': 11000 }[q] ?? q) : guardado ?? 0, false); }   // ?ritmo=pausado o lo guardado
 $('btn-reiniciar').onclick = async () => {
   if (!modoVivo) { irAlPaso(-1); return; }
   if (!confirm('¿Sesión nueva? Se borra la corrida actual y los agentes arrancan de cero.')) return;
@@ -767,13 +1029,17 @@ function llenarPara() {
 // Atajos del guion (stage/atajos.json): llenan la caja, no envían; quien decide lee y aprieta Enter.
 let ATAJOS = [];
 async function cargarAtajos() {
-  try { ATAJOS = (await (await fetch('atajos.json', { cache: 'no-store' })).json()).atajos || []; } catch { ATAJOS = []; }
-  const m = $('atajos'); m.replaceChildren(); m.appendChild(el_('div', 'tit', 'Atajos del guion'));
+  let sesiones = [];
+  try { const d = await (await fetch('atajos.json', { cache: 'no-store' })).json(); sesiones = d.sesiones || [{ titulo: 'Atajos del guion', atajos: d.atajos || [] }]; ATAJOS = sesiones.flatMap((x) => x.atajos); } catch { ATAJOS = []; }
+  const m = $('atajos'); m.replaceChildren();
   if (!seg.actual) dibujarObjetivo();
-  for (const a of ATAJOS) {
-    const b = el_('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.append(a.titulo); if (a.detalle) b.appendChild(el_('small', null, a.detalle));
-    b.onclick = () => { cajaTexto.value = a.texto; ajustarCaja(); $('para').value = ''; cerrarAtajos(); cajaTexto.focus(); };
-    m.appendChild(b);
+  for (const ses of sesiones) {   // tres sesiones grabables, cada una con sus actos; la primera es la de la charla
+    m.appendChild(el_('div', 'tit', ses.titulo));
+    for (const a of ses.atajos) {
+      const b = el_('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.append(a.titulo); if (a.detalle) b.appendChild(el_('small', null, a.detalle));
+      b.onclick = () => { cajaTexto.value = a.texto; ajustarCaja(); $('para').value = ''; cerrarAtajos(); cajaTexto.focus(); };
+      m.appendChild(b);
+    }
   }
 }
 function cerrarAtajos() { $('atajos').classList.remove('abierto'); $('btn-mas').classList.remove('abierto'); $('btn-mas').textContent = '+'; $('btn-mas').setAttribute('aria-expanded', 'false'); }
@@ -783,11 +1049,12 @@ document.addEventListener('pointerdown', (e) => { if (!$('compositor').contains(
 // El chat se puede esconder del todo (tecla c, botón Chat, ?chat=0): la escuela ocupa el 100 %. La pestaña del borde lo vuelve a abrir.
 function chatVisible(on) {
   const esc = $('escenario'); esc.classList.toggle('sin-chat', !on);
-  $('btn-chat').classList.toggle('on', !!on);
+  $('btn-chat').classList.toggle('on', !!on); $('v-chat').classList.toggle('on', !!on);
   try { localStorage.setItem('chatOculto', on ? '0' : '1'); } catch {}
   escalar(); if (on) chatDibujar(false);
 }
 $('btn-chat').onclick = () => chatVisible($('escenario').classList.contains('sin-chat'));
+$('v-chat').onclick = () => $('btn-chat').click();
 $('pestana').onclick = () => chatVisible(true);
 // Ancho del chat: se arrastra la manija del borde (o [ y ]); la escuela ocupa el resto.
 let anchoActual = 0;
@@ -800,19 +1067,22 @@ $('manija').addEventListener('pointerdown', (e) => {
   $('manija').addEventListener('pointermove', mover); $('manija').addEventListener('pointerup', soltar);
 });
 // Escuela ↔ Organigrama ↔ Tablero: las otras dos vistas viven en iframes encima; cambiar de vista no corta la conexión.
-const VISTAS = { org: { iframe: 'org', boton: 'v-org', src: () => 'organigrama.html?embebido=1&tema=' + tema + '&nombre=' + encodeURIComponent(CONFIG.personas.nombre || '') }, tab: { iframe: 'tab', boton: 'v-tab', src: () => 'tablero.html?embebido=1&tema=' + tema } };
-function vista(cual) {   // 'escuela' | 'org' | 'tab'
+const VISTAS = { org: { iframe: 'org', boton: 'v-org', src: () => 'organigrama.html?embebido=1&tema=' + tema + '&nombre=' + encodeURIComponent(CONFIG.personas.nombre || '') }, tab: { iframe: 'tab', boton: 'v-tab', src: () => 'tablero.html?embebido=1&tema=' + tema + '&nombre=' + encodeURIComponent(CONFIG.personas.nombre || '') }, agn: { iframe: 'agn', boton: 'v-org', src: () => 'agente.html?embebido=1&tema=' + tema } };
+function vista(cual, extra) {   // 'escuela' | 'org' | 'tab' | 'agn' (la ficha de un agente: extra = su id)
   for (const [k, v] of Object.entries(VISTAS)) {
     const f = $(v.iframe), ab = cual === k;
-    if (ab && !f.getAttribute('src')) f.src = v.src();
-    f.classList.toggle('abierto', ab); $(v.boton).classList.toggle('on', ab);
+    if (ab && !f.getAttribute('src')) f.src = v.src() + (k === 'agn' && extra ? '&id=' + encodeURIComponent(extra) : '');
+    else if (ab && k === 'agn' && extra && f.contentWindow) f.contentWindow.postMessage({ tipo: 'agente', id: extra }, '*');
+    f.classList.toggle('abierto', ab); $(v.boton).classList.toggle('on', ab || (k === 'org' && cual === 'agn'));
     if (ab) f.focus();
   }
   $('v-escuela').classList.toggle('on', cual === 'escuela'); if (cual === 'escuela') window.focus();
 }
+/** La ficha de un agente (agente.html): qué es, qué herramientas tiene y qué se le pide. Solo lectura. */
+const verAgente = (id) => { if (id && id !== 'persona' && !String(id).startsWith('persona:')) vista('agn', id); };
 const vistaAbierta = () => Object.entries(VISTAS).find(([, v]) => $(v.iframe).classList.contains('abierto'))?.[0] || 'escuela';
 $('v-org').onclick = () => vista('org'); $('v-tab').onclick = () => vista('tab'); $('v-escuela').onclick = () => vista('escuela');
-const porHash = () => { if (location.hash === '#organigrama') vista('org'); if (location.hash === '#tablero') vista('tab'); };
+const porHash = () => { if (location.hash === '#organigrama') vista('org'); if (location.hash === '#tablero') vista('tab'); const m = location.hash.match(/^#agente(?:=|-)(\w+)/); if (m) verAgente(m[1]); };
 porHash(); addEventListener('hashchange', porHash);
 // El Tablero recibe los eventos `tarea` (en vivo o de la grabación) y, al abrirse, todos los que ya pasaron
 const tabEventos = [];
@@ -821,7 +1091,10 @@ function tabReiniciar() { tabEventos.length = 0; tabPost({ tipo: 'tablero', rein
 addEventListener('message', (e) => {
   const d = e.data;
   if (d === 'cerrar-org') vista('escuela');
+  else if (d && d.tipo === 'chat') $('btn-chat').click();   // tecla c desde el organigrama o el Tablero
+  else if (d && d.tipo === 'pantalla') { if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
   else if (d && d.tipo === 'vista') vista(d.cual);
+  else if (d && d.tipo === 'agente') verAgente(d.id);   // clic en una tarjeta del organigrama
   else if (d && d.tipo === 'tema' && d.tema !== tema) aplicarTema(d.tema);
   else if (d && d.tipo === 'tablero-listo') tabPost({ tipo: 'tablero', reiniciar: true, eventos: tabEventos, vivo: modoVivo && !!enviarMensaje });
 });
@@ -829,10 +1102,28 @@ $('btn-grab').onclick = () => { desconectar(); cargarGrabacion(); };
 $('corridas').onchange = (e) => { desconectar(); cargarGrabacion(e.target.value); };
 $('btn-vivo').onclick = () => { huboConexion = true; conectar(); };
 let ocultar = null;
-addEventListener('mousemove', () => { $('barra').classList.add('visible'); $('vistas').classList.add('visible'); document.body.style.cursor = 'default'; clearTimeout(ocultar); ocultar = setTimeout(() => { $('barra').classList.remove('visible'); $('vistas').classList.remove('visible'); document.body.style.cursor = 'none'; }, 2500); });
+addEventListener('mousemove', () => { document.body.style.cursor = 'default'; document.body.classList.remove('quieto'); clearTimeout(ocultar); ocultar = setTimeout(() => { if ($('ajustes').hidden) { document.body.style.cursor = 'none'; document.body.classList.add('quieto'); } }, 2500); });
+document.body.classList.add('quieto');   // hasta que se mueva el mouse, la barra está apagada
+// El menú de ajustes, desde el perfil de quien decide
+function ajustes(abrir) {
+  const m = $('ajustes'), ab = abrir === undefined ? m.hidden : abrir;
+  m.hidden = !ab; $('perfil').classList.toggle('abierto', ab); $('arriba').classList.toggle('abierto', ab); $('perfil').setAttribute('aria-expanded', String(ab));
+  if (ab) { $('nombre-director').value = CONFIG.personas.nombre; $('nombre-director').focus(); $('nombre-director').select(); }
+}
+$('perfil').onclick = () => ajustes();
+document.addEventListener('pointerdown', (e) => { if (!$('ajustes').hidden && !e.target.closest('#ajustes, #perfil')) ajustes(false); });
+$('form-nombre').onsubmit = async (e) => {
+  e.preventDefault(); const n = $('nombre-director').value.trim().replace(/\s+/g, ' ').slice(0, 40); if (!n) return;
+  try { localStorage.setItem('nombreDirector', n); } catch {}
+  if (modoVivo && enviarMensaje) {   // en vivo, el servidor es la fuente: firma los mensajes y se lo dice a los agentes
+    try { const r = await fetch('/api/persona', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nombre: n }) }); if (!r.ok) throw new Error((await r.json()).error || 'No se pudo.'); } catch (err) { aviso(err.message); return; }
+  }
+  nombrarPersona(n); ajustes(false);
+};
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) { e.preventDefault(); $('texto').focus(); return; }
   if (e.key === 'Escape' && $('atajos').classList.contains('abierto')) { cerrarAtajos(); cajaTexto.focus(); return; }
+  if (e.key === 'Escape' && !$('ajustes').hidden) { ajustes(false); $('perfil').focus(); return; }   // antes del filtro de campos: el foco suele estar en el nombre
   if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.closest('#atajos, .tarjeta')) return;
   if (e.key === '[') anchoChat((anchoActual || $('chat').offsetWidth) - 20);
   if (e.key === ']') anchoChat((anchoActual || $('chat').offsetWidth) + 20);
@@ -847,7 +1138,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'c') $('btn-chat').click();
   if (e.key === 'o') vista(vistaAbierta() === 'org' ? 'escuela' : 'org');
   if (e.key === 'b') vista(vistaAbierta() === 'tab' ? 'escuela' : 'tab');
-  if (e.key === 'Escape') vista('escuela');
+  if (e.key === 'Escape') { if (!$('ajustes').hidden) ajustes(false); else vista('escuela'); }
   if (e.key === 'f') document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
 });
 // Arrastrar un JSON a la ventana: reproduce esa corrida (formato de stage/corridas/*.eventos.json)
@@ -874,7 +1165,7 @@ function escalar() {
   const m = document.getElementById('martina'); if (m && MARTINA) { m.style.left = MARTINA.x * K + 'px'; m.style.top = (MARTINA.y + 4) * K + 'px'; }
   const cd = document.getElementById('cartel-decision'); if (cd && DECISION) { cd.style.left = DECISION.x * K + 'px'; cd.style.top = DECISION.y * K + 'px'; }
 }
-addEventListener('resize', () => { escalar(); chatDibujar(false); }); escalar(); chatDibujar(false);
+addEventListener('resize', () => { escalar(); chatDibujar(false); posicionarPapeles(); }); escalar(); chatDibujar(false);
 if (document.fonts) document.fonts.ready.then(() => chatDibujar(false));   // con las fuentes cargadas el texto mide distinto
 
 // ── En vivo: el servidor de la escuela (servidor/), por SSE ──────────────────
@@ -890,35 +1181,52 @@ function enviarAlServidor(texto, decision = null) {
 }
 // Repone de golpe lo que ya pasó: posiciones y chat, sin globos ni caminatas.
 function cargarSnapshot(lista) {
-  reiniciar(); eventos = lista.map(completarHerramienta).sort((a, b) => a.t - b.t);
+  reiniciar(); colaEventos = []; eventos = lista.map(completarHerramienta).sort((a, b) => a.t - b.t);
   silencioso = true; ofi.instantaneo = true;
   for (const ev of eventos) { reloj = ev.t; aplicar(ev); }
   ofi.instantaneo = false; silencioso = false; indice = eventos.length;
   chatDibujar(false); dibujarObjetivo(); tabPost({ tipo: 'tablero', reiniciar: true, eventos: tabEventos, vivo: modoVivo && !!enviarMensaje });
 }
+// El ritmo: en vivo, la vista puede retener los mensajes de los agentes para que la sala los lea y quien narra explique.
+// Los eventos llegan del servidor y entran a `eventos` enseguida (así los repartos triples se reconocen), pero se aplican
+// en orden desde una cola que no suelta un `dice` hasta que pasaron `ritmoMs` desde el anterior. La persona no espera.
+function fijarRitmo(ms, guardar = true) {
+  ritmoMs = Math.max(0, Number(ms) || 0); const sel = $('ritmo'); if (sel && sel.value !== String(ritmoMs)) sel.value = String(ritmoMs);
+  if (guardar) { try { localStorage.setItem('ritmo', String(ritmoMs)); } catch {} }
+  if (!ritmoMs) drenarEventos();
+}
+function drenarEventos() {
+  while (colaEventos.length) {
+    const ev = colaEventos[0];
+    if (ev.tipo === 'dice' && ritmoMs > 0 && reloj - ultimoDiceEn < ritmoMs) return;   // todavía no: que se lea el anterior
+    colaEventos.shift(); aplicar(ev);
+    if (ev.tipo === 'dice') ultimoDiceEn = reloj;
+  }
+}
 function recibir(lista) {
-  const nuevos = (Array.isArray(lista) ? lista : [lista]).map(completarHerramienta);
-  for (const n of nuevos) eventos.push(n);
+  const nuevos = (Array.isArray(lista) ? lista : [lista]).map(completarHerramienta).sort((x, y) => x.t - y.t);
+  for (const n of nuevos) { eventos.push(n); colaEventos.push(n); }
   eventos.sort((x, y) => x.t - y.t);
-  for (const n of nuevos.sort((x, y) => x.t - y.t)) aplicar(n);
   indice = eventos.length;
+  drenarEventos();
 }
 function conectar() {
   desconectar(); deseaVivo = true;
-  setPlay(false); eventos = []; reiniciar(); modoVivo = true; reloj = 0;
+  setPlay(false); eventos = []; colaEventos = []; ultimoDiceEn = -Infinity; reiniciar(); modoVivo = true; reloj = 0;
   textoEstado = 'Conectando…'; actualizarEstado();
-  $('btn-play').textContent = 'En vivo';
   const s = es = new EventSource('/api/eventos');
   let abierto = false;
   s.addEventListener('estado', (e) => {
     let d = {}; try { d = JSON.parse(e.data); } catch {}
     abierto = huboConexion = true; textoEstado = '';
-    if (d.persona && !params.get('nombre')) nombrarPersona(d.persona);   // el nombre lo manda el servidor (ESCUELA_DIRECTOR), salvo ?nombre=
+    const elegido = nombreElegido();
+    if (elegido && d.persona !== elegido) fetch('/api/persona', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nombre: elegido }) }).catch(() => {});   // el elegido acá manda; el servidor se alinea
+    else if (d.persona) nombrarPersona(d.persona);   // si no, el nombre lo manda el servidor (ESCUELA_DIRECTOR)
     enviarMensaje = enviarAlServidor; actualizarEstado();
   });
   s.addEventListener('snapshot', (e) => { try { cargarSnapshot(JSON.parse(e.data).eventos || []); } catch (err) { console.error(err); } });
   s.addEventListener('eventos', (e) => { try { recibir(JSON.parse(e.data)); } catch (err) { console.error(err); } });
-  s.addEventListener('reinicio', () => { eventos = []; reiniciar(); aviso('Sesión nueva.'); });
+  s.addEventListener('reinicio', () => { eventos = []; colaEventos = []; ultimoDiceEn = -Infinity; reiniciar(); aviso('Sesión nueva.'); });
   s.onerror = () => {
     if (es !== s) return;
     if (!abierto && !huboConexion) { s.close(); es = null; falla('No hay servidor: se reproduce la grabación.'); return; }
@@ -940,7 +1248,7 @@ async function cargarIndiceCorridas() {
   sel.hidden = !(indiceCorridas.corridas || []).length;
 }
 async function cargarGrabacion(archivo) {
-  const q = archivo ? 'corridas/' + archivo : params.get('corrida') || (indiceCorridas.predeterminada ? 'corridas/' + indiceCorridas.predeterminada : 'corridas/2026-10-12-primer-anio-en-riesgo.eventos.json');
+  const q = archivo ? 'corridas/' + archivo : params.get('corrida') || (indiceCorridas.predeterminada ? 'corridas/' + indiceCorridas.predeterminada : 'corridas/2026-10-22-martina-riesgo-antes-del-parcial.eventos.json');
   const data = await (await fetch(q)).json();
   const sel = $('corridas'); if ([...sel.options].some((o) => 'corridas/' + o.value === q)) sel.value = q.replace(/^corridas\//, '');
   modoVivo = false; textoEstado = ''; cargarEventos(data.eventos);
@@ -953,13 +1261,14 @@ async function cargarGrabacion(archivo) {
 // ?corrida=… o ?paso=N, arranca con la corrida grabada.
 try {
   CONFIG = await (await fetch('agentes.json')).json();
-  if (params.get('nombre')) CONFIG.personas.nombre = params.get('nombre').trim().slice(0, 40);   // ?nombre=Greyla: quién es la persona que decide
+  { const n = nombreElegido(); if (n) CONFIG.personas.nombre = n; }   // ?nombre=Greyla o el guardado en el perfil: quién es la persona que decide
   llenarPara(); cargarAtajos();
   await cargarIndiceCorridas();
   ofi = await crearOficina($('lienzo')); ofi.tema(tema);
+  $('perfil-cara').src = urlDeCara(null); $('perfil-nombre').textContent = CONFIG.personas.nombre;
   for (const t of CARTELES) { const c = document.createElement('div'); c.className = 'sala-cartel'; c.textContent = t.texto; c.dataset.x = t.x; c.dataset.y = t.y; $('capa').appendChild(c); }
   const m = document.createElement('div'); m.id = 'martina'; m.className = 'tag martina px'; m.textContent = 'Martina'; $('capa').appendChild(m);
-  const cd = document.createElement('div'); cd.id = 'cartel-decision'; cd.className = 'px'; cd.textContent = 'Esperando tu decisión'; $('capa').appendChild(cd);
+  const cd = document.createElement('div'); cd.id = 'cartel-decision'; cd.className = 'px'; cd.textContent = 'Pendiente de tu revisión'; $('capa').appendChild(cd);
   { let oculto = params.get('chat') === '0'; try { if (!params.has('chat') && localStorage.getItem('chatOculto') === '1') oculto = true; } catch {} chatVisible(!oculto); }
   escalar();
   reiniciar();

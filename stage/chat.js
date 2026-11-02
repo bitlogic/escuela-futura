@@ -4,7 +4,7 @@
 
 const MENCION = /(@[A-Za-zÁÉÍÓÚáéíóúñÑ]+(?: [A-ZÁÉÍÓÚ][a-záéíóúñ]+)?)/;
 // Lo que los agentes ponen al principio de una línea con dos puntos y no es un nombre de estudiante.
-const ROTULOS = ['traducción', 'traduccion', 'pendiente', 'propuesta para decidir', 'propuesta', 'borrador', 'para quién', 'para quien', 'cómo', 'como', 'módulos', 'modulos', 'falta validar', 'idea', 'nota', 'resumen'];
+const ROTULOS = ['pendiente', 'propuesta para decidir', 'propuesta', 'borrador', 'para quién', 'para quien', 'cómo', 'como', 'módulos', 'modulos', 'falta validar', 'idea', 'nota', 'resumen', 'riesgo de equivocarnos', 'si nos equivocamos', 'riesgo'];
 // "Martina R.", "Lucía P.", "Tomás", "Joaquín M." y también "Con lo de Advisor, cambio" (hasta 3 palabras antes de los dos puntos).
 const FICHA = /^(?:Me preocupa |Me preocupan )?([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?: [A-ZÁÉÍÓÚÑ]\.?| [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,2}):\s+(.*\S)\s*$/;   // "Me preocupa Joaquín: …" también es una ficha
 
@@ -28,14 +28,19 @@ export function destinatario(texto) {
 /** "riesgo alto" / "riesgo medio" / "riesgo bajo" dentro de una línea, o null. */
 export function riesgoDe(texto) { const m = String(texto || '').match(/riesgo\s+(alto|medio|bajo)/i); return m ? m[1].toLowerCase() : null; }
 
-/** El nombre con que arranca un caso numerado ("Martina R., riesgo alto: …" → "Martina R."), o null. */
-export function nombreDeCaso(texto) { const m = String(texto || '').match(/^([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?: [A-ZÁÉÍÓÚÑ]\.?| [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,2})\s*[,:.]/); return m ? m[1] : null; }
+/** El nombre con que arranca un caso numerado ("Martina R., riesgo alto: …" → "Martina R."), o null.
+ * Un caso también puede ser una cosa y no una persona ("Antes de cada parcial: …", la rutina que propone Coordinación): una frase corta hasta los dos puntos. */
+export function nombreDeCaso(texto) {
+  const t = String(texto || '');
+  const m = t.match(/^([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?: [A-ZÁÉÍÓÚÑ]\.?| [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,2})\s*[,:.]/); if (m) return m[1];
+  const f = t.match(/^([A-ZÁÉÍÓÚÑ][^,:.;]{2,48}?):\s/); return f ? f[1].trim() : null;
+}
 
 /**
  * Ordena el texto en bloques que la vista dibuja distinto:
  *  - { tipo: 'p', texto }                       párrafo
  *  - { tipo: 'ficha', nombre, texto, riesgo }    una línea por estudiante ("Martina: 2 de 10 clases, riesgo alto")
- *  - { tipo: 'rotulo', rotulo, texto }           "Traducción: …", "Pendiente: …", "Borrador: …"
+ *  - { tipo: 'rotulo', rotulo, texto }           "Pendiente: …", "Nota: …", "Borrador: …"
  *  - { tipo: 'item', n, texto, nombre, riesgo }  caso numerado ("1. Martina R., riesgo alto: …")
  *  - { tipo: 'detalle', texto }                  línea sangrada o con viñeta que sigue a un caso
  */
@@ -67,17 +72,28 @@ export function primeraLinea(texto) {
   return l.replace(/^\s*(\d+[.)]|[-•*])\s+/, '').replace(/^(@[A-Za-zÁÉÍÓÚáéíóúñÑ]+[,\s]*)+/, '').trim();
 }
 
+/** Los dos momentos de honestidad de la demo, detectados en el texto: 'limite' ("Eso no lo puedo hacer yo…") y 'no_se' ("No lo sé…"), o null.
+ * El servidor la manda en el evento `dice` como `marca`; la vista la calcula si una grabación vieja no la trae. */
+export function marcaDe(texto) {
+  const t = limpiar(texto).replace(/^(@[A-Za-zÁÉÍÓÚáéíóúñÑ]+[,\s]*)+/, '');
+  if (/^eso no (lo )?puedo hacer yo|^no (lo )?puedo (hacer|firmar|eximir|habilitar)|no lo hago (yo )?ni lo simulo/i.test(t)) return 'limite';
+  if (/^no (lo )?s[eé](?=[\s.,:;!]|$)|^los datos no (lo )?dicen/i.test(t)) return 'no_se';   // sin \b: la é no es "palabra" para la expresión regular
+  return null;
+}
+export const TEXTO_MARCA = { limite: 'No lo hace: lo firma una persona', no_se: 'Lo que los datos no dicen' };
+
 /** ¿Es la propuesta de Coordinación, la que espera una decisión? */
 export function esPropuesta(texto) { return /^\W*propuesta|para decidir|¿aprob|aprobás, editás/i.test(limpiar(texto)); }
 
 /**
  * La propuesta como datos para la tarjeta de decisión:
- * { titulo, casos: [{ n, nombre, riesgo, texto }], notas, pendiente, pregunta }. Sin casos numerados devuelve casos: [].
+ * { titulo, casos: [{ n, nombre, riesgo, texto }], notas, riesgoPropio, pendiente, pregunta }. Sin casos numerados devuelve casos: [].
  * `notas` son las líneas sueltas después de los casos ("Nota: …", "Lo de Advisor cambia el orden…"): la tarjeta las muestra, no las pierde.
+ * `riesgoPropio` es la línea "Riesgo de equivocarnos: …": la objeción de Coordinación a su propia propuesta (el abogado del diablo).
  */
 export function propuesta(texto) {
   const { resto } = destinatario(texto);
-  const out = { titulo: '', casos: [], notas: [], pendiente: '', pregunta: '' };
+  const out = { titulo: '', casos: [], notas: [], riesgoPropio: '', pendiente: '', pregunta: '' };
   for (const b of bloques(resto)) {
     if (b.tipo === 'item') out.casos.push({ n: b.n, nombre: b.nombre || `Caso ${b.n}`, riesgo: b.riesgo, texto: b.texto, acciones: [] });
     else if (b.tipo === 'detalle' && out.casos.length) {
@@ -88,6 +104,7 @@ export function propuesta(texto) {
     else if (b.tipo === 'rotulo' && /propuesta/i.test(b.rotulo)) out.titulo = b.texto;
     else if (!out.casos.length && !out.titulo) out.titulo = b.texto.replace(/^propuesta para decidir:?\s*/i, '');
     else if (b.tipo === 'rotulo' && /^nota$/i.test(b.rotulo)) out.notas.push(b.texto);
+    else if (b.tipo === 'rotulo' && /^(riesgo|si nos equivocamos)/i.test(b.rotulo)) out.riesgoPropio = b.texto;
     else { const [p, q] = partirPregunta(b.texto); if (q) { out.pregunta = q; if (p && !out.pendiente) out.pendiente = p; else if (p) out.notas.push(p); } else if (p) out.notas.push(p); }
   }
   for (const c of out.casos) {   // sin línea "Acciones:", la última oración "plan de pagos, Secretaría; llamada, Bienestar." también vale
@@ -131,7 +148,7 @@ export function redactarDecision(casos, decisiones) {
     c.acciones.forEach((a, i) => { const e = d.acciones[i]; if (e === 'si') si.push(a.texto); else if (e === 'yo') yo.push(a.texto); else if (e === 'no') no.push(a.texto); });
     const frases = [];
     if (si.length) frases.push(`${mayus(lista(si))}, sí`);
-    for (const a of yo) frases.push(`${mayus(a)}: ${art(a)} hago yo`);
+    for (const a of yo) frases.push(`${art(a) === 'la' ? 'La' : 'El'} ${a} ${art(a)} hago yo`);   // "La llamada la hago yo": sin dos puntos, que el chat no lo lea como ficha
     if (no.length) frases.push(`${mayus(lista(no))}, no`);
     const nota = String(d.nota || '').trim().replace(/[.\s]+$/, '');
     if (nota) frases.push(mayus(nota));

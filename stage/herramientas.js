@@ -16,6 +16,7 @@ export const HERRAMIENTA_LUGAR = {
   ver_oferta_academica: 'academia',
   ver_demanda_formativa: 'academia',
   proponer_tarea: null,     // las del Tablero no mueven al personaje
+  entregar_tarea: null,
   revisar_tarea: null,
 };
 
@@ -28,11 +29,12 @@ export const HERRAMIENTA_TEXTO = {
   ver_uso_tutor: 'Reviso las consultas al tutor',
   ver_notas: 'Reviso las notas',
   ver_situacion_administrativa: 'Reviso inscripciones y pagos',
-  ver_ingresantes: 'Reviso cómo ingresó',
+  ver_ingresantes: 'Reviso la ficha de ingreso',
   ver_aspirantes: 'Reviso los aspirantes',
   ver_oferta_academica: 'Reviso la oferta académica',
   ver_demanda_formativa: 'Reviso qué se está pidiendo',
   proponer_tarea: 'Anoto una acción en el Tablero',
+  entregar_tarea: 'Entrego mi acción del Tablero',
   revisar_tarea: 'Reviso una acción del Tablero',
 };
 
@@ -48,7 +50,7 @@ export function argHerramienta(input) {
   return '';
 }
 /** Texto del globo de una herramienta con sus argumentos. */
-export const textoHerramienta = (nombre, input) => { if (nombre === 'proponer_tarea' || nombre === 'revisar_tarea') return HERRAMIENTA_TEXTO[nombre] + (input && input.accion ? ': ' + input.accion : ''); const a = argHerramienta(input); return (HERRAMIENTA_TEXTO[nombre] || nombre) + (a ? ' de ' + a : ''); };
+export const textoHerramienta = (nombre, input) => { if (nombre === 'proponer_tarea' || nombre === 'entregar_tarea' || nombre === 'revisar_tarea') return HERRAMIENTA_TEXTO[nombre] + (input && input.accion ? ': ' + input.accion : ''); const a = argHerramienta(input); return (HERRAMIENTA_TEXTO[nombre] || nombre) + (a ? ' de ' + a : ''); };
 
 /** Completa un evento `herramienta` que venga sin `lugar` o `texto` (p. ej. de una corrida vieja). */
 export function completarHerramienta(ev) {

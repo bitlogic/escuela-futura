@@ -73,7 +73,7 @@ export const TOOLS = [
     name: 'ver_aspirantes',
     description: 'Aspirantes en curso para la próxima cohorte. Para Admisiones.',
     inputSchema: { type: 'object', properties: {} },
-    run: (db) => ({ aspirantes: db.aspirantes }),
+    run: (db) => ({ hoy: db.hoy, inscripcion_2027: db.inscripcion_2027 || null, aspirantes: db.aspirantes }),
   },
   {
     name: 'ver_oferta_academica',
@@ -85,7 +85,7 @@ export const TOOLS = [
     name: 'ver_demanda_formativa',
     description: 'Temas que piden aspirantes, estudiantes, docentes y empresas, con la señal que los sostiene. Para Academia.',
     inputSchema: { type: 'object', properties: {} },
-    run: (db) => ({ hoy: db.hoy, demanda: db.demanda }),
+    run: (db) => ({ hoy: db.hoy, demanda: db.demanda, detalle: db.demanda_detalle || null }),
   },
 ];
 

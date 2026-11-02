@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { crearSeguimiento, actividadDe, palabraDe, planDe } from './seguimiento.js';
+import { crearSeguimiento, actividadDe, palabraDe, planDe, tipoDeDecision } from './seguimiento.js';
 import { esPropuesta, propuesta } from './chat.js';
 
 const ids = { coordinacion: 'coordinacion', bienestar: 'bienestar', tutor: 'tutor', advisor: 'advisor' };
@@ -25,21 +25,23 @@ test('un objetivo deja un registro de actividad y, al cerrarse, el ciclo de vida
   s.aplicar({ t: 7500, tipo: 'fin', quien: 'coordinacion' });
   a = act(s, 8000); assert.equal(a.items[1].texto, 'Coordinación repartió el trabajo a Bienestar y Tutor'); assert.equal(a.items[1].t, '0:07'); assert.equal(a.items.length, 2);
   s.aplicar({ t: 9000, tipo: 'inicio', quien: 'bienestar' }); s.aplicar({ t: 9000, tipo: 'inicio', quien: 'tutor' });
-  assert.equal(act(s, 9100).badge.texto, 'Trabajando: Bienestar, Tutor');
-  s.aplicar({ t: 9000, tipo: 'inicio', quien: 'advisor' }); assert.equal(act(s, 9100).badge.texto, 'Trabajando: 3 agentes'); s.aplicar({ t: 9001, tipo: 'fin', quien: 'advisor' });
+  assert.equal(act(s, 9100).badge.texto, 'Analizando');
+  s.aplicar({ t: 9000, tipo: 'inicio', quien: 'advisor' }); assert.deepEqual(act(s, 9100).trabajando, ['Bienestar', 'Tutor', 'Advisor']); s.aplicar({ t: 9001, tipo: 'fin', quien: 'advisor' });
+  s.aplicar({ t: 9000, tipo: 'inicio', quien: 'coordinacion' }); assert.equal(act(s, 9100).badge.texto, 'Analizando'); s.aplicar({ t: 9001, tipo: 'fin', quien: 'coordinacion' });   // Coordinación espera: no cuenta
   s.aplicar({ t: 30000, tipo: 'dice', quien: 'tutor', a: ['bienestar'], texto: '@Bienestar dejó el tutor' });
   s.aplicar({ t: 31000, tipo: 'dice', quien: 'tutor', a: ['coordinacion'], texto: '@Coordinación Martina: 3 de 10' }); s.aplicar({ t: 31500, tipo: 'fin', quien: 'tutor' });
   s.aplicar({ t: 36000, tipo: 'dice', quien: 'bienestar', a: ['coordinacion'], texto: 'Martina: 2 de 10' }); s.aplicar({ t: 36500, tipo: 'fin', quien: 'bienestar' });
   a = act(s, 37000); assert.deepEqual(a.items.slice(2).map((x) => x.texto), ['Tutor le avisó algo a Bienestar sin que se lo pidieran', 'Tutor respondió', 'Bienestar respondió']);
   s.aplicar({ t: 38000, tipo: 'inicio', quien: 'coordinacion' });
+  assert.equal(act(s, 38500).badge.texto, 'Preparando propuesta');
   s.aplicar({ t: 80000, tipo: 'dice', quien: 'coordinacion', a: [P], texto: '@Dirección Propuesta para decidir: x\n1. Martina R., riesgo alto: y.' }); s.aplicar({ t: 80500, tipo: 'fin', quien: 'coordinacion' });
-  a = act(s, 81000); assert.equal(s.actual.estado, 'propuesta'); assert.equal(a.badge.texto, 'Esperando tu decisión'); assert.equal(a.items[a.items.length - 1].estado, 'espera');
+  a = act(s, 81000); assert.equal(s.actual.estado, 'propuesta'); assert.equal(a.badge.texto, 'Pendiente de tu revisión'); assert.equal(a.preparacion, '1:20'); assert.equal(a.items[a.items.length - 1].estado, 'espera');
   s.aplicar({ t: 110000, tipo: 'persona', texto: 'Plan de pagos sí. La llamada la hago yo.' });
-  assert.equal(s.actual.estado, 'decidido'); assert.equal(s.pedidos.length, 1);
+  assert.equal(s.actual.estado, 'decidido'); assert.equal(s.pedidos.length, 1); assert.equal(s.actual.decisionTipo, 'ajustes'); assert.equal(act(s, 110500).badge.texto, 'Aprobada con ajustes');
   s.aplicar({ t: 111000, tipo: 'inicio', quien: 'coordinacion' });
   s.aplicar({ t: 118000, tipo: 'dice', quien: 'coordinacion', a: [P], texto: '@Dirección Martina: plan de pagos, Secretaría.' }); s.aplicar({ t: 118500, tipo: 'fin', quien: 'coordinacion' });
   a = act(s, 119000);
-  assert.equal(s.actual.estado, 'cerrado'); assert.equal(a.badge.texto, 'Objetivo cumplido en 1:58');
+  assert.equal(s.actual.estado, 'cerrado'); assert.equal(a.badge.texto, 'Aprobada con ajustes'); assert.equal(a.total, '1:58');
   assert.deepEqual(a.items.map((x) => x.t), ['0:00', '0:07', '1:20', '1:50', '1:58']);
   assert.equal(a.items[1].detalle, '2 agentes, 2 respondieron, 1 aviso entre ellos');
   assert.equal(a.items[3].detalle, 'Plan de pagos sí. La llamada la hago yo.');
@@ -55,7 +57,7 @@ test('una pregunta a un agente es un pedido aparte y queda respondida', () => {
   s.aplicar({ t: 10000, tipo: 'persona', texto: '@Advisor eximile la deuda a Martina.' });
   assert.equal(s.pedidos.length, 2); assert.ok(!s.actual.objetivo); assert.equal(s.objetivoCumplido.estado, 'cerrado');
   s.aplicar({ t: 11000, tipo: 'inicio', quien: 'advisor' });
-  assert.equal(act(s, 11100).badge.texto, 'Trabajando: Advisor'); assert.match(act(s, 11100).items[1].texto, /^Advisor revisando cuotas…$/);
+  assert.equal(act(s, 11100).badge.texto, 'Analizando'); assert.match(act(s, 11100).items[1].texto, /^Advisor revisando cuotas…$/);
   s.aplicar({ t: 15000, tipo: 'dice', quien: 'advisor', a: [P], texto: 'Eso lo decide una persona.' }); s.aplicar({ t: 15100, tipo: 'fin', quien: 'advisor' });
   const a = act(s, 16000);
   assert.equal(s.actual.estado, 'cerrado'); assert.equal(a.badge.texto, 'Respondido en 0:05'); assert.equal(a.items[1].texto, 'Advisor respondió');
@@ -80,7 +82,7 @@ test('consultar no es decidir: una pregunta durante la propuesta la deja esperan
   s.aplicar({ t: 1000, tipo: 'dice', quien: 'coordinacion', a: [P], texto: PROPUESTA });
   s.aplicar({ t: 2000, tipo: 'persona', texto: '@Bienestar ¿por qué recomendás la llamada?' });
   assert.equal(s.actual.estado, 'propuesta'); assert.equal(s.pedidos.length, 1);
-  assert.equal(act(s).badge.texto, 'Esperando tu decisión'); assert.equal(act(s).items.at(-2).texto, 'Le preguntaste a Bienestar');
+  assert.equal(act(s).badge.texto, 'Pendiente de tu revisión'); assert.equal(act(s).items.at(-2).texto, 'Le preguntaste a Bienestar');
   s.aplicar({ t: 3000, tipo: 'inicio', quien: 'bienestar' });
   s.aplicar({ t: 4000, tipo: 'dice', quien: 'bienestar', a: [P], texto: 'Porque no viene desde el 18/8.' }); s.aplicar({ t: 4100, tipo: 'fin', quien: 'bienestar' });
   assert.equal(s.actual.estado, 'propuesta'); assert.equal(act(s).items.at(-2).texto, 'Bienestar respondió');
@@ -115,4 +117,13 @@ test('la decisión estructurada de la tarjeta manda sobre el texto; sin ella, el
   assert.deepEqual(planDe(null, acc, 'Aprobado todo.', 'Alfredo').map((x) => x.estado), ['pendiente', 'pendiente', 'pendiente']);
   assert.deepEqual(planDe(null, acc, 'Plan de pagos sí. Práctica guiada no; a Martina la llamo yo.', 'Alfredo').map((x) => x.responsable + '/' + x.estado), ['Secretaría/pendiente', '/descartada', 'Alfredo/pendiente']);
   assert.equal(planDe(null, [], 'x'), null);
+});
+
+test('tipoDeDecision: aprobada, con ajustes o descartada', () => {
+  assert.equal(tipoDeDecision({ acciones: [{ estado: 'si' }, { estado: 'si' }] }), 'aprobada');
+  assert.equal(tipoDeDecision({ acciones: [{ estado: 'si' }, { estado: 'yo' }] }), 'ajustes');
+  assert.equal(tipoDeDecision({ acciones: [{ estado: 'no' }] }), 'descartada');
+  assert.equal(tipoDeDecision(null, [{ estado: 'pendiente' }], 'Todo sí.'), 'aprobada');
+  assert.equal(tipoDeDecision(null, [{ estado: 'pendiente' }], 'Plan de pagos sí. La llamada la hago yo.'), 'ajustes');
+  assert.equal(tipoDeDecision(null, [{ estado: 'descartada' }], 'No.'), 'descartada');
 });

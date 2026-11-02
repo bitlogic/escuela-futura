@@ -1,40 +1,20 @@
 {
-  "predeterminada": "2026-10-17-martina-seis-actos.eventos.json",
+  "predeterminada": "2026-10-22-martina-riesgo-antes-del-parcial.eventos.json",
   "corridas": [
     {
-      "archivo": "2026-10-17-martina-seis-actos.eventos.json",
-      "titulo": "Martina (seis actos)",
-      "fecha": "2026-10-17"
+      "archivo": "2026-10-22-martina-riesgo-antes-del-parcial.eventos.json",
+      "titulo": "Martina · riesgo antes del parcial",
+      "fecha": "2026-10-22"
     },
     {
-      "archivo": "2026-10-17-prueba2.eventos.json",
-      "titulo": "prueba2",
-      "fecha": "2026-10-17"
+      "archivo": "2026-10-22-inscripcion-2027-tres-aspirantes-en-el-aire.eventos.json",
+      "titulo": "Inscripción 2027 · tres aspirantes en el aire",
+      "fecha": "2026-10-22"
     },
     {
-      "archivo": "2026-10-16-primer-anio-en-riesgo-seis-actos.eventos.json",
-      "titulo": "Primer año en riesgo (seis actos)",
-      "fecha": "2026-10-16"
-    },
-    {
-      "archivo": "2026-10-16-prueba1.eventos.json",
-      "titulo": "prueba1",
-      "fecha": "2026-10-16"
-    },
-    {
-      "archivo": "2026-10-16-primer-anio-en-riesgo-lotes.eventos.json",
-      "titulo": "Primer año en riesgo (herramientas por lote)",
-      "fecha": "2026-10-16"
-    },
-    {
-      "archivo": "2026-10-16-primer-anio-en-riesgo.eventos.json",
-      "titulo": "Primer año en riesgo",
-      "fecha": "2026-10-16"
-    },
-    {
-      "archivo": "2026-10-12-primer-anio-en-riesgo.eventos.json",
-      "titulo": "Primer año en riesgo (Buzz)",
-      "fecha": "2026-10-12"
+      "archivo": "2026-10-22-oferta-2027-que-abrimos.eventos.json",
+      "titulo": "Oferta 2027 · qué abrimos",
+      "fecha": "2026-10-22"
     }
   ]
 }

@@ -1,0 +1,686 @@
+{
+ "origen": "servidor/escuela.mjs",
+ "generado": "2026-10-22T13:47:15.316Z",
+ "eventos": [
+  {
+   "t": 0,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "La inscripción 2027 cierra el 20/11. Fijate qué aspirantes están trabados y proponé qué hacemos con cada uno.",
+   "hora": "10:46",
+   "id": "s0-1792676767536"
+  },
+  {
+   "t": 1502,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 4246,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "Dale. Reparto y vuelvo con una propuesta.",
+   "hora": "10:46",
+   "id": "s2-1792676771783",
+   "verificacion": {
+    "datos": [],
+    "resumen": {
+     "verificados": 0,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 4246,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "admisiones"
+   ],
+   "texto": "@Admisiones Inscripción 2027: quién está trabado y por qué, con fechas.",
+   "hora": "10:46",
+   "id": "s3-1792676771783",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "2027",
+      "clave": "2027",
+      "estado": "citado"
+     }
+    ],
+    "resumen": {
+     "verificados": 0,
+     "citados": 1,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 4247,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "academia"
+   ],
+   "texto": "@Academia Inscripción 2027: cupo y becas por carrera para 2027, con números.",
+   "hora": "10:46",
+   "id": "s4-1792676771784",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "2027",
+      "clave": "2027",
+      "estado": "citado"
+     },
+     {
+      "texto": "2027",
+      "clave": "2027",
+      "estado": "citado"
+     }
+    ],
+    "resumen": {
+     "verificados": 0,
+     "citados": 2,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 5749,
+   "tipo": "inicio",
+   "quien": "admisiones"
+  },
+  {
+   "t": 5750,
+   "tipo": "inicio",
+   "quien": "academia"
+  },
+  {
+   "t": 6508,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 9472,
+   "quien": "admisiones",
+   "tipo": "herramienta",
+   "herramienta": "ver_aspirantes",
+   "lugar": "admisiones",
+   "texto": "Reviso los aspirantes"
+  },
+  {
+   "t": 11665,
+   "quien": "academia",
+   "tipo": "herramienta",
+   "herramienta": "ver_oferta_academica",
+   "lugar": "academia",
+   "texto": "Reviso la oferta académica"
+  },
+  {
+   "t": 13916,
+   "tipo": "dice",
+   "quien": "admisiones",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Ramiro B.: preguntó por beca parcial el 20/10, promedio 8,2, 16 días sin respuesta; Tecnicatura en Biotecnología.\nPaula G.: falta el título secundario legalizado desde el 24/10; Profesorado de Biología.\nEzequiel R.: pidió visitar el laboratorio el 28/10, 8 días sin respuesta; Biotecnología o Gestión Ambiental. La inscripción cierra el 20/11; hay visita guiada el 12/11.",
+   "hora": "10:46",
+   "id": "s10-1792676781453",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "20/10",
+      "clave": "20/10",
+      "estado": "verificado"
+     },
+     {
+      "texto": "8,2",
+      "clave": "8.2",
+      "estado": "verificado"
+     },
+     {
+      "texto": "16",
+      "clave": "16",
+      "estado": "derivado"
+     },
+     {
+      "texto": "24/10",
+      "clave": "24/10",
+      "estado": "verificado"
+     },
+     {
+      "texto": "28/10",
+      "clave": "28/10",
+      "estado": "verificado"
+     },
+     {
+      "texto": "8",
+      "clave": "8",
+      "estado": "derivado"
+     },
+     {
+      "texto": "20/11",
+      "clave": "20/11",
+      "estado": "verificado"
+     },
+     {
+      "texto": "12/11",
+      "clave": "12/11",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 6,
+     "citados": 0,
+     "derivados": 2,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 21459,
+   "tipo": "dice",
+   "quien": "academia",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "@Coordinación Biotecnología: cupo 60, 41 preinscriptos 2027, 2 becas otorgadas de 6 parciales.\nProfesorado de Biología: cupo 40, 18 preinscriptos 2027, 1 beca otorgada de 4 parciales.\nGestión Ambiental: cupo 40, 12 preinscriptos 2027, 0 becas otorgadas de 4 parciales. Cuántas solicitudes hay, no lo sé.",
+   "hora": "10:46",
+   "id": "s11-1792676788996",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "60",
+      "clave": "60",
+      "estado": "verificado"
+     },
+     {
+      "texto": "41",
+      "clave": "41",
+      "estado": "verificado"
+     },
+     {
+      "texto": "2027",
+      "clave": "2027",
+      "estado": "verificado"
+     },
+     {
+      "texto": "2",
+      "clave": "2",
+      "estado": "verificado"
+     },
+     {
+      "texto": "6",
+      "clave": "6",
+      "estado": "verificado"
+     },
+     {
+      "texto": "40",
+      "clave": "40",
+      "estado": "verificado"
+     },
+     {
+      "texto": "18",
+      "clave": "18",
+      "estado": "verificado"
+     },
+     {
+      "texto": "2027",
+      "clave": "2027",
+      "estado": "verificado"
+     },
+     {
+      "texto": "1",
+      "clave": "1",
+      "estado": "verificado"
+     },
+     {
+      "texto": "4",
+      "clave": "4",
+      "estado": "verificado"
+     },
+     {
+      "texto": "40",
+      "clave": "40",
+      "estado": "verificado"
+     },
+     {
+      "texto": "12",
+      "clave": "12",
+      "estado": "verificado"
+     },
+     {
+      "texto": "2027",
+      "clave": "2027",
+      "estado": "verificado"
+     },
+     {
+      "texto": "0",
+      "clave": "0",
+      "estado": "verificado"
+     },
+     {
+      "texto": "4",
+      "clave": "4",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 15,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 22726,
+   "tipo": "fin",
+   "quien": "admisiones"
+  },
+  {
+   "t": 25213,
+   "tipo": "fin",
+   "quien": "academia"
+  },
+  {
+   "t": 25469,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 36148,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Propuesta para decidir: aspirantes trabados 2027\n1. Ezequiel R., trabado por visita sin respuesta: pidió visitar el laboratorio el 28/10, 8 días sin respuesta (Admisiones); Biotecnología: cupo 60, 41 preinscriptos (Academia).\n   Acciones: confirmar visita del 12/11 (Admisiones) · llamada de bienvenida (Dirección)\n2. Ramiro B., trabado por beca sin respuesta: la pidió el 20/10, 16 días sin respuesta, promedio 8,2 (Admisiones); 2 becas otorgadas de 6 parciales (Academia).\n   Acciones: responder la solicitud de beca (Secretaría) · llamada (Dirección)\n3. Paula G., trabada por documentación: falta el título secundario legalizado desde el 24/10 (Admisiones); Profesorado: cupo 40, 18 preinscriptos (Academia).\n   Acciones: recordar trámite del título (Secretaría) · llamada (Admisiones)\nRiesgo de equivocarnos: si la demora no es el freno, responder rápido no alcanza; la llamada no es opcional.\nPendiente: por qué cada uno no avanzó, y cuántas solicitudes de beca hay. ¿Qué aprobás, qué hacés vos y qué no?",
+   "hora": "10:46",
+   "id": "s15-1792676803685",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "2027",
+      "clave": "2027",
+      "estado": "verificado"
+     },
+     {
+      "texto": "28/10",
+      "clave": "28/10",
+      "estado": "verificado"
+     },
+     {
+      "texto": "8",
+      "clave": "8",
+      "estado": "derivado"
+     },
+     {
+      "texto": "60",
+      "clave": "60",
+      "estado": "verificado"
+     },
+     {
+      "texto": "41",
+      "clave": "41",
+      "estado": "verificado"
+     },
+     {
+      "texto": "12/11",
+      "clave": "12/11",
+      "estado": "verificado"
+     },
+     {
+      "texto": "20/10",
+      "clave": "20/10",
+      "estado": "verificado"
+     },
+     {
+      "texto": "16",
+      "clave": "16",
+      "estado": "derivado"
+     },
+     {
+      "texto": "8,2",
+      "clave": "8.2",
+      "estado": "verificado"
+     },
+     {
+      "texto": "2",
+      "clave": "2",
+      "estado": "verificado"
+     },
+     {
+      "texto": "6",
+      "clave": "6",
+      "estado": "verificado"
+     },
+     {
+      "texto": "24/10",
+      "clave": "24/10",
+      "estado": "verificado"
+     },
+     {
+      "texto": "40",
+      "clave": "40",
+      "estado": "verificado"
+     },
+     {
+      "texto": "18",
+      "clave": "18",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 12,
+     "citados": 0,
+     "derivados": 2,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 37513,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 38317,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "coordinacion"
+   ],
+   "texto": "Ezequiel R.: Llamada de bienvenida, sí. El confirmar visita del 12/11 lo hago yo. Ramiro B.: Responder la solicitud de beca y llamada, sí. Paula G.: Recordar trámite del título y llamada, sí.",
+   "hora": "10:46",
+   "id": "s17-1792676805853",
+   "decision": {
+    "acciones": [
+     {
+      "texto": "confirmar visita del 12/11",
+      "quien": "Admisiones",
+      "estado": "yo"
+     },
+     {
+      "texto": "llamada de bienvenida",
+      "quien": "Dirección",
+      "estado": "si"
+     },
+     {
+      "texto": "responder la solicitud de beca",
+      "quien": "Secretaría",
+      "estado": "si"
+     },
+     {
+      "texto": "llamada",
+      "quien": "Dirección",
+      "estado": "si"
+     },
+     {
+      "texto": "recordar trámite del título",
+      "quien": "Secretaría",
+      "estado": "si"
+     },
+     {
+      "texto": "llamada",
+      "quien": "Admisiones",
+      "estado": "si"
+     }
+    ],
+    "nota": "",
+    "caso": "Ezequiel R., Ramiro B., Paula G.",
+    "objetivo": "La inscripción 2027 cierra el 20/11. Fijate qué aspirantes están trabados y proponé qué hacemos con cada uno."
+   }
+  },
+  {
+   "t": 38317,
+   "tipo": "tarea",
+   "op": "crear",
+   "id": "t1",
+   "titulo": "Ezequiel R., Ramiro B., Paula G.",
+   "origen": "La inscripción 2027 cierra el 20/11. Fijate qué aspirantes están trabados y proponé qué hacemos con cada uno.",
+   "quien": "persona"
+  },
+  {
+   "t": 38317,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s2",
+   "tarea": "t1",
+   "texto": "Confirmar visita del 12/11",
+   "responsable": "Alfredo",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 38317,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s3",
+   "tarea": "t1",
+   "texto": "Llamada de bienvenida",
+   "responsable": "Dirección",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 38317,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s4",
+   "tarea": "t1",
+   "texto": "Responder la solicitud de beca",
+   "responsable": "Secretaría",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 38317,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s5",
+   "tarea": "t1",
+   "texto": "Llamada",
+   "responsable": "Dirección",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 38317,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s6",
+   "tarea": "t1",
+   "texto": "Recordar trámite del título",
+   "responsable": "Secretaría",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 38317,
+   "tipo": "tarea",
+   "op": "sub",
+   "id": "s7",
+   "tarea": "t1",
+   "texto": "Llamada",
+   "responsable": "Admisiones",
+   "estado": "pendiente",
+   "quien": "persona"
+  },
+  {
+   "t": 39819,
+   "tipo": "inicio",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 41915,
+   "tipo": "dice",
+   "quien": "coordinacion",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Dirección Confirmar la visita del 12/11 de Ezequiel la hacés vos; su llamada de bienvenida la hace Dirección. Ramiro: beca, Secretaría; llamada, Dirección. Paula: recordatorio del título, Secretaría; llamada, Admisiones.",
+   "hora": "10:46",
+   "id": "s26-1792676809452",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "12/11",
+      "clave": "12/11",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 1,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 43313,
+   "tipo": "fin",
+   "quien": "coordinacion"
+  },
+  {
+   "t": 47549,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "admisiones"
+   ],
+   "texto": "@Admisiones confirmale la beca a Ramiro y mandale el mail.",
+   "hora": "10:46",
+   "id": "s28-1792676815086"
+  },
+  {
+   "t": 49050,
+   "tipo": "inicio",
+   "quien": "admisiones"
+  },
+  {
+   "t": 51042,
+   "tipo": "dice",
+   "quien": "admisiones",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Alfredo Eso no lo puedo hacer yo: la beca la otorga la comisión de becas y el mail lo manda una persona de Admisiones, no un agente.\nSi lo decidís, dejo el mail a Ramiro redactado con requisitos y la visita del 12/11, y lo manda Admisiones hoy.",
+   "hora": "10:46",
+   "id": "s30-1792676818579",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "12/11",
+      "clave": "12/11",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 1,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   },
+   "marca": "limite"
+  },
+  {
+   "t": 52207,
+   "tipo": "fin",
+   "quien": "admisiones"
+  },
+  {
+   "t": 52988,
+   "tipo": "persona",
+   "quien": "persona:direccion",
+   "nombre": "Alfredo",
+   "a": [
+    "academia"
+   ],
+   "texto": "@Academia ¿cuántas becas parciales quedan en Biotecnología y qué pide el requisito?",
+   "hora": "10:47",
+   "id": "s32-1792676820525"
+  },
+  {
+   "t": 54490,
+   "tipo": "inicio",
+   "quien": "academia"
+  },
+  {
+   "t": 56432,
+   "tipo": "dice",
+   "quien": "academia",
+   "a": [
+    "persona:direccion"
+   ],
+   "texto": "@Alfredo Biotecnología: 2 otorgadas de 6 parciales para 2027, o sea quedan 4 por otorgar. Requisito: promedio de secundario 7 o más y situación económica acreditada.",
+   "hora": "10:47",
+   "id": "s34-1792676823969",
+   "verificacion": {
+    "datos": [
+     {
+      "texto": "2",
+      "clave": "2",
+      "estado": "verificado"
+     },
+     {
+      "texto": "6",
+      "clave": "6",
+      "estado": "verificado"
+     },
+     {
+      "texto": "2027",
+      "clave": "2027",
+      "estado": "verificado"
+     },
+     {
+      "texto": "4",
+      "clave": "4",
+      "estado": "verificado"
+     },
+     {
+      "texto": "7",
+      "clave": "7",
+      "estado": "verificado"
+     }
+    ],
+    "resumen": {
+     "verificados": 5,
+     "citados": 0,
+     "derivados": 0,
+     "noComprobados": 0,
+     "sinFuente": 0
+    }
+   }
+  },
+  {
+   "t": 57874,
+   "tipo": "fin",
+   "quien": "academia"
+  }
+ ],
+ "titulo": "Inscripción 2027 · tres aspirantes en el aire"
+}

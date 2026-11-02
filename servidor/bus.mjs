@@ -6,8 +6,8 @@
 // Reglas (ver docs/bus.md): un estado por agente; el servidor sabe a quién espera cada uno (pendientes);
 // un despertar provocado por agentes no arranca hasta que los que deben respuesta callan, ni mientras
 // alguno de los que X mandó a trabajar en su último turno siga activo (aunque ya haya contestado: puede
-// estar ajustando por un aviso de otro); si alguien termina sin contestar, al que esperaba se le avisa;
-// topes de saltos, turnos y mensajes.
+// estar ajustando por un aviso de otro), ni mientras alguien a quien esos delegados sumaron siga activo (el equipo
+// crece); si alguien termina sin contestar, al que esperaba se le avisa; topes de saltos, turnos y mensajes.
 
 export const LIMITES = {
   espera: 1500,          // ms que se juntan mensajes antes de arrancar un turno
@@ -57,14 +57,14 @@ export function crearBus({ agentes, persona, resolver, correrTurno, programar = 
   const topeTurnos = (a) => a.turnos >= (L.turnos[a.id] ?? L.turnos.otros);
 
   // ── Publicar: chat + evento + despertar a los mencionados ──
-  function publicar({ de, texto, a, salto = 0, decision = null }) {
+  function publicar({ de, texto, a, salto = 0, decision = null, verificacion = null, marca = null }) {
     const t = ahora();
-    const m = { id: 's' + S.seq + '-' + t, de, nombre: nombreDe.get(de) || de, texto, a, hora: hora(t), t: t - S.inicio, salto };
+    const m = { id: 's' + S.seq + '-' + t, de, nombre: nombreDe.get(de) || de, texto, a, hora: hora(t), t: t - S.inicio, salto, ...(verificacion ? { verificacion } : {}) };
     S.chat.push(m);
     const esPersona = de === persona.id;
     if (!esPersona) S.mensajesAgentes++;
     emitir(esPersona ? { tipo: 'persona', quien: de, nombre: m.nombre, a, texto, hora: m.hora, id: m.id, ...(decision ? { decision } : {}) }
-                     : { tipo: 'dice', quien: de, a, texto, hora: m.hora, id: m.id });
+                     : { tipo: 'dice', quien: de, a, texto, hora: m.hora, id: m.id, ...(verificacion ? { verificacion } : {}), ...(marca ? { marca } : {}) });
     const emisor = ag.get(de);
     const despertados = [], noDespiertan = [];
     for (const id of a) {
@@ -74,7 +74,12 @@ export function crearBus({ agentes, persona, resolver, correrTurno, programar = 
       const despierta = esPersona || (salto <= L.saltoMax && !topeTurnos(x) && S.mensajesAgentes <= L.mensajes);
       x.cola.push({ ...m, despierta });
       // Espera respuesta solo si le escribe a alguien que no le había escrito: contestar no crea expectativa
-      if (despierta) { despertados.push(id); if (emisor && emisor.turno && !emisor.turno.remitentes.includes(id)) { emisor.pendientes.add(id); emisor.turno.equipo.add(id); } if (x.estado !== 'corriendo') programarArranque(x, esPersona); }
+      if (despierta) {
+        despertados.push(id); if (emisor && emisor.turno && !emisor.turno.remitentes.includes(id)) { emisor.pendientes.add(id); emisor.turno.equipo.add(id); }
+        // El equipo crece: si un delegado de X suma a alguien más (Advisor le pregunta a Admisiones), X también lo espera
+        if (emisor) for (const y of ag.values()) if (y !== emisor && y.id !== id && y.equipo.has(de)) y.equipo.add(id);
+        if (x.estado !== 'corriendo') programarArranque(x, esPersona);
+      }
       else noDespiertan.push(id);
     }
     log('msg', m.nombre, '→', a.join(','), despertados.length ? '' : '(no despierta)');
@@ -116,12 +121,13 @@ export function crearBus({ agentes, persona, resolver, correrTurno, programar = 
       epoca: turno.epoca,
       vigente: () => turno.epoca === S.epoca,
       /** El agente manda un mensaje al canal. Devuelve el texto para el tool_result; lanza si la mención no existe. */
-      enviar(texto, explicitos = []) {
+      enviar(texto, opciones = {}) {
+        const { explicitos = [], verificacion = null, marca = null } = Array.isArray(opciones) ? { explicitos: opciones } : opciones;   // verificacion: del verificador; marca: 'limite' | 'no_se' (agente.mjs)
         if (!ctx.vigente()) return 'La corrida se reinició.';
         const r = resolver(texto, { de: x.id, explicitos, porDefecto: remitentes });
         if (r.invalidas.length) throw new Error(`No reconozco @${r.invalidas.join(', @')}. Destinatarios: ${r.nombres.join(', ')}.`);
         if (!r.a.length) throw new Error(`¿A quién? Mencioná con @Nombre. Destinatarios: ${r.nombres.join(', ')}.`);
-        const { despertados, noDespiertan } = publicar({ de: x.id, texto, a: r.a, salto });
+        const { despertados, noDespiertan } = publicar({ de: x.id, texto, a: r.a, salto, verificacion, marca });
         const n = (ids) => ids.map((id) => nombreDe.get(id)).join(', ');
         let out = `Enviado a ${n(r.a)}.`;
         if (!/@/.test(texto)) out = `Enviado a ${n(r.a)} (sin @mención: le respondés a quien te escribió).`;
@@ -165,6 +171,8 @@ export function crearBus({ agentes, persona, resolver, correrTurno, programar = 
       return { a: r.a, despertados, invalidas: [] };
     },
     reiniciar,
+    /** Cambia el nombre de la persona que decide (firma sus mensajes de acá en adelante). */
+    renombrarPersona(nombre) { persona.nombre = nombre; nombreDe.set(persona.id, nombre); },
     /** Un evento que no es un mensaje (p. ej. del Tablero): va a la vista y a la grabación. */
     emitir: (ev) => emitir(ev),
     suscribir(fn) { oyentes.add(fn); return () => oyentes.delete(fn); },

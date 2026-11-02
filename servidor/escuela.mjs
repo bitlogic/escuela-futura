@@ -4,7 +4,7 @@
 //   node servidor/escuela.mjs            # http://localhost:8080/stage/ (abre el navegador)
 //   node servidor/escuela.mjs --puerto 9000 --sin-navegador
 //
-// Variables (en .env o en el entorno): ANTHROPIC_API_KEY (obligatoria), ESCUELA_MODEL (claude-opus-5-5),
+// Variables (en .env o en el entorno): ANTHROPIC_API_KEY (obligatoria), ESCUELA_MODEL (claude-sonnet-5-5; Opus 5.5 como alternativa),
 // ESCUELA_EFFORT (medium), ESCUELA_PUERTO (8080), ESCUELA_DIRECTOR (Alfredo: el nombre de quien decide),
 // ESCUELA_SIN_FALLBACK=1 para no reintentar en otro modelo.
 
@@ -17,7 +17,8 @@ import { cargarPack } from './personas.mjs';
 import { crearResolutor } from './menciones.mjs';
 import { crearBus } from './bus.mjs';
 import { crearCorredor } from './agente.mjs';
-import { crearHttp } from './http.mjs';
+import { crearHttp, fichasDeAgentes } from './http.mjs';
+import { HERRAMIENTA_LUGAR } from '../stage/herramientas.js';
 import { TOOLS, ejecutar as ejecutarDatos } from '../mcp-escuela/herramientas.mjs';
 import { crearTableroServidor, HERRAMIENTAS_TABLERO, NOMBRES_HERRAMIENTAS } from './tablero.mjs';
 
@@ -33,7 +34,7 @@ const args = process.argv.slice(2);
 const flag = (n) => args.includes(n);
 const valor = (n, def) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : def; };
 const PUERTO = Number(valor('--puerto', process.env.ESCUELA_PUERTO || 8080));
-const MODELO = process.env.ESCUELA_MODEL || 'claude-opus-5-5';
+const MODELO = process.env.ESCUELA_MODEL || 'claude-sonnet-5-5';   // decisión del 19/10: Sonnet con el verificador (41 s hasta la propuesta); Opus 5.5 como alternativa
 const EFFORT = process.env.ESCUELA_EFFORT || 'medium';
 // La persona que decide: su nombre se configura (ESCUELA_DIRECTOR); @Dirección la menciona igual.
 const PERSONA = { id: 'persona:direccion', nombre: process.env.ESCUELA_DIRECTOR || 'Alfredo', alias: ['direccion', 'director', 'directora'] };
@@ -56,11 +57,13 @@ const cliente = new Anthropic({ maxRetries: 4, timeout: 90_000 });
 // El Tablero: las tareas nacen de las decisiones (API) o de los agentes (sus dos herramientas); el bus las emite
 let tablero = null;
 const ejecutar = (nombre, args, agenteId) => (NOMBRES_HERRAMIENTAS.has(nombre) ? tablero.ejecutar(agenteId, nombre, args) : ejecutarDatos(nombre, args));
-const corredor = crearCorredor({ cliente, modelo: MODELO, effort: EFFORT, instrucciones: pack.instrucciones.replaceAll('{{DIRECTOR}}', PERSONA.nombre), agentes: pack.agentes, herramientas: [...TOOLS, ...HERRAMIENTAS_TABLERO], ejecutar, fallbacks: !process.env.ESCUELA_SIN_FALLBACK, log });
+const corredor = crearCorredor({ cliente, modelo: MODELO, effort: EFFORT, instrucciones: () => pack.instrucciones.replaceAll('{{DIRECTOR}}', PERSONA.nombre), agentes: pack.agentes, herramientas: [...TOOLS, ...HERRAMIENTAS_TABLERO], ejecutar, fallbacks: !process.env.ESCUELA_SIN_FALLBACK, log });
 const bus = crearBus({ agentes: pack.agentes, persona: PERSONA, resolver, correrTurno: corredor.correrTurno, log });
-tablero = crearTableroServidor({ bus, nombrePersona: PERSONA.nombre, log });
+tablero = crearTableroServidor({ bus, nombrePersona: PERSONA.nombre, agentes: pack.agentes, log });
 const reiniciar = () => { corredor.reiniciar(); bus.reiniciar(); tablero.reiniciar(); };
-const http = crearHttp({ bus, reiniciar, info: { modelo: MODELO, persona: PERSONA.nombre }, log, tablero });
+const info = { modelo: MODELO, persona: PERSONA.nombre };
+const renombrar = (n) => { PERSONA.nombre = n; info.persona = n; bus.renombrarPersona(n); log('persona', n); };
+const http = crearHttp({ bus, reiniciar, info, log, tablero, renombrar, fichas: () => fichasDeAgentes({ ...pack, instrucciones: pack.instrucciones.replaceAll('{{DIRECTOR}}', PERSONA.nombre) }, [...TOOLS, ...HERRAMIENTAS_TABLERO], HERRAMIENTA_LUGAR) });
 
 const puerto = await http.escuchar(PUERTO);
 const url = `http://localhost:${puerto}/stage/`;

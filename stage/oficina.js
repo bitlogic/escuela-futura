@@ -87,7 +87,7 @@ const ESTUDIANTES = [];
   for (const y of filas) for (const c of cols) { const [m, h] = modelos[k]; ESTUDIANTES.push({ x: f.x0 + c, y, modelo: m, tono: h, foco: y === filas[1] && c === cols[2] }); k++; }
 }
 export const MARTINA = ESTUDIANTES.find((e) => e.foco);
-// Dónde va el cartel "Esperando tu decisión": centrado en la pared del fondo del despacho de Dirección y Coordinación.
+// Dónde va el cartel "Pendiente de tu revisión": centrado en la pared del fondo del despacho de Dirección y Coordinación.
 export const DECISION = { x: FISICAS.p1.x0 + FISICAS.p1.ancho / 2, y: 7 };
 
 // ── Utilidades ───────────────────────────────────────────────────────────────

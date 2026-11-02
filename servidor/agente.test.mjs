@@ -91,3 +91,19 @@ test('error de API o refusal: el turno termina sin romper la conversación', asy
   await assert.rejects(() => c2.correrTurno('bienestar', lote, ctxFalso()), /sin respuesta guionada/);
   assert.equal(c2.conversacion('bienestar').length, 1, 'queda el user; el próximo turno agrega otro user (se fusionan)');
 });
+
+test('verificador: las cifras del mensaje se cruzan con los tool_result propios y lo recibido, y viajan con enviar', async () => {
+  const cliente = clienteFalso([
+    { stop_reason: 'tool_use', content: [uso('t1', 'ver_asistencia', { estudiante: 'Martina' })] },
+    { stop_reason: 'tool_use', content: [uso('t2', 'enviar_mensaje', { texto: '@Coordinación Martina: 5 de 22 clases desde el 18/8, riesgo alto; parcial del 10/11. Los otros 23 vienen bien. 9 entregas.' })] },
+    { stop_reason: 'end_turn', content: [] },
+  ]);
+  const enviados = [];
+  const c = crearCorredor({ cliente, modelo: 'm', instrucciones: 'Equipo.', agentes: AGENTES, herramientas: HERRAMIENTAS, fallbacks: false,
+    ejecutar: () => JSON.stringify({ estudiante: 'Martina R.', resumen: { desde_cambio: { desde: '2026-08-18', presentes: 5, clases: 22 } } }) });
+  const ctx = ctxFalso(); ctx.enviar = (t, o) => { enviados.push({ t, o }); return 'Enviado.'; };
+  await c.correrTurno('bienestar', { mensajes: [{ hora: '10:00', nombre: 'Coordinación', texto: '@Bienestar Biología 1: quién se aleja antes del parcial del 10/11.' }], faltan: [], terminaronSin: [] }, ctx);
+  const v = enviados[0].o.verificacion; const por = Object.fromEntries(v.datos.map((d) => [d.texto, d.estado]));
+  assert.equal(por['5 de 22'], 'verificado'); assert.equal(por['18/8'], 'verificado'); assert.equal(por['10/11'], 'citado'); assert.equal(por['23'], 'derivado'); assert.equal(por['9'], 'sin_fuente');
+  assert.equal(v.resumen.sinFuente, 1);
+});

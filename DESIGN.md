@@ -219,3 +219,18 @@ Canvas pixel-art con cuatro salas (Dirección y Coord., Secretaría y Admis., Au
 - **Don't** usar `border-left` o `border-right` mayor a 1 px como acento de color.
 - **Don't** distinguir agentes o estados solo por color.
 - **Don't** mostrar controles en pantalla durante la charla.
+
+## 7. Cambios del 22/10 (crítica de diseño, 30/40)
+
+- **Nada parpadea.** Los indicadores de actividad (encabezado del chat, badge y línea viva de la franja, pestaña) respiran con `respiro` (2,2 s, curva suave) o quedan fijos. `parpadeo` y `brillo` se sacaron: el movimiento de la escena son los personajes.
+- **La barra de vistas es cromo del operador.** Se apaga con el mouse quieto (`body.quieto`) y durante una decisión (`#mundo.decidiendo`); la vista activa va en papel sobre tinta (el naranja es de la persona); las teclas `o b c` se ven solo al pasar el mouse.
+- **El panel de decisión entra entero**, también a 1280×720: medidas escaladas con `--esc` y la letra (`--tp`) baja de a un punto hasta que el pie quede a la vista. El caso es el título (1,15×), "Propuesta para decidir" es el rótulo con la cara de Coordinación, la pregunta va arriba con los verbos de los botones ("¿Qué aprobás, qué hacés vos y qué no?"), Nota / Riesgo de equivocarnos / Pendiente van juntas antes de "Qué proponen", la caja de nota aparece al elegir "Lo hago yo" o "No", y "No" va separado de "Lo hago yo".
+- **El globo de decisión existe** (`.bub.decision`: azul, 34 px escalados, hasta 620 px, 9 s, por encima de todos los rótulos) y el cartel de Dirección pasa a "Decidido" en verde un instante.
+- **El Tablero abre en Lista**, con el responsable primero y a 24 px; en Kanban no hay bordes de color por columna ni contadores en las vacías; los títulos de Tablero y Organigrama van en sans. Nada dice "0 de 6 hechas": recién nacidas, las acciones están "en manos de personas".
+- **Los rótulos de los personajes no se pisan**: si dos quedan juntos, el segundo baja un renglón.
+- **Un solo naranja** (segunda crítica, 29/40): el chip de aviso entre agentes lleva el color del agente, Martina va en papel, los títulos del Tablero y el Organigrama no llevan color, "+ Tarea" y el chip de agente dejaron el naranja. Los errores de la línea de abajo van en rojo, no naranja.
+- **Los dos momentos de honestidad tienen marca**: chip rojo "No lo hace: lo firma una persona" y globo con marco rojo cuando un agente dice que no; chip "Lo que los datos no dicen" y marco ámbar cuando dice que no sabe (`marca` en el evento `dice`).
+- **Piso de 16 px escalados** en chips, rótulos y badges; el badge de riesgo y los rótulos de ficha suben a 0,62 de la letra base.
+- **Las tareas en la escuela**: cada acción aprobada es un papel (`.papel`) sobre el escritorio de su responsable, crema / celeste / verde según el estado. El Tablero sigue para el detalle.
+- **Papel no es blanco**: los campos del tema claro y las tarjetas del Tablero y el Organigrama van en `#fbf8f1`. El Organigrama carga Plain.
+- **El tilde es solo de lo comprobado**: lo citado de otro mensaje no lleva tilde ni suma al chip.

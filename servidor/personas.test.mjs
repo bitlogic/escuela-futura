@@ -4,6 +4,8 @@ import { cargarPack, parsePersona } from './personas.mjs';
 import { crearResolutor } from './menciones.mjs';
 import { TOOLS } from '../mcp-escuela/herramientas.mjs';
 import { HERRAMIENTAS_TABLERO } from './tablero.mjs';
+import { readFileSync } from 'node:fs';
+import { fichasActuales } from '../scripts/exportar-pack.mjs';
 
 test('el pack carga seis agentes, cada uno con herramientas que existen', () => {
   const { instrucciones, agentes } = cargarPack();
@@ -27,4 +29,9 @@ test('menciones: nombres sin tildes, todos, persona, y mención seguida de palab
   assert.deepEqual(r('@Director listo, @directora', { de: 'coordinacion' }).a, ['persona:direccion']);
   assert.equal(r('@todos', { de: 'tutor' }).a.length, 5);
   assert.deepEqual(r('nada', { de: 'tutor', porDefecto: ['tutor', 'coordinacion'] }).a, ['coordinacion']);
+});
+
+test('stage/agentes-detalle.json está al día con pack/ (si falla: node scripts/exportar-pack.mjs)', () => {
+  const exportado = JSON.parse(readFileSync(new URL('../stage/agentes-detalle.json', import.meta.url), 'utf8'));
+  assert.deepEqual(exportado, fichasActuales());
 });

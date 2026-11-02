@@ -216,3 +216,37 @@ test('la decisión estructurada de la persona viaja en el evento persona', async
   bus.mensajePersona('hola'); await respirar();
   assert.equal('decision' in eventos[1], false);
 });
+
+test('el equipo crece: si Advisor suma a otro agente, Coordinación también lo espera antes de proponer', async () => {
+  const AG = [...AGENTES, { id: 'admisiones', nombre: 'Admisiones' }];
+  const r = reloj(); const eventos = []; const turnos = []; const abiertos = new Map();
+  const guion = {
+    coordinacion: [async (ctx) => { ctx.enviar('@Bienestar a.'); ctx.enviar('@Tutor b.'); ctx.enviar('@Advisor c.'); }],
+    bienestar: [async (ctx) => ctx.enviar('@Coordinación listo bienestar')],
+    tutor: [async (ctx) => ctx.enviar('@Coordinación listo tutor')],
+    advisor: [async (ctx) => { ctx.enviar('@Coordinación listo advisor'); ctx.enviar('@Admisiones ¿qué dijo Martina al ingresar?'); }],
+    admisiones: ['abierto'],
+  };
+  const correrTurno = async (id, lote, ctx) => { turnos.push({ id, lote, ctx }); const g = (guion[id] || []).shift(); if (!g) return; if (g === 'abierto') return new Promise((ok) => abiertos.set(id, ok)); await g(ctx, lote); };
+  const bus = crearBus({ agentes: AG, persona: PERSONA, resolver: crearResolutor({ agentes: AG, persona: PERSONA }), correrTurno, programar: r.programar, cancelar: r.cancelar, ahora: r.ahora });
+  bus.suscribir((f) => eventos.push(...f));
+  const inicios = (id) => eventos.filter((e) => e.quien === id && e.tipo === 'inicio').length;
+  bus.mensajePersona('objetivo');
+  await r.avanzar(4500); await r.avanzar(5000);
+  assert.equal(inicios('admisiones'), 1, 'Admisiones arranca por la pregunta de Advisor');
+  assert.equal(inicios('coordinacion'), 1, 'Coordinación no arranca mientras Admisiones, sumada por Advisor, sigue trabajando');
+  turnos.find((t) => t.id === 'admisiones').ctx.enviar('@Coordinación Martina dijo que quiere seguir Medicina.');
+  abiertos.get('admisiones')(); await respirar(); await r.avanzar(1500);
+  assert.equal(inicios('coordinacion'), 2);
+  const lote = turnos.filter((t) => t.id === 'coordinacion')[1].lote;
+  assert.deepEqual(lote.mensajes.map((m) => m.de), ['bienestar', 'tutor', 'advisor', 'admisiones']);
+});
+
+test('la verificación de un mensaje viaja en el evento dice y en lo que recibe el destinatario', async () => {
+  const guion = { coordinacion: [async (ctx) => ctx.enviar('@Tutor Biología 1: notas.', { verificacion: { datos: [{ texto: '1', estado: 'verificado' }], resumen: {} } })] };
+  const { bus, r, eventos, turnos } = armar({ guion });
+  bus.mensajePersona('objetivo'); await r.avanzar(3500);
+  const dice = eventos.find((e) => e.tipo === 'dice');
+  assert.equal(dice.verificacion.datos[0].estado, 'verificado');
+  assert.equal(turnos.find((t) => t.id === 'tutor').lote.mensajes[0].verificacion.datos.length, 1);
+});
