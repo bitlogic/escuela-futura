@@ -205,6 +205,7 @@ export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, 
 
   function tecla(k) {
     if (k === 'm') { const activo = !sonido.silenciar(sonido.activo); return { hecho: true, aviso: activo ? 'Sonido prendido' : 'Sonido apagado' }; }
+    if (k === 'p') { luz.hd = !luz.hd; return { hecho: true, aviso: luz.hd ? 'HD-2D prendido' : 'HD-2D apagado (pixel plano)' }; }   // la salida de emergencia si la máquina se queda
     return { hecho: false };
   }
   return {

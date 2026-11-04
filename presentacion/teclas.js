@@ -3,11 +3,11 @@
 export const ACCIONES = {
   ArrowRight: 'siguiente', PageDown: 'siguiente', ' ': 'siguiente', Enter: 'siguiente',
   ArrowLeft: 'anterior', PageUp: 'anterior', Backspace: 'anterior',
-  Home: 'inicio', End: 'fin', d: 'demo', n: 'presentador', f: 'pantalla', t: 'reloj', '?': 'ayuda', h: 'ayuda', m: 'silencio',
+  Home: 'inicio', End: 'fin', d: 'demo', n: 'presentador', f: 'pantalla', t: 'reloj', '?': 'ayuda', h: 'ayuda', m: 'silencio', p: 'hd',
 };
 /** La acción de una tecla, o null. `conEscena`: hay escena (y por lo tanto sonido). */
 export function accionDeTecla(k, { conEscena = false } = {}) {
   const a = ACCIONES[k] || null;
-  if (a === 'silencio' && !conEscena) return null;
+  if ((a === 'silencio' || a === 'hd') && !conEscena) return null;   // m y p solo existen con escena
   return a;
 }

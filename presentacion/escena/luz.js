@@ -15,7 +15,11 @@
 // Lo caro se hace una vez: los desenfoques de las capas se hornean en canvases propios cuando cambia la capa,
 // los halos son sprites radiales cacheados por color, la viñeta y el grading son degradados cacheados.
 // `hd: false` deja cielo plano, mundo, fachada y las capas sin desenfoque. `degradado` (FPS bajos) apaga los
-// desenfoques y deja luces y viñeta. Con prefers-reduced-motion nada respira: ni la franja ni la niebla.
+// desenfoques, la niebla, la luz del día y el grading (las pasadas de pantalla entera) y deja luces y viñeta: medido el
+// 4/11 (evaluaciones/escena/rendimiento.md), con GPU la escena cuesta ~1 ms por cuadro y nada de esto importa; sin GPU
+// (raster por software) HD-2D da 33 fps, y apagar solo los desenfoques no cambiaba nada (34 fps): lo caro ahí son las
+// pasadas de pantalla entera. Se recupera una vez a los 10 s buenos y otra a los 20; a la tercera caída queda degradado,
+// para que no parpadee entre los dos modos. Con prefers-reduced-motion nada respira: ni la franja ni la niebla.
 //
 //   crearLuz(canvas) → { render(args), medirFps(dt), hd (get/set), degradado, fps }
 // El módulo se importa en Node sin DOM: nada de document fuera de crearLuz.
@@ -58,8 +62,8 @@ export function crearLuz(canvas) {
   const conFiltro = ctx && 'filter' in ctx;                            // Safari viejo no tiene ctx.filter: sin desenfoque
   const quieto = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
   const reloj = () => (typeof performance !== 'undefined' ? performance.now() / 1000 : 0);
-  let acumulado = 0, cuadros = 0, lentos = 0, buenos = 0, avisado = false, transcurrido = 0;
-  const ESPERA_INICIAL = 5, SEGUNDOS_BUENOS = 10, FPS_RECUPERA = 55;   // se ignora el arranque (la demo también carga) y se vuelve a prender si la máquina da
+  let acumulado = 0, cuadros = 0, lentos = 0, buenos = 0, avisado = false, transcurrido = 0, caidas = 0;
+  const ESPERA_INICIAL = 5, SEGUNDOS_BUENOS = 10, FPS_RECUPERA = 55, CAIDAS_MAX = 3;   // se ignora el arranque (la demo también carga); se vuelve a prender si la máquina da, cada vez con el doble de segundos buenos, y a la tercera caída queda degradado
   let tHaz = 0, tFoco = 0, ultimoReloj = reloj();                     // rampas internas (el haz y el halo entran y salen suaves)
 
   // ---------- Lienzos y cachés ----------
@@ -244,33 +248,35 @@ export function crearLuz(canvas) {
     cieloYSuelo(C, estado, aPantalla, aPantallaCapa, t);
     if (capas && capas.lejana) capa(capas.lejana, aPantallaCapa, .45, 1, hd ? DESENFOQUES.lejana : 0);
     mundoNitido(mundo, fachada, estado, aPantalla, v);
+    const entero = hd && !luz.degradado;   // las pasadas de pantalla entera (niebla, luz del día, grading): lo caro sin GPU
     if (hd) {
       tapa();
       luces({ estado, aPantalla, ventanas, lamparas, foco, sofiaEn, t, dt });
-      niebla(estado, aPantalla, t);
+      if (entero) niebla(estado, aPantalla, t);
     }
     if (capas && capas.cercana && estado.fachada > .01) capa(capas.cercana, aPantallaCapa, 1.5, clamp(estado.fachada, 0, 1), hd ? DESENFOQUES.cercana : 0);
     if (desenfoque) franja(estado, v, t);
     if (hd) {
       // la luz del día: una subida pareja ('screen') que aclara el mundo cuando amanece, antes de la viñeta
       const dia = Math.max(0, (estado.hora - .5) * 2) * (.4 + .6 * clamp(estado.fachada, 0, 1));
-      if (dia > .01) { ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = .16 * dia; ctx.fillStyle = rgb(COLORES.dia); ctx.fillRect(0, 0, W, H); ctx.globalCompositeOperation = 'source-over'; }
+      if (entero && dia > .01) { ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = .16 * dia; ctx.fillStyle = rgb(COLORES.dia); ctx.fillRect(0, 0, W, H); ctx.globalCompositeOperation = 'source-over'; }
       ctx.globalAlpha = .4 + .3 * noche; ctx.fillStyle = vineta; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1;
-      ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = .18; ctx.fillStyle = grading; ctx.fillRect(0, 0, W, H);
+      if (entero) { ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = .18; ctx.fillStyle = grading; ctx.fillRect(0, 0, W, H); }
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
     }
     ctx.restore();
   }
 
-  /** Promedio de FPS por segundo; si baja de 40 durante 3 s seguidos, degrada (apaga los desenfoques) y avisa una sola vez. */
+  /** Promedio de FPS por segundo; si baja de 40 durante 3 s seguidos, degrada (apaga desenfoques, niebla, día y grading) y avisa
+   *  una sola vez. Se recupera con 10 s a 55 o más; la segunda vez pide 20 s, y a la tercera caída no se recupera más (sin parpadeo). */
   function medirFps(dt) {
     acumulado += dt; cuadros++;
     if (acumulado >= 1) {
       luz.fps = cuadros / acumulado; acumulado = 0; cuadros = 0;
       transcurrido += 1; if (transcurrido <= ESPERA_INICIAL) return luz.fps;
       lentos = luz.fps < FPS_MINIMO ? lentos + 1 : 0; buenos = luz.fps >= FPS_RECUPERA ? buenos + 1 : 0;
-      if (luz.degradado && buenos >= SEGUNDOS_BUENOS) { luz.degradado = false; buenos = 0; }
-      if (lentos >= SEGUNDOS_LENTOS && !luz.degradado) { luz.degradado = true; if (!avisado) { avisado = true; console.warn(`[escena] FPS bajos (${luz.fps.toFixed(0)}): se apagan los desenfoques, quedan luces y viñeta`); } }
+      if (luz.degradado && caidas < CAIDAS_MAX && buenos >= SEGUNDOS_BUENOS * Math.pow(2, caidas - 1)) { luz.degradado = false; buenos = 0; }
+      if (lentos >= SEGUNDOS_LENTOS && !luz.degradado) { luz.degradado = true; caidas++; if (!avisado) { avisado = true; console.warn(`[escena] FPS bajos (${luz.fps.toFixed(0)}): se apagan desenfoques, niebla, día y grading; quedan luces y viñeta`); } }
     }
     return luz.fps;
   }

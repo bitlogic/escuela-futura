@@ -21,6 +21,7 @@ Los parámetros de la vista que vengan en la URL de la charla pasan a la escuela
 | `t` | reinicia el reloj de la charla (arranca solo al salir de la portada) |
 | `f` | pantalla completa |
 | `m` | silencia el sonido de la escena (timbre, luces, motivo de la esfera, giro, campana de la propuesta) |
+| `p` | apaga o prende el HD-2D en vivo (la salida de emergencia si la máquina se queda; la escena también se degrada sola a los 3 s por debajo de 40 fps) |
 | `Inicio` `Fin` | primera / última |
 | `?` | ayuda |
 

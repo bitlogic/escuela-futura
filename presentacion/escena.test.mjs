@@ -91,6 +91,7 @@ test('las teclas de la charla resuelven igual con y sin escena; m solo con escen
     assert.equal(accionDeTecla('d', { conEscena: con }), 'demo'); assert.equal(accionDeTecla('n', { conEscena: con }), 'presentador'); assert.equal(accionDeTecla('PageDown', { conEscena: con }), 'siguiente');
   }
   assert.equal(accionDeTecla('m', { conEscena: true }), 'silencio'); assert.equal(accionDeTecla('m', { conEscena: false }), null); assert.equal(accionDeTecla('x'), null);
+  assert.equal(accionDeTecla('p', { conEscena: true }), 'hd'); assert.equal(accionDeTecla('p', { conEscena: false }), null);
 });
 
 test('los datos cruzados cierran: las casas de los agentes son puestos reales, las señales nombran láminas del deck, Sofía tiene su tramo', () => {

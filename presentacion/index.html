@@ -40,6 +40,7 @@
     <p><b>n</b> abre la vista del presentador (notas y reloj)</p>
     <p><b>t</b> reinicia el reloj de la charla</p>
     <p><b>f</b> pantalla completa</p>
+    <p><b>m</b> silencia la escena · <b>p</b> apaga o prende el HD-2D (si la máquina se queda)</p>
     <p><b>Inicio / Fin</b> primera / última</p>
     <p><b>?</b> esta ayuda · Escape la cierra</p>
     <p style="margin-top:12px;font-size:14px;color:#5E5889">Con la demo en pantalla las teclas son de la escuela (b Tablero, o organigrama, c chat, t tema, Enter escribe); para seguir con las láminas: PageDown, Shift+→ o d.</p>
@@ -156,7 +157,7 @@ document.addEventListener('keydown', (e) => {
   else if (accion === 'fin') ir(laminas.length - 1);
   else if (accion === 'demo') alternarDemo();
   else if (accion === 'presentador') abrirPresentador();
-  else if (accion === 'silencio') { const r = escena.tecla('m'); if (r.hecho && r.aviso) aviso(r.aviso); }
+  else if (accion === 'silencio' || accion === 'hd') { const r = escena.tecla(accion === 'hd' ? 'p' : 'm'); if (r.hecho && r.aviso) aviso(r.aviso); }
   else if (accion === 'pantalla') pantallaCompleta();
   else if (accion === 'reloj') { inicio = Date.now(); aviso('Reloj en 0:00'); publicarEstado(); }
   else if (accion === 'ayuda') $('ui-ayuda').classList.add('visible');
