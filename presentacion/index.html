@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Institución Agéntica — Innova Educa 21</title>
+<link rel="stylesheet" href="estilo.css">
+<style>
+  /* La demo: la vista de la escuela (stage/, servida por el mismo servidor) ocupa la ventana entera sobre las láminas. */
+  #ui-demo { position: fixed; inset: 0; z-index: 10; background: #06050F; opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility 0s linear .45s; }
+  #ui-demo.visible { opacity: 1; visibility: visible; transition: opacity .45s ease; }
+  #ui-demo iframe { width: 100%; height: 100%; border: 0; display: block; background: #06050F; }
+  /* Avisos cortos y la ayuda de teclas; no forman parte del deck. */
+  #ui-aviso { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 20; font: 500 15px/1.4 'JetBrains Mono', monospace; color: #F3F0FF; background: rgba(21, 17, 47, .92); border: 1px solid #2A2452; border-radius: 10px; padding: 8px 14px; opacity: 0; transition: opacity .3s; pointer-events: none; max-width: 80vw; }
+  #ui-aviso.visible { opacity: 1; }
+  #ui-ayuda { position: fixed; inset: 0; z-index: 30; display: none; align-items: center; justify-content: center; background: rgba(6, 5, 15, .82); }
+  #ui-ayuda.visible { display: flex; }
+  #ui-ayuda div { background: #15112F; border: 1px solid #2A2452; border-radius: 16px; padding: 28px 36px; font-size: 17px; line-height: 1.6; color: #A8A2D0; min-width: 420px; }
+  #ui-ayuda h2 { font-size: 22px; font-weight: 600; color: #F3F0FF; margin: 0 0 12px; }
+  #ui-ayuda b { color: #2EE6D2; font-family: 'JetBrains Mono', monospace; font-weight: 500; display: inline-block; min-width: 150px; }
+  #ui-ayuda p { margin: 0; }
+  /* Número de lámina (solo el número): fijo abajo a la derecha, apagado; queda debajo de la demo cuando está en pantalla. */
+  #ui-numero { position: fixed; right: 22px; bottom: 16px; z-index: 5; font: 500 15px/1 'JetBrains Mono', monospace; letter-spacing: 1px; color: #5E5889; pointer-events: none; user-select: none; }
+  #ui-numero b { color: #A8A2D0; font-weight: 500; }
+</style>
+</head>
+<body>
+<div id="ui-lienzo" class="lienzo" aria-live="polite"></div>
+<div id="ui-demo"><iframe id="ui-escuela" title="Escuela Futura en vivo" allow="fullscreen"></iframe></div>
+<div id="ui-numero" aria-hidden="true"></div>
+<div id="ui-aviso" role="status"></div>
+<div id="ui-ayuda" role="dialog" aria-label="Teclas">
+  <div>
+    <h2>Teclas</h2>
+    <p><b>→ espacio PageDown</b> siguiente lámina</p>
+    <p><b>← PageUp</b> anterior</p>
+    <p><b>d</b> trae o esconde la demo (la escuela en vivo)</p>
+    <p><b>n</b> abre la vista del presentador (notas y reloj)</p>
+    <p><b>t</b> reinicia el reloj de la charla</p>
+    <p><b>f</b> pantalla completa</p>
+    <p><b>Inicio / Fin</b> primera / última</p>
+    <p><b>?</b> esta ayuda · Escape la cierra</p>
+    <p style="margin-top:12px;font-size:14px;color:#5E5889">Con la demo en pantalla las teclas son de la escuela (b Tablero, o organigrama, c chat, t tema, Enter escribe); para seguir con las láminas: PageDown, Shift+→ o d.</p>
+  </div>
+</div>
+<script type="module">
+import { cargarDeck, escalar, mostrarPaso } from './reproductor.js';
+
+const $ = (id) => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const lienzo = $('ui-lienzo'), demo = $('ui-demo'), escuela = $('ui-escuela');
+const canal = ('BroadcastChannel' in window) ? new BroadcastChannel('charla') : null;
+
+let laminas = [], actual = -1, paso = 0, demoVisible = false, inicio = null, temporizador = null;
+
+// ---------- Láminas ----------
+// Va a la lámina n. `completa`: con todos sus pasos ya vistos (al volver atrás); si no, arranca en el paso 0.
+function ir(n, { instantaneo = false, completa = false } = {}) {
+  n = Math.max(0, Math.min(laminas.length - 1, n));
+  if (n === actual) { mostrarDemo(!!laminas[n].demo); return; }
+  const prev = laminas[actual], sig = laminas[n];
+  clearTimeout(temporizador);
+  paso = completa ? sig.pasos : 0;
+  mostrarPaso(sig.section, paso);
+  for (const l of laminas) l.section.classList.remove('anterior', 'quieta');
+  if (prev) { prev.section.classList.remove('actual'); prev.section.classList.add('anterior'); }
+  if (instantaneo) sig.section.classList.add('quieta');
+  sig.section.classList.add('actual');
+  temporizador = setTimeout(() => { if (prev) prev.section.classList.remove('anterior'); sig.section.classList.remove('quieta'); }, 500);
+  actual = n;
+  history.replaceState(null, '', '#' + sig.id);
+  numero();
+  if (n > 0 && inicio == null) inicio = Date.now();   // el reloj arranca al salir de la portada
+  mostrarDemo(!!sig.demo);
+  publicarEstado();
+}
+function numero() { $('ui-numero').innerHTML = `<b>${actual + 1}</b>`; }   // solo el número de lámina; el paso se ve en la vista del presentador
+// Siguiente: primero el próximo paso de la lámina; cuando no quedan, la lámina siguiente. Anterior: deshace el paso o vuelve.
+function avanzar() {
+  const l = laminas[actual];
+  if (l && paso < l.pasos) { paso++; mostrarPaso(l.section, paso); numero(); publicarEstado(); }
+  else ir(actual + 1);
+}
+function retroceder() {
+  const l = laminas[actual];
+  if (l && paso > 0) { paso--; mostrarPaso(l.section, paso); numero(); publicarEstado(); }
+  else ir(actual - 1, { completa: true });
+}
+
+// ---------- La demo embebida ----------
+function mostrarDemo(si) {
+  if (si === demoVisible) return;
+  demoVisible = si;
+  demo.classList.toggle('visible', si);
+  if (si) setTimeout(() => { try { escuela.contentWindow.focus(); } catch {} }, 60);
+  else { try { escuela.blur(); } catch {} window.focus(); }
+  publicarEstado();
+}
+const alternarDemo = () => mostrarDemo(!demoVisible);
+
+// La escuela se carga al abrir (aunque no se vea): así está conectada y lista cuando llega la demo.
+// Los parámetros de la vista que vengan en esta URL (?nombre=, ?tema=, ?ritmo=, ?chat=, ?grabacion=) pasan a la escuela.
+{
+  const q = new URLSearchParams();
+  for (const k of ['nombre', 'tema', 'ritmo', 'chat', 'grabacion', 'corrida', 'paso']) if (params.has(k)) q.set(k, params.get(k));
+  const qs = q.toString();
+  escuela.src = '/stage/' + (qs ? '?' + qs : '');
+}
+// Las teclas de la charla también valen dentro de la escuela (misma origen: el servidor la sirve por /stage/): el clicker sigue andando.
+function engancharTeclas(win) {
+  try {
+    win.addEventListener('keydown', teclaEnDemo, true);
+    for (const f of win.document.querySelectorAll('iframe')) f.addEventListener('load', () => { try { f.contentWindow && engancharTeclas(f.contentWindow); } catch {} });
+  } catch {}
+}
+escuela.addEventListener('load', () => { try { escuela.contentWindow && engancharTeclas(escuela.contentWindow); } catch {} });
+function teclaEnDemo(e) {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const enCampo = /^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || '') || (e.target && e.target.isContentEditable);
+  const k = e.key; let hecho = true;
+  if (k === 'PageDown' || (e.shiftKey && k === 'ArrowRight' && !enCampo)) avanzar();
+  else if (k === 'PageUp' || (e.shiftKey && k === 'ArrowLeft' && !enCampo)) retroceder();
+  else if (k === 'd' && !enCampo) alternarDemo();
+  else if (k === 'f' && !enCampo) pantallaCompleta();
+  else if (k === 'n' && !enCampo) abrirPresentador();
+  else hecho = false;
+  if (hecho) { e.preventDefault(); e.stopImmediatePropagation(); }
+}
+
+// ---------- Teclas de la presentación ----------
+document.addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  if ($('ui-ayuda').classList.contains('visible')) { if (k === 'Escape' || k === '?' || k === 'h') $('ui-ayuda').classList.remove('visible'); return; }
+  if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter') { e.preventDefault(); avanzar(); }
+  else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') { e.preventDefault(); retroceder(); }
+  else if (k === 'Home') ir(0);
+  else if (k === 'End') ir(laminas.length - 1);
+  else if (k === 'd') alternarDemo();
+  else if (k === 'n') abrirPresentador();
+  else if (k === 'f') pantallaCompleta();
+  else if (k === 't') { inicio = Date.now(); aviso('Reloj en 0:00'); publicarEstado(); }
+  else if (k === '?' || k === 'h') $('ui-ayuda').classList.add('visible');
+});
+lienzo.addEventListener('click', (e) => { if (e.button === 0) avanzar(); });
+function pantallaCompleta() { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); }
+
+// ---------- Avisos ----------
+let avisoT = null;
+function aviso(texto) { const a = $('ui-aviso'); a.textContent = texto; a.classList.add('visible'); clearTimeout(avisoT); avisoT = setTimeout(() => a.classList.remove('visible'), 2200); }
+
+// ---------- Vista del presentador (otra ventana; se habla por BroadcastChannel) ----------
+let ventanaPresentador = null;
+function abrirPresentador() {
+  if (ventanaPresentador && !ventanaPresentador.closed) { ventanaPresentador.focus(); return; }
+  ventanaPresentador = window.open('presentador.html', 'presentador', 'width=1180,height=760');
+  publicarEstado();
+}
+function publicarEstado() {
+  if (!canal || actual < 0) return;
+  canal.postMessage({ tipo: 'estado', actual, paso, total: laminas.length, inicio, demo: demoVisible });
+}
+if (canal) canal.onmessage = (ev) => {
+  const m = ev.data || {};
+  if (m.tipo === 'hola') publicarEstado();
+  else if (m.tipo === 'ir') ir(m.n);
+  else if (m.tipo === 'avanzar') avanzar();
+  else if (m.tipo === 'retroceder') retroceder();
+  else if (m.tipo === 'demo') mostrarDemo(!!m.si);
+  else if (m.tipo === 'reloj') { inicio = m.inicio; publicarEstado(); }
+};
+
+// ---------- Arranque ----------
+const ajustar = () => escalar(lienzo);
+addEventListener('resize', ajustar); ajustar();
+try {
+  ({ laminas } = await cargarDeck());
+  for (const l of laminas) lienzo.appendChild(l.section);
+  const pedida = (params.get('lamina') || location.hash.slice(1) || '').trim();
+  let n = laminas.findIndex((l) => l.id === pedida); if (n < 0 && /^\d+$/.test(pedida)) n = Number(pedida) - 1; if (n < 0) n = 0;
+  ir(n, { instantaneo: true });
+  if (params.get('presentador') === '1') abrirPresentador();
+} catch (e) { console.error(e); document.body.insertAdjacentText('afterbegin', 'No se pudo cargar el deck: ' + e.message + ' (abrí esta página con ./charla).'); }
+</script>
+</body>
+</html>

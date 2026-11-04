@@ -1,0 +1,36 @@
+/* Tipografía del deck, local (Outfit y JetBrains Mono, licencia OFL): la charla no depende de la red. */
+@font-face { font-family: 'Outfit'; src: url(assets/outfit.woff2) format('woff2'); font-weight: 300 800; font-display: swap; }
+@font-face { font-family: 'JetBrains Mono'; src: url(assets/jetbrains-mono.woff2) format('woff2'); font-weight: 100 800; font-display: swap; }
+
+html, body { margin: 0; height: 100%; background: #06050F; color: #F3F0FF; overflow: hidden; font-family: 'Outfit', Arial, sans-serif; }
+
+/* El lienzo de 1920×1080 que se escala a la ventana. Cada lámina es una <section> apilada; la actual se ve. */
+.lienzo { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.lienzo section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; display: flex; flex-direction: column; box-sizing: border-box; font-size: 32px; font-weight: 400; line-height: 1.4; opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility 0s linear .45s; }
+.lienzo section.actual { opacity: 1; visibility: visible; z-index: 2; transition: opacity .45s ease; }
+.lienzo section.anterior { opacity: 1; visibility: visible; z-index: 1; transition: none; }   /* se queda debajo mientras entra la nueva: fundido sin bache */
+.lienzo section.quieta { transition: none; }
+
+/* Pasos dentro de una lámina: lo marcado con data-paso entra con un clic (fundido corto y un leve ascenso). */
+.lienzo section [data-paso] { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
+.lienzo section [data-paso].visto { opacity: 1; transform: none; }
+.lienzo section.quieta [data-paso] { transition: none; }
+@media (prefers-reduced-motion: reduce) { .lienzo section [data-paso] { transform: none; transition: opacity .2s; } }
+
+/* Las reglas por defecto del formato del deck: div = columna flex; textos sin margen con sus tamaños por etiqueta. */
+.lienzo section *, .lienzo section *::before, .lienzo section *::after { box-sizing: border-box; }
+.lienzo section div { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.lienzo section h1, .lienzo section h2, .lienzo section h3, .lienzo section p, .lienzo section ul, .lienzo section ol { margin: 0; overflow-wrap: anywhere; }
+.lienzo section h1 { font-size: 96px; font-weight: 600; line-height: 1.1; }
+.lienzo section h2 { font-size: 64px; font-weight: 600; line-height: 1.15; }
+.lienzo section h3 { font-size: 44px; font-weight: 600; line-height: 1.2; }
+.lienzo section p, .lienzo section li { font-size: inherit; font-weight: inherit; line-height: inherit; }
+.lienzo section ul, .lienzo section ol { padding-left: 1.2em; }
+.lienzo section b { font-weight: 700; }
+.lienzo section a { color: inherit; }
+.lienzo section hr { margin: 0; border: 0; height: 0; flex-shrink: 0; }
+.lienzo section img { display: block; }
+.lienzo section x-shape, .lienzo section .x-icon { display: block; flex-shrink: 0; }
+.lienzo section x-shape[kind="ellipse"] { border-radius: 50%; }
+.lienzo section .x-icon svg { display: block; }
+.lienzo section iframe { display: block; }

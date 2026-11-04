@@ -1,0 +1,4 @@
+#!/bin/sh
+# Levanta la charla: las láminas de la versión de 30 min con la demo de Escuela Futura embebida, en http://localhost:8090/.
+# Levanta también la escuela (./escenario) si no está corriendo. Flags: --puerto N, --sin-navegador, --sin-escuela.
+cd "$(dirname "$0")" && exec node presentacion/servidor.mjs "$@"

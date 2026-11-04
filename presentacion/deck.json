@@ -1,0 +1,73 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-01T22:30:00Z"
+  },
+  "lists": "css",
+  "title": "Institución Agéntica — Innova Educa 21 (versión 30 min)",
+  "order": [
+    "cover",
+    "equipo",
+    "sofia",
+    "chatgpt",
+    "carrera",
+    "entrevista",
+    "primera-vez",
+    "ranking",
+    "manos",
+    "datos",
+    "tesis",
+    "capo",
+    "agente",
+    "escuela",
+    "vivo",
+    "decision",
+    "aula",
+    "criterio",
+    "recibe",
+    "cierre",
+    "gracias"
+  ],
+  "sections": {
+    "apertura": {
+      "description": "Portada, quiénes somos, y la historia de Sofía: tres paradigmas en una sola carrera.",
+      "start": "cover"
+    },
+    "velocidad": {
+      "description": "I · Velocidad: la carrera dura más que la tecnología; Argentina #31; manos en la sala; casi todas usan IA, pocas decidieron cómo.",
+      "start": "primera-vez"
+    },
+    "tesis": {
+      "description": "Lo que venimos a decir: no se puede formar para trabajar con agentes desde una institución que no trabaja con agentes.",
+      "start": "tesis"
+    },
+    "tecnologia": {
+      "description": "II · Tecnología: de preguntar a delegar, y un agente en cinco puntos.",
+      "start": "capo"
+    },
+    "construccion": {
+      "description": "III · Construcción: Escuela Futura, la demo en vivo (el objetivo se manda en escena; un solo caso, narrado) y la decisión humana.",
+      "start": "escuela"
+    },
+    "dilemas": {
+      "description": "IV · Dilemas: qué consigna vale la pena pedir, y delegar con criterio.",
+      "start": "aula"
+    },
+    "cierre": {
+      "description": "Sofía se recibe, la idea para llevarse y gracias.",
+      "start": "recibe"
+    }
+  },
+  "faces": {
+    "outfit": {
+      "family": "Outfit",
+      "src": "assets/outfit.woff2"
+    },
+    "jetbrains-mono": {
+      "family": "JetBrains Mono",
+      "src": "assets/jetbrains-mono.woff2"
+    }
+  },
+  "designSystems": []
+}
