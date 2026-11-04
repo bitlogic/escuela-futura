@@ -20,6 +20,9 @@
   #p-plan, #p-hora { font: 400 16px/1.4 'JetBrains Mono', monospace; color: #A8A2D0; }
   #p-plan b { color: #2EE6D2; font-weight: 500; }
   #p-cual { font: 500 15px/1.4 'JetBrains Mono', monospace; color: #A8A2D0; }
+  #p-escena { font: 400 13px/1.5 'JetBrains Mono', monospace; color: #A8A2D0; margin: 6px 0 0; min-height: 1.5em; }
+  #p-escena b { color: #2EE6D2; font-weight: 500; }
+  #p-escena .mueve { color: #FF4FD8; }
   #demo-chip { display: none; font: 500 13px/1 'JetBrains Mono', monospace; color: #FF4FD8; border: 1px solid #FF4FD8; border-radius: 999px; padding: 6px 12px; width: max-content; }
   #demo-chip.visible { display: inline-block; }
   main { padding: 16px 20px 24px; overflow: auto; }
@@ -30,7 +33,7 @@
 </head>
 <body>
 <header>
-  <div><p class="rotulo" id="p-cual">Actual</p><div class="mini"><div id="p-actual" class="lienzo"></div></div><p id="demo-chip">● la demo está en pantalla</p></div>
+  <div><p class="rotulo" id="p-cual">Actual</p><div class="mini"><div id="p-actual" class="lienzo"></div></div><p id="p-escena"></p><p id="demo-chip">● la demo está en pantalla</p></div>
   <div><p class="rotulo">Siguiente</p><div class="mini oscura"><div id="p-siguiente" class="lienzo"></div></div></div>
   <div id="p-reloj"><p id="p-transcurrido">0:00</p><p id="p-plan"></p><p id="p-hora"></p></div>
 </header>
@@ -59,7 +62,19 @@ function pintar() {
   if (m) { const t = document.createElement('span'); t.className = 'tiempo'; t.textContent = m[1] + '\n'; n.appendChild(t); n.append(m[2]); } else n.textContent = l.notas || '(sin notas)';
   $('p-plan').innerHTML = l.desde ? `Plan: <b>${l.desde}</b>${l.hasta ? ' – <b>' + l.hasta + '</b>' : ''}` : '';
   $('demo-chip').classList.toggle('visible', !!estado.demo);
+  escenaTexto(l, sig);
   reloj();
+}
+// La puesta en escena: el plano actual con sus parámetros, y si la siguiente lámina mueve la cámara.
+function escenaTexto(l, sig) {
+  const e = estado.escena, p = $('p-escena');
+  if (!l.escena || !e || !e.activa) { p.textContent = l.escena ? 'escena: apagada' : 'sin escena'; return; }
+  const partes = [`plano <b>${e.plano}</b>`];
+  if (e.sofia) partes.push(`Sofía ${e.sofia}`); if (e.foco) partes.push(`foco ${e.foco}`); if (e.quieto) partes.push('quieta');
+  partes.push(`hora ${Number(e.hora).toFixed(2)}`, `fachada ${Number(e.fachada).toFixed(1)}`, `placa ${e.placa}`);
+  const sigPlano = sig && sig.escena ? sig.escena.plano : null;
+  const mueve = sig && (!sig.escena || sigPlano !== e.plano || (sig.escena.zoom != null && Math.abs(sig.escena.zoom - e.zoom) > .05));
+  p.innerHTML = partes.join(' · ') + (sig ? (mueve ? ` <span class="mueve">→ ${sigPlano ? 'la cámara va a ' + sigPlano : 'sin escena'}</span>` : ' · la siguiente no mueve la cámara') : '');
 }
 function reloj() {
   const seg = estado.inicio ? (Date.now() - estado.inicio) / 1000 : 0;

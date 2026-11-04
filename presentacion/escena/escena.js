@@ -9,13 +9,21 @@ import { crearLuz } from './luz.js';
 import { crearGiro } from './giro.js';
 import { crearSonido } from './sonido.js';
 
-export const PLACAS = ['izq', 'der', 'abajo', 'ninguna'];
+export const PLACAS = ['izq', 'der', 'abajo', 'plena', 'ninguna'];   // plena: placa entera sobre la escena, que queda como textura
 /** Las claves que puede traer data-escena (además del plano). */
 export const CLAVES = ['plano', 'camx', 'camy', 'zoom', 'hora', 'fachada', 'luzInterior', 'sofia', 'manos', 'vacia', 'quieto', 'foco', 'oficina', 'esfera', 'giro'];
 export const SOFIAS = ['entra', 'camina', 'puerta', 'sale'];
 export const FOCOS = ['rol', 'skills', 'herramientas', 'memoria', 'autonomia'];
 const PLACA_COLOR = { oscura: '#0B0920', clara: '#F3F0FF' };
 const SEGUNDOS_LECTURA = 5;
+// Las señales que suenan al entrar a una lámina (solo yendo hacia adelante, nunca al abrir en ella): el timbre y el motivo
+// al revés cuando Sofía entra, las luces con la tesis, el motivo al derecho con la esfera en 2026 y en el cierre.
+const SENALES = {
+  sofia: (s) => { s.timbre(); setTimeout(() => s.motivo(false), 1200); },
+  tesis: (s) => s.luces(),
+  recibe: (s) => s.motivo(true),
+  cierre: (s) => s.motivo(true),
+};
 
 /** Parsea un data-escena; devuelve el objeto o lanza con el motivo (lo usan la app y los tests). */
 export function leerEscena(texto) {
@@ -59,7 +67,7 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
   const cur = { luzInterior: 1, sofiaK: 0, manos: 0, pausaLectura: 0 };
   const obj = { luzInterior: 1, sofiaK: 0, manos: 0 };
   const fijo = { plano: null, sofia: null, vacia: false, quieto: false, foco: null, oficina: 'coordinacion', esfera: false, placa: 'ninguna', placaClara: false, paso: 0, giro: false };
-  let activa = false, lamina = null, demoVisible = false, parada = false, ultimo = 0, rafId = 0, fin = null;
+  let activa = false, lamina = null, demoVisible = false, parada = false, ultimo = 0, rafId = 0, fin = null, indiceAnterior = -1;
 
   // ---------- Qué pide cada lámina ----------
   function objetivoDe(l, paso) {
@@ -74,7 +82,8 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
     placa.className = 'pos-' + pl.pos + (pl.clara ? ' clara' : '') + (pl.pos === 'ninguna' ? '' : ' visible');
     placa.style.background = pl.propia ? (l.section.style.background || PLACA_COLOR.oscura) : (pl.clara ? PLACA_COLOR.clara : PLACA_COLOR.oscura);
   }
-  function ir(l, paso = 0, { instantaneo = false } = {}) {
+  function ir(l, paso = 0, { instantaneo = false, indice = -1 } = {}) {
+    const adelante = indice > indiceAnterior; indiceAnterior = indice;
     lamina = l; fijo.paso = paso;
     if (!l || !l.escena || op.sinEscena) { apagar(); return false; }
     const { e, pl, sofiaK, manos, foco, luzInterior } = objetivoDe(l, paso);
@@ -85,6 +94,7 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
     aplicarPlaca(l, pl);
     cur.pausaLectura = 1;
     if (instantaneo) { camara.saltar(); Object.assign(cur, obj); cur.pausaLectura = 0; }
+    else if (adelante && SENALES[l.id]) SENALES[l.id](sonido);
     else if (cambioPlano) sonido.tic();
     if (!activa) { activa = true; canvas.classList.add('visible'); document.body.classList.add('con-escena'); arrancar(); }
     return true;
@@ -93,11 +103,12 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
   function apagar() { activa = false; canvas.classList.remove('visible'); placa.className = ''; document.body.classList.remove('con-escena'); }
 
   // ---------- La demo ----------
+  let entroConGiro = false;   // la demo entró con el giro: sale con el giro, aunque la lámina ya sea otra (PageDown a "decision")
   async function demo(si) {
     if (si === demoVisible) return;
     demoVisible = si;
-    if (si) { if (activa && fijo.giro) { sonido.giro(); await giro.aCenital(); } else { capaDemo.classList.add('visible'); } }
-    else { if (activa && fijo.giro) { sonido.giro(); await giro.aPerfil(); } else capaDemo.classList.remove('visible'); }
+    if (si) { entroConGiro = activa && fijo.giro; if (entroConGiro) { sonido.giro(); await giro.aCenital(); } else capaDemo.classList.add('visible'); }
+    else { const conGiro = entroConGiro && activa; entroConGiro = false; if (conGiro) { sonido.giro(); await giro.aPerfil(); } else capaDemo.classList.remove('visible'); }
   }
 
   // ---------- El bucle ----------
@@ -112,7 +123,7 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
   }
   function cuadro(ahora) {
     rafId = 0;
-    if (!activa || demoVisible || parada || giro.enCurso) { if (activa && !parada) rafId = requestAnimationFrame(cuadro); return; }
+    if (!activa || parada || (demoVisible && !giro.enCurso)) { if (activa && !parada) rafId = requestAnimationFrame(cuadro); return; }   // durante el giro se sigue dibujando: la cámara viaja mientras el perfil se acuesta o se levanta
     const dt = Math.min(.1, (ahora - ultimo) / 1000); ultimo = ahora;
     const cam = camara.tick(dt);
     const k = 1 - Math.pow(0.05, dt), kr = 1 - Math.pow(0.03, dt);
@@ -126,7 +137,7 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
     edificio.dibujarFachada(fc, estado);
     const aP = (wx, wy) => { const [x, y, s] = camara.aPantalla(wx, wy); return [x, y, s]; };
     const aPC = (wx, wy, f) => camara.aPantallaCapa(wx, wy, f);
-    luz.render({ mundo, fachada, capas: { lejana, cercana }, estado, aPantalla: aP, aPantallaCapa: aPC, ventanas: edificio.ventanas(estado), lamparas: edificio.lamparas(estado), foco: gente.focoEn(estado), cielo: edificio.cielo, vista });
+    luz.render({ mundo, fachada, capas: { lejana, cercana }, estado, aPantalla: aP, aPantallaCapa: aPC, ventanas: edificio.ventanas(estado), lamparas: edificio.lamparas(estado), foco: gente.focoEn(estado), sofiaEn: gente.sofia && gente.sofia.visible ? { x: gente.sofia.x + 3, y: gente.sofia.y - 8 } : null, proyector: typeof edificio.proyector === 'function' ? edificio.proyector(estado) : null, farolas: typeof edificio.farolas === 'function' ? edificio.farolas() : [], cielo: edificio.cielo, vista });
     luz.medirFps(dt);
     if (fin) fin(estado);
     rafId = requestAnimationFrame(cuadro);
@@ -143,6 +154,7 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
     estado() { return activa ? { activa, plano: fijo.plano, ...fijo, ...cur, ...camara.actual(), hd: luz.hd, fps: luz.fps } : { activa: false }; },
     get activa() { return activa; },
     alFin(f) { fin = f; },             // para el banco: un callback por cuadro con el estado
+    fijar(cambios = {}) { for (const [k, v] of Object.entries(cambios)) { if (k in obj) { obj[k] = v; cur[k] = v; } else if (k in fijo) fijo[k] = v; } },   // para el banco: pisa el estado interpolado o fijo (sofiaK, manos, foco…)
     camara, edificio, gente, luz, giro, sonido,
   };
 }

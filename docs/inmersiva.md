@@ -87,33 +87,33 @@ El travelling de Sofía (`hall`, `sofia: 'camina'`): camx va de 290 a 420 a lo l
 
 ### 3.4 Lo que declara cada lámina
 
-`data-escena` (JSON con claves del estado; lo que falta hereda del plano) y `data-placa` (`izq|der|abajo|ninguna`, más la palabra `clara` cuando la lámina es de fondo claro). La placa toma el color base del deck: oscura `#0B0920`, clara `#F3F0FF`; en `tesis` la banda de abajo lleva el degradado propio de la lámina. Los pasos (`data-paso`) se publican en `estado.paso` y la escena reacciona donde se indica.
+`data-escena` (JSON con claves del estado; lo que falta hereda del plano) y `data-placa` (`izq|der|abajo|plena|ninguna`, más `clara` cuando la lámina es de fondo claro y `propia` cuando la placa toma el fondo de la lámina; `plena` es la placa entera al 86 % para las láminas que son listas o texto centrado). La placa toma el color base del deck: oscura `#0B0920`, clara `#F3F0FF`; en `tesis` la banda de abajo lleva el degradado propio de la lámina. Los pasos (`data-paso`) se publican en `estado.paso` y la escena reacciona donde se indica.
 
 | # | Lámina | `data-escena` | `data-placa` | Qué pasa |
 |---|---|---|---|---|
-| 1 | cover | `{"plano":"fachada","hora":0,"esfera":true}` | izq | ventanas prendiéndose; la esfera sobre el edificio, arriba a la derecha |
+| 1 | cover | `{"plano":"fachada","hora":0}` | izq | ventanas prendiéndose; la esfera es la del deck, en la propia lámina |
 | 2 | equipo | `{"plano":"fachada","hora":0.05,"zoom":1.4,"camx":340,"camy":200}` | izq | la cámara se acerca a la puerta |
-| 3 | sofia | `{"plano":"hall","sofia":"entra"}` | izq | Sofía entra por la puerta y arranca; las marcas 2022 · 2024 · 2026 están en la pared del hall; la esfera se encoge en la marca de 2022 |
+| 3 | sofia | `{"plano":"hall","sofia":"entra","esfera":true}` | izq | Sofía entra por la puerta y arranca; las marcas 2022 · 2024 · 2026 están en la pared del hall; la esfera se encoge en la marca de 2022 |
 | 4 | chatgpt | `{"plano":"hall","sofia":"camina"}` | izq | sigue el travelling |
 | 5 | carrera | `{"plano":"hall","sofia":"camina"}` | izq | sigue; los pasos de la lámina (2024, 2026) adelantan `sofiaK` |
-| 6 | entrevista | `{"plano":"hall","sofia":"puerta"}` | izq | Sofía al final del pasillo, de espaldas a la cámara, mirando la puerta |
+| 6 | entrevista | `{"plano":"hall","sofia":"puerta"}` | plena | Sofía al final del pasillo, de espaldas a la cámara, mirando la puerta |
 | 7 | primera-vez | `{"plano":"edificio","hora":1}` | izq clara | amanece: el cambio de luz de las notas, literal |
-| 8 | ranking | `{"plano":"edificio","hora":1,"quieto":true}` | izq clara | quieto |
+| 8 | ranking | `{"plano":"edificio","hora":1,"quieto":true}` | plena clara | quieto |
 | 9 | manos | `{"plano":"aula","manos":"pasos"}` | izq | las manos suben con los pasos de la lámina (paso 1: un tercio; paso 2: todas) |
-| 10 | datos | `{"plano":"aula","zoom":1.6,"quieto":true}` | izq | quieto, un poco más lejos |
-| 11 | tesis | `{"plano":"edificio","hora":0.5,"luzInterior":1}` | abajo | todas las ventanas encendidas |
+| 10 | datos | `{"plano":"aula","zoom":1.6,"quieto":true}` | plena | quieto, un poco más lejos |
+| 11 | tesis | `{"plano":"edificio","hora":0.5,"luzInterior":1}` | abajo propia | todas las ventanas encendidas |
 | 12 | capo | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0}` | izq | la fachada se desvanece al entrar: casa de muñecas con los seis trabajando |
 | 13 | agente | `{"plano":"oficina","oficina":"coordinacion","foco":"pasos"}` | izq | paso 1 rol (el agente se ilumina), 2 skills (el estante), 3 herramientas (la pantalla), 4 memoria (el cuaderno), 5 autonomía (se levanta y va a otra sala) |
 | 14 | escuela | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0}` | izq | mismo plano que capo, sin movimiento |
 | 15 | vivo | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0,"giro":true}` | ninguna | el giro |
 | 16 | decision | `{"plano":"oficina","oficina":"direccion","hora":0.55}` | der clara | la persona en el escritorio; un agente en la puerta con el papel |
 | 17 | aula | `{"plano":"aula","hora":0.2,"manos":0,"quieto":true,"vacia":true}` | izq | la misma aula, vacía, luz de la tarde |
-| 18 | criterio | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0,"quieto":true}` | izq | el edificio abierto, quieto |
-| 19 | recibe | `{"plano":"patio","sofia":"sale","esfera":true}` | izq | Sofía sale por la puerta y cruza hacia fuera de cuadro; la esfera en la marca de 2026 |
-| 20 | cierre | `{"plano":"fachada","hora":0.85,"esfera":true}` | abajo | el mismo encuadre que la portada; la esfera se expande |
+| 18 | criterio | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0,"quieto":true}` | plena | el edificio abierto, quieto |
+| 19 | recibe | `{"plano":"patio","sofia":"sale"}` | izq | Sofía sale por la puerta y cruza hacia fuera de cuadro; la esfera en la marca de 2026 |
+| 20 | cierre | `{"plano":"fachada","hora":0.85}` | izq | el mismo encuadre que la portada; la esfera se expande |
 | 21 | gracias | `{"plano":"fachada","hora":0.5,"luzInterior":1}` | izq | ventanas prendidas durante las preguntas |
 
-Las láminas de fondo claro (primera-vez, ranking, decision) llevan placa clara y escena de día. Dos láminas mueven su bloque de texto al pie para la placa de abajo (tesis, cierre): es layout, no contenido.
+Las láminas de fondo claro (primera-vez, ranking, decision) llevan placa clara y escena de día. Tesis mueve su bloque de texto al pie para la placa de abajo; decision se alinea a la derecha; primera-vez, manos y aula angostan el texto para que quede sobre la placa; y el año o la palabra gigante de fondo del deck (sofia, chatgpt, recibe) lleva `data-marca-agua` y no se ve con escena. Es layout, no contenido. Lo que trajeron los módulos reales está en `presentacion/escena/CONTRATO.md`, "Ajustes de la oleada 1".
 
 ### 3.5 Las firmas
 

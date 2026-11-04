@@ -75,7 +75,7 @@ function ir(n, { instantaneo = false, completa = false } = {}) {
   actual = n;
   history.replaceState(null, '', '#' + sig.id);
   numero();
-  if (escena) escena.ir(sig, paso, { instantaneo });
+  if (escena) escena.ir(sig, paso, { instantaneo, indice: n });
   if (n > 0 && inicio == null) inicio = Date.now();   // el reloj arranca al salir de la portada
   mostrarDemo(!!sig.demo);
   publicarEstado();
@@ -122,6 +122,7 @@ function engancharTeclas(win) {
 escuela.addEventListener('load', () => { try { escuela.contentWindow && engancharTeclas(escuela.contentWindow); } catch {} });
 function teclaEnDemo(e) {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (escena) { escena.gesto(); if (escena.giro.enCurso) { e.preventDefault(); e.stopImmediatePropagation(); return; } }
   const enCampo = /^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || '') || (e.target && e.target.isContentEditable);
   const k = e.key; let hecho = true;
   if (k === 'PageDown' || (e.shiftKey && k === 'ArrowRight' && !enCampo)) avanzar();
@@ -129,6 +130,7 @@ function teclaEnDemo(e) {
   else if (k === 'd' && !enCampo) alternarDemo();
   else if (k === 'f' && !enCampo) pantallaCompleta();
   else if (k === 'n' && !enCampo) abrirPresentador();
+  else if (k === 'm' && !enCampo && escena) { const r = escena.tecla('m'); if (r.aviso) aviso(r.aviso); }
   else hecho = false;
   if (hecho) { e.preventDefault(); e.stopImmediatePropagation(); }
 }
@@ -138,6 +140,7 @@ document.addEventListener('keydown', (e) => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key;
   if (escena) escena.gesto();   // el primer gesto habilita el audio del navegador
+  if (escena && escena.giro.enCurso) { e.preventDefault(); return; }   // mientras gira la cámara, ninguna tecla: el giro termina solo
   if ($('ui-ayuda').classList.contains('visible')) { if (k === 'Escape' || k === '?' || k === 'h') $('ui-ayuda').classList.remove('visible'); return; }
   if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter') { e.preventDefault(); avanzar(); }
   else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') { e.preventDefault(); retroceder(); }
@@ -150,7 +153,7 @@ document.addEventListener('keydown', (e) => {
   else if (k === 't') { inicio = Date.now(); aviso('Reloj en 0:00'); publicarEstado(); }
   else if (k === '?' || k === 'h') $('ui-ayuda').classList.add('visible');
 });
-lienzo.addEventListener('click', (e) => { if (e.button === 0) avanzar(); });
+lienzo.addEventListener('click', (e) => { if (escena) escena.gesto(); if (e.button === 0 && !(escena && escena.giro.enCurso)) avanzar(); });
 function pantallaCompleta() { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); }
 
 // ---------- Avisos ----------
@@ -166,7 +169,7 @@ function abrirPresentador() {
 }
 function publicarEstado() {
   if (!canal || actual < 0) return;
-  canal.postMessage({ tipo: 'estado', actual, paso, total: laminas.length, inicio, demo: demoVisible });
+  canal.postMessage({ tipo: 'estado', actual, paso, total: laminas.length, inicio, demo: demoVisible, escena: escena ? escena.estado() : null });
 }
 if (canal) canal.onmessage = (ev) => {
   const m = ev.data || {};

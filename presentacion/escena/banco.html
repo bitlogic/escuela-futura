@@ -40,7 +40,7 @@ function laminaDe(p) {
 }
 const lamina = laminaDe(q);
 escena.ir(lamina, num('paso', 0), { instantaneo: q.get('instantaneo') !== '0' });
-if (q.has('sofiaK')) { escena.camara.ir({ plano: lamina.escena.plano, sofiaK: num('sofiaK', 0), placa: lamina.placa }); escena.camara.saltar(); }
+if (q.has('sofiaK')) { escena.fijar({ sofiaK: num('sofiaK', 0) }); escena.camara.ir({ plano: lamina.escena.plano, sofiaK: num('sofiaK', 0), placa: lamina.placa }); escena.camara.saltar(); }
 
 const panel = document.getElementById('panel'); if (q.get('panel') === '0') panel.classList.add('oculto');
 escena.alFin((estado) => { panel.textContent = `plano ${estado.plano} · zoom ${estado.zoom.toFixed(2)} · hora ${estado.hora.toFixed(2)} · fachada ${estado.fachada.toFixed(2)}\nsofia ${estado.sofia || '-'} k ${estado.sofiaK.toFixed(2)} · manos ${estado.manos.toFixed(2)} · foco ${estado.foco || '-'} · quieto ${estado.quieto}\nhd ${estado.hd} · fps ${escena.luz.fps.toFixed(0)} · lectura ${estado.pausaLectura.toFixed(2)}`; });
