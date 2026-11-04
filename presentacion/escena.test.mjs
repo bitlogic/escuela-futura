@@ -37,7 +37,7 @@ test('las 21 láminas declaran su puesta en escena: data-escena válido y data-p
   assert.throws(() => leerEscena('{"plano":"nave"}'), /plano desconocido/);
   assert.throws(() => leerEscena('{"plano":"hall","color":1}'), /clave desconocida/);
   assert.throws(() => leerPlaca('arriba'), /placa desconocida/);
-  assert.deepEqual(leerPlaca('der clara'), { pos: 'der', clara: true, propia: false });
+  assert.deepEqual(leerPlaca('der clara'), { pos: 'der', clara: true, propia: false, fija: false });
 });
 
 test('los seis planos tienen cámara, hora y fachada; la cámara interpola hacia el objetivo y corre la escena según la placa', () => {

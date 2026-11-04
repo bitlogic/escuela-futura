@@ -99,7 +99,7 @@ El travelling de Sofía (`hall`, `sofia: 'camina'`): camx va de 290 a 420 a lo l
 | 6 | entrevista | `{"plano":"hall","sofia":"puerta"}` | plena | Sofía al final del pasillo, de espaldas a la cámara, mirando la puerta |
 | 7 | primera-vez | `{"plano":"edificio","hora":1}` | izq clara | amanece: el cambio de luz de las notas, literal |
 | 8 | ranking | `{"plano":"edificio","hora":1,"quieto":true}` | plena clara | quieto |
-| 9 | manos | `{"plano":"aula","manos":"pasos"}` | izq | las manos suben con los pasos de la lámina (paso 1: un tercio; paso 2: todas) |
+| 9 | manos | `{"plano":"aula","manos":"pasos"}` | izq | las manos suben con los pasos de la lámina (paso 1: todas, mientras la sala tiene la mano arriba; paso 2: bajan, quedan pocas) |
 | 10 | datos | `{"plano":"aula","zoom":1.6,"quieto":true}` | plena | quieto, un poco más lejos |
 | 11 | tesis | `{"plano":"edificio","hora":0.5,"luzInterior":1}` | abajo propia | todas las ventanas encendidas |
 | 12 | capo | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0}` | izq | la fachada se desvanece al entrar: casa de muñecas con los seis trabajando |

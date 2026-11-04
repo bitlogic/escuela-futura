@@ -200,7 +200,7 @@ try {
   if (params.get('sin-escena') !== '1') {
     try {
       const [{ crearEscena }, { SALAS, TEMAS }, { MODELOS, cargarImagen }] = await Promise.all([import('./escena/escena.js'), import('/stage/oficina.js'), import('/stage/personajes.js')]);
-      escena = await crearEscena({ canvas: $('ui-escena'), placa: $('ui-placa'), capaDemo: demo, iframeDemo: escuela, deps: { SALAS, TEMAS, MODELOS, cargarImagen }, opciones: { hd: params.get('plano') !== '1', mudo: params.get('mudo') === '1' }, alFallar: apagarEscena });
+      escena = await crearEscena({ canvas: $('ui-escena'), placa: $('ui-placa'), capaDemo: demo, iframeDemo: escuela, lienzo, deps: { SALAS, TEMAS, MODELOS, cargarImagen }, opciones: { hd: params.get('plano') !== '1', mudo: params.get('mudo') === '1' }, alFallar: apagarEscena });
     } catch (e) { console.error('La escena no pudo arrancar; sigue la charla sin ella.', e); escena = null; }
   }
   window.charla = { get escena() { return escena; }, get laminas() { return laminas; }, ir };   // para diagnóstico (FPS, estado) desde la consola y Playwright

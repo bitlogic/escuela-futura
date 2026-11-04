@@ -182,7 +182,7 @@ export function crearLuz(canvas) {
     // el halo del foco ("agente": el agente, el estante, la pantalla, el cuaderno), con un latido leve
     if (foco && tFoco > .01) {
       const [x, y, s] = aPantalla(foco.x, foco.y), lat = quieto ? 1 : .9 + .1 * Math.sin(t * 2.2);
-      halo(x, y, 26 * s * lat, 26 * s * lat, COLORES.foco, .75 * tFoco); halo(x, y, 9 * s, 9 * s, [255, 255, 255], .45 * tFoco);
+      halo(x, y, 52 * s * lat, 52 * s * lat, COLORES.foco, .35 * tFoco); halo(x, y, 14 * s, 14 * s, [255, 255, 255], .18 * tFoco);
     }
     // el halo de Sofía: solo cuando escena.js pasa su posición (sofiaEn, en coordenadas del mundo)
     if (estado.sofia && sofiaEn) { const [x, y, s] = aPantalla(sofiaEn.x, sofiaEn.y); halo(x, y, 20 * s, 20 * s, COLORES.sofia, .45); }

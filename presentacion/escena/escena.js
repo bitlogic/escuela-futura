@@ -42,14 +42,14 @@ export function leerPlaca(texto) {
   const partes = (texto || 'izq').trim().split(/\s+/);
   const pos = partes[0];
   if (!PLACAS.includes(pos)) throw new Error(`placa desconocida: ${pos}`);
-  for (const p of partes.slice(1)) if (!['clara', 'propia'].includes(p)) throw new Error(`modificador de placa desconocido: ${p}`);
-  return { pos, clara: partes.includes('clara'), propia: partes.includes('propia') };
+  for (const p of partes.slice(1)) if (!['clara', 'propia', 'fija'].includes(p)) throw new Error(`modificador de placa desconocido: ${p}`);
+  return { pos, clara: partes.includes('clara'), propia: partes.includes('propia'), fija: partes.includes('fija') };   // fija: no mide el texto, queda la placa del CSS
 }
 
 const lerp = (a, b, k) => a + (b - a) * k;
 const lienzo = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
 
-export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, deps, opciones = {}, alFallar = null }) {
+export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, lienzo: lienzoLaminas = null, deps, opciones = {}, alFallar = null }) {
   const { SALAS, TEMAS, MODELOS, cargarImagen } = deps;
   const op = { hd: true, sinEscena: false, mudo: false, simple: false, ...opciones };
   const camara = crearCamara();
@@ -88,9 +88,40 @@ export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, 
     const foco = e.foco === 'pasos' ? ([null, ...FOCOS][paso] ?? null) : (e.foco ?? null);
     return { e, pl, sofiaK, manos, foco, luzInterior: e.luzInterior ?? 1 };
   }
+  const MARGEN_PLACA = 48, RAMPA_PLACA = 80, TOPE_PLACA = .72;
+  // Dónde termina el texto de la lámina (coordenadas del lienzo de 1920×1080): los textos sin fondo propio, con sus pasos incluidos.
+  function medirTexto(section) {
+    const sr = section.getBoundingClientRect(); const s = sr.width / 1920; if (!s) return null;
+    // Se saltean los textos con fondo propio (tarjetas) y los que están pineados (la línea de tiempo al pie, las marcas de agua): no piden placa.
+    const conFondo = (el) => { for (let e = el; e && e !== section; e = e.parentElement) { const st = getComputedStyle(e); if (st.position === 'absolute' || (st.backgroundColor && st.backgroundColor !== 'rgba(0, 0, 0, 0)' && st.backgroundColor !== 'transparent') || (st.backgroundImage && st.backgroundImage !== 'none')) return true; } return false; };
+    let right = 0, left = 1920, top = 1080, hay = false;
+    for (const el of section.querySelectorAll('h1, h2, h3, p, li')) {
+      if (!el.textContent.trim() || el.closest('[data-marca-agua]') || conFondo(el)) continue;
+      // el texto real, no la caja (en una columna flex un <p> ocupa todo el ancho aunque diga dos palabras)
+      const rango = document.createRange(); rango.selectNodeContents(el); const r = rango.getBoundingClientRect(); if (!r.width) continue;
+      hay = true; right = Math.max(right, (r.right - sr.left) / s); left = Math.min(left, (r.left - sr.left) / s); top = Math.min(top, (r.top - sr.top) / s);
+    }
+    return hay ? { right, left, top, s, ox: sr.left, oy: sr.top } : null;
+  }
+  let placaActual = null;
   function aplicarPlaca(l, pl) {
-    placa.className = 'pos-' + pl.pos + (pl.clara ? ' clara' : '') + (pl.pos === 'ninguna' ? '' : ' visible');
+    placaActual = { l, pl };
+    let pos = pl.pos;
+    const m = !pl.fija && (pos === 'izq' || pos === 'der' || pos === 'abajo') ? medirTexto(l.section) : null;
+    if (m) {
+      const frac = pos === 'izq' ? (m.right + MARGEN_PLACA) / 1920 : pos === 'der' ? 1 - (m.left - MARGEN_PLACA) / 1920 : 1 - (m.top - MARGEN_PLACA) / 1080;
+      if (frac > TOPE_PLACA) pos = 'plena';
+    }
+    placa.className = 'pos-' + pos + (pl.clara ? ' clara' : '') + (pos === 'ninguna' ? '' : ' visible');
     placa.style.background = pl.propia ? (l.section.style.background || PLACA_COLOR.oscura) : (pl.clara ? PLACA_COLOR.clara : PLACA_COLOR.oscura);
+    let mascara = '';
+    if (m && pos !== 'plena') {
+      const rampa = RAMPA_PLACA * m.s;
+      if (pos === 'izq') { const borde = m.ox + (m.right + MARGEN_PLACA) * m.s; mascara = `linear-gradient(90deg, #000 0, #000 ${borde}px, transparent ${borde + rampa}px)`; }
+      else if (pos === 'der') { const borde = innerWidth - (m.ox + (m.left - MARGEN_PLACA) * m.s); mascara = `linear-gradient(270deg, #000 0, #000 ${borde}px, transparent ${borde + rampa}px)`; }
+      else if (pos === 'abajo') { const borde = innerHeight - (m.oy + (m.top - MARGEN_PLACA) * m.s); mascara = `linear-gradient(0deg, #000 0, #000 ${borde}px, transparent ${borde + rampa}px)`; }
+    }
+    placa.style.webkitMaskImage = mascara; placa.style.maskImage = mascara;
   }
   function ir(l, paso = 0, { instantaneo = false, indice = -1 } = {}) {
     const adelante = indice > indiceAnterior; indiceAnterior = indice; clearTimeout(senalDiferida);
@@ -117,13 +148,14 @@ export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, 
   async function demo(si) {
     if (si === demoVisible) return;
     demoVisible = si;
-    if (si) { entroConGiro = activa && fijo.giro; if (entroConGiro) { sonido.giro(); await giro.aCenital(); } else capaDemo.classList.add('visible'); }
-    else { const conGiro = entroConGiro && activa; entroConGiro = false; arrancar(); if (conGiro) { sonido.giro(); await giro.aPerfil(); } else capaDemo.classList.remove('visible'); }
+    const enGiro = (on) => { placa.classList.toggle('en-giro', on); if (lienzoLaminas) lienzoLaminas.classList.toggle('en-giro', on); };
+    if (si) { entroConGiro = activa && fijo.giro; if (entroConGiro) { enGiro(true); sonido.giro(); await new Promise((r) => setTimeout(r, 200)); await giro.aCenital(); } else capaDemo.classList.add('visible'); }
+    else { const conGiro = entroConGiro && activa; entroConGiro = false; arrancar(); if (conGiro) { sonido.giro(); await giro.aPerfil(); enGiro(false); } else capaDemo.classList.remove('visible'); }
   }
 
   // ---------- El bucle ----------
   function medir() { const dpr = Math.min(1.5, devicePixelRatio || 1); const w = Math.round(innerWidth * dpr), h = Math.round(innerHeight * dpr); if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; } }
-  addEventListener('resize', medir); medir();
+  addEventListener('resize', () => { medir(); if (activa && placaActual) aplicarPlaca(placaActual.l, placaActual.pl); }); medir();
   document.addEventListener('visibilitychange', () => { parada = document.hidden; if (!parada) arrancar(); });
   function arrancar() { if (!rafId) { ultimo = performance.now(); rafId = requestAnimationFrame(cuadro); } }
   function estadoActual(cam) {

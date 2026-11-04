@@ -5,7 +5,7 @@ export const PANTALLA = { W: 1920, H: 1080, PX: 3 };          // a zoom 1, cada 
 
 export const PLANOS = {
   fachada:  { camx: 320, camy: 160, zoom: 1,    hora: 0,   fachada: 1 },
-  hall:     { camx: 350, camy: 190, zoom: 2.3,  hora: .15, fachada: 0 },
+  hall:     { camx: 350, camy: 232, zoom: 2.3,  hora: .15, fachada: 0 },   // la planta alta queda fuera de cuadro: nadie cortado a mitad de cuerpo
   edificio: { camx: 320, camy: 150, zoom: .85,  hora: .5,  fachada: 1 },
   aula:     { camx: 210, camy: 190, zoom: 2,    hora: .25, fachada: 0 },
   oficina:  { camx: 240, camy: 110, zoom: 2.4,  hora: .55, fachada: 0 },
@@ -23,7 +23,7 @@ const lerp = (a, b, k) => a + (b - a) * k;
 export function crearCamara() {
   const cur = { camx: 320, camy: 160, zoom: 1, hora: 0, fachada: 1, dx: 0, dy: 0 };
   const obj = { ...cur };
-  const LENTAS = ['camx', 'camy', 'zoom', 'hora'];          // la cámara se mueve con calma
+  const LENTAS = ['camx', 'camy', 'zoom'];                  // la cámara se mueve con calma; la hora, más despacio todavía (un amanecer dura 2 s)
   const RAPIDAS = ['fachada', 'dx', 'dy'];                   // la fachada y el corrimiento, un poco más vivos
   return {
     /** Fija el objetivo: un plano por nombre más parámetros sueltos ({ plano, camx, zoom, hora, fachada, oficina, sofiaK, placa }). */
@@ -42,6 +42,7 @@ export function crearCamara() {
     tick(dt) {
       const k = 1 - Math.pow(0.0025, dt), kr = 1 - Math.pow(0.03, dt);
       for (const key of LENTAS) cur[key] = lerp(cur[key], obj[key], k);
+      cur.hora = lerp(cur.hora, obj.hora, 1 - Math.pow(0.2, dt));
       for (const key of RAPIDAS) cur[key] = lerp(cur[key], obj[key], kr);
       return { ...cur };
     },
