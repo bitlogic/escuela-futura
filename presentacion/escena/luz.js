@@ -21,7 +21,7 @@
 // El módulo se importa en Node sin DOM: nada de document fuera de crearLuz.
 
 import { PANTALLA } from './camara.js';
-import { MUNDO } from './edificio.js';
+import { SUELO_COLOR, MUNDO } from './edificio.js';
 
 const rgb = (c, a = 1) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`;
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -52,7 +52,8 @@ export function crearLuz(canvas) {
   const conFiltro = ctx && 'filter' in ctx;                            // Safari viejo no tiene ctx.filter: sin desenfoque
   const quieto = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
   const reloj = () => (typeof performance !== 'undefined' ? performance.now() / 1000 : 0);
-  let acumulado = 0, cuadros = 0, lentos = 0, avisado = false;
+  let acumulado = 0, cuadros = 0, lentos = 0, buenos = 0, avisado = false, transcurrido = 0;
+  const ESPERA_INICIAL = 5, SEGUNDOS_BUENOS = 10, FPS_RECUPERA = 55;   // se ignora el arranque (la demo también carga) y se vuelve a prender si la máquina da
   let tHaz = 0, tFoco = 0, ultimoReloj = reloj();                     // rampas internas (el haz y el halo entran y salen suaves)
 
   // ---------- Lienzos y cachés ----------
@@ -241,6 +242,7 @@ export function crearLuz(canvas) {
     const hd = luz.hd, desenfoque = hd && !luz.degradado && conFiltro;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; if (conFiltro) ctx.filter = 'none';
     ctx.fillStyle = rgb(C[0]); ctx.fillRect(0, 0, canvas.width, canvas.height);
+    { const hy = aPantalla(0, MUNDO.SUELO)[1] * v.esc + v.oy; if (hy < canvas.height) { ctx.fillStyle = SUELO_COLOR; ctx.fillRect(0, hy, canvas.width, canvas.height - hy); } }   // debajo del horizonte, suelo (las bandas en ventanas que no son 16:9)
     ctx.setTransform(v.esc, 0, 0, v.esc, v.ox, v.oy);
     ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();        // nada se sale de la composición
 
@@ -270,7 +272,9 @@ export function crearLuz(canvas) {
     acumulado += dt; cuadros++;
     if (acumulado >= 1) {
       luz.fps = cuadros / acumulado; acumulado = 0; cuadros = 0;
-      lentos = luz.fps < FPS_MINIMO ? lentos + 1 : 0;
+      transcurrido += 1; if (transcurrido <= ESPERA_INICIAL) return luz.fps;
+      lentos = luz.fps < FPS_MINIMO ? lentos + 1 : 0; buenos = luz.fps >= FPS_RECUPERA ? buenos + 1 : 0;
+      if (luz.degradado && buenos >= SEGUNDOS_BUENOS) { luz.degradado = false; buenos = 0; }
       if (lentos >= SEGUNDOS_LENTOS && !luz.degradado) { luz.degradado = true; if (!avisado) { avisado = true; console.warn(`[escena] FPS bajos (${luz.fps.toFixed(0)}): se apagan los desenfoques, quedan luces y viñeta`); } }
     }
     return luz.fps;

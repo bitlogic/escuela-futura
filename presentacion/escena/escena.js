@@ -13,13 +13,14 @@ export const PLACAS = ['izq', 'der', 'abajo', 'plena', 'ninguna'];   // plena: p
 /** Las claves que puede traer data-escena (además del plano). */
 export const CLAVES = ['plano', 'camx', 'camy', 'zoom', 'hora', 'fachada', 'luzInterior', 'sofia', 'manos', 'vacia', 'quieto', 'foco', 'oficina', 'esfera', 'giro'];
 export const SOFIAS = ['entra', 'camina', 'puerta', 'sale'];
+export { SENALES };
 export const FOCOS = ['rol', 'skills', 'herramientas', 'memoria', 'autonomia'];
 const PLACA_COLOR = { oscura: '#0B0920', clara: '#F3F0FF' };
 const SEGUNDOS_LECTURA = 5;
 // Las señales que suenan al entrar a una lámina (solo yendo hacia adelante, nunca al abrir en ella): el timbre y el motivo
 // al revés cuando Sofía entra, las luces con la tesis, el motivo al derecho con la esfera en 2026 y en el cierre.
 const SENALES = {
-  sofia: (s) => { s.timbre(); setTimeout(() => s.motivo(false), 1200); },
+  sofia: (s) => { s.timbre(); return setTimeout(() => s.motivo(false), 1200); },   // devuelve el timer: se cancela si se cambia de lámina antes
   tesis: (s) => s.luces(),
   recibe: (s) => s.motivo(true),
   cierre: (s) => s.motivo(true),
@@ -48,7 +49,7 @@ export function leerPlaca(texto) {
 const lerp = (a, b, k) => a + (b - a) * k;
 const lienzo = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
 
-export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {} }) {
+export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, deps, opciones = {}, alFallar = null }) {
   const { SALAS, TEMAS, MODELOS, cargarImagen } = deps;
   const op = { hd: true, sinEscena: false, mudo: false, simple: false, ...opciones };
   const camara = crearCamara();
@@ -57,17 +58,26 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
   const luz = crearLuz(canvas); luz.hd = op.hd;
   const giro = crearGiro({ canvasEscena: canvas, capaDemo, simple: op.simple || !op.hd });
   const sonido = crearSonido(); if (op.mudo) sonido.silenciar(true);
-  if (typeof sonido.vigilarPropuesta === 'function') sonido.vigilarPropuesta();   // la campana cuando llega la propuesta (escucha /api/eventos; oleada 1)
 
   const mundo = lienzo(MUNDO.W, MUNDO.H), fachada = lienzo(MUNDO.W, MUNDO.H), lejana = lienzo(MUNDO.W, MUNDO.H), cercana = lienzo(MUNDO.W, MUNDO.H);
   edificio.capaLejana(lejana.getContext('2d')); edificio.capaCercana(cercana.getContext('2d'));
   const mc = mundo.getContext('2d'), fc = fachada.getContext('2d');
+  // Lo estático se dibuja una vez; el interior y la fachada, solo cuando cambia la hora o la luz (cuantizadas): por cuadro queda un drawImage y la gente.
+  const fondo = lienzo(MUNDO.W, MUNDO.H), interior = lienzo(MUNDO.W, MUNDO.H); let fondoListo = false, claveInterior = '', claveFachada = '';
+  const claveDe = (estado) => `${Math.round(estado.hora * 100)}|${estado.luzInterior > .3 ? 1 : 0}|${Math.round(estado.luzInterior * 20)}`;
+  function dibujarMundo(estado) {
+    if (!fondoListo) { edificio.dibujarFondo(fondo.getContext('2d'), estado); fondoListo = true; }
+    const clave = claveDe(estado);
+    if (clave !== claveInterior) { const ic = interior.getContext('2d'); ic.clearRect(0, 0, MUNDO.W, MUNDO.H); edificio.dibujarInterior(ic, estado); claveInterior = clave; }
+    if (estado.fachada > .01 && clave !== claveFachada) { edificio.dibujarFachada(fc, estado); claveFachada = clave; }
+    mc.clearRect(0, 0, MUNDO.W, MUNDO.H); mc.drawImage(fondo, 0, 0); mc.drawImage(interior, 0, 0); gente.dibujar(mc, estado);
+  }
 
   // El estado que no lleva la cámara: lo que la escena interpola o fija por lámina.
   const cur = { luzInterior: 1, sofiaK: 0, manos: 0, pausaLectura: 0 };
   const obj = { luzInterior: 1, sofiaK: 0, manos: 0 };
   const fijo = { plano: null, sofia: null, vacia: false, quieto: false, foco: null, oficina: 'coordinacion', esfera: false, placa: 'ninguna', placaClara: false, paso: 0, giro: false };
-  let activa = false, lamina = null, demoVisible = false, parada = false, ultimo = 0, rafId = 0, fin = null, indiceAnterior = -1;
+  let activa = false, lamina = null, demoVisible = false, parada = false, ultimo = 0, rafId = 0, fin = null, indiceAnterior = -1, senalDiferida = 0, vigia = null, observador = null;
 
   // ---------- Qué pide cada lámina ----------
   function objetivoDe(l, paso) {
@@ -83,7 +93,7 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
     placa.style.background = pl.propia ? (l.section.style.background || PLACA_COLOR.oscura) : (pl.clara ? PLACA_COLOR.clara : PLACA_COLOR.oscura);
   }
   function ir(l, paso = 0, { instantaneo = false, indice = -1 } = {}) {
-    const adelante = indice > indiceAnterior; indiceAnterior = indice;
+    const adelante = indice > indiceAnterior; indiceAnterior = indice; clearTimeout(senalDiferida);
     lamina = l; fijo.paso = paso;
     if (!l || !l.escena || op.sinEscena) { apagar(); return false; }
     const { e, pl, sofiaK, manos, foco, luzInterior } = objetivoDe(l, paso);
@@ -94,13 +104,13 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
     aplicarPlaca(l, pl);
     cur.pausaLectura = 1;
     if (instantaneo) { camara.saltar(); Object.assign(cur, obj); cur.pausaLectura = 0; }
-    else if (adelante && SENALES[l.id]) SENALES[l.id](sonido);
+    else if (adelante && SENALES[l.id]) senalDiferida = SENALES[l.id](sonido) || 0;
     else if (cambioPlano) sonido.tic();
     if (!activa) { activa = true; canvas.classList.add('visible'); document.body.classList.add('con-escena'); arrancar(); }
     return true;
   }
-  function pasoA(n) { if (!activa || !lamina) return; fijo.paso = n; const { sofiaK, manos, foco } = objetivoDe(lamina, n); Object.assign(obj, { sofiaK, manos }); fijo.foco = foco; if (lamina.escena.sofia) camara.ir({ plano: lamina.escena.plano, sofiaK, placa: fijo.placa, hora: lamina.escena.hora, fachada: lamina.escena.fachada }); }
-  function apagar() { activa = false; canvas.classList.remove('visible'); placa.className = ''; document.body.classList.remove('con-escena'); }
+  function pasoA(n) { if (!activa || !lamina) return; fijo.paso = n; const { sofiaK, manos, foco } = objetivoDe(lamina, n); Object.assign(obj, { sofiaK, manos }); fijo.foco = foco; const e = lamina.escena; if (e.sofia) camara.ir({ plano: e.plano, camx: e.camx, camy: e.camy, zoom: e.zoom, hora: e.hora, fachada: e.fachada, oficina: e.oficina, sofiaK, placa: fijo.placa }); }
+  function apagar() { activa = false; canvas.classList.remove('visible'); placa.className = ''; document.body.classList.remove('con-escena'); if (rafId) { cancelAnimationFrame(rafId); rafId = 0; } clearTimeout(senalDiferida); if (vigia && vigia.cerrar) vigia.cerrar(); if (observador) observador.disconnect(); }
 
   // ---------- La demo ----------
   let entroConGiro = false;   // la demo entró con el giro: sale con el giro, aunque la lámina ya sea otra (PageDown a "decision")
@@ -108,11 +118,11 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
     if (si === demoVisible) return;
     demoVisible = si;
     if (si) { entroConGiro = activa && fijo.giro; if (entroConGiro) { sonido.giro(); await giro.aCenital(); } else capaDemo.classList.add('visible'); }
-    else { const conGiro = entroConGiro && activa; entroConGiro = false; if (conGiro) { sonido.giro(); await giro.aPerfil(); } else capaDemo.classList.remove('visible'); }
+    else { const conGiro = entroConGiro && activa; entroConGiro = false; arrancar(); if (conGiro) { sonido.giro(); await giro.aPerfil(); } else capaDemo.classList.remove('visible'); }
   }
 
   // ---------- El bucle ----------
-  function medir() { const dpr = Math.min(2, devicePixelRatio || 1); const w = Math.round(innerWidth * dpr), h = Math.round(innerHeight * dpr); if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; } }
+  function medir() { const dpr = Math.min(1.5, devicePixelRatio || 1); const w = Math.round(innerWidth * dpr), h = Math.round(innerHeight * dpr); if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; } }
   addEventListener('resize', medir); medir();
   document.addEventListener('visibilitychange', () => { parada = document.hidden; if (!parada) arrancar(); });
   function arrancar() { if (!rafId) { ultimo = performance.now(); rafId = requestAnimationFrame(cuadro); } }
@@ -123,7 +133,11 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
   }
   function cuadro(ahora) {
     rafId = 0;
-    if (!activa || parada || (demoVisible && !giro.enCurso)) { if (activa && !parada) rafId = requestAnimationFrame(cuadro); return; }   // durante el giro se sigue dibujando: la cámara viaja mientras el perfil se acuesta o se levanta
+    if (!activa || parada || (demoVisible && !giro.enCurso)) return;   // con la demo en pantalla no se dibuja ni se re-pide; demo(false) rearma. Durante el giro sí: la cámara viaja mientras el perfil se acuesta o se levanta
+    try { paso(ahora); } catch (e) { apagar(); if (alFallar) alFallar(e); else console.error('[escena] error en el cuadro; la escena se apaga', e); return; }
+    rafId = requestAnimationFrame(cuadro);
+  }
+  function paso(ahora) {
     const dt = Math.min(.1, (ahora - ultimo) / 1000); ultimo = ahora;
     const cam = camara.tick(dt);
     const k = 1 - Math.pow(0.05, dt), kr = 1 - Math.pow(0.03, dt);
@@ -133,15 +147,29 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
     gente.tick(dt, estado);
     // El canvas de la escena cubre la ventana entera; la composición es de 1920×1080 escalada.
     const esc = Math.min(canvas.width / 1920, canvas.height / 1080), vista = { esc, ox: (canvas.width - 1920 * esc) / 2, oy: (canvas.height - 1080 * esc) / 2 };
-    mc.clearRect(0, 0, MUNDO.W, MUNDO.H); edificio.dibujarFondo(mc, estado); edificio.dibujarInterior(mc, estado); gente.dibujar(mc, estado);
-    edificio.dibujarFachada(fc, estado);
+    dibujarMundo(estado);
     const aP = (wx, wy) => { const [x, y, s] = camara.aPantalla(wx, wy); return [x, y, s]; };
     const aPC = (wx, wy, f) => camara.aPantallaCapa(wx, wy, f);
     luz.render({ mundo, fachada, capas: { lejana, cercana }, estado, aPantalla: aP, aPantallaCapa: aPC, ventanas: edificio.ventanas(estado), lamparas: edificio.lamparas(estado), foco: gente.focoEn(estado), sofiaEn: gente.sofia && gente.sofia.visible ? { x: gente.sofia.x + 3, y: gente.sofia.y - 8 } : null, proyector: typeof edificio.proyector === 'function' ? edificio.proyector(estado) : null, farolas: typeof edificio.farolas === 'function' ? edificio.farolas() : [], cielo: edificio.cielo, vista });
     luz.medirFps(dt);
     if (fin) fin(estado);
-    rafId = requestAnimationFrame(cuadro);
   }
+
+  // La campana suena cuando la vista abre el panel de decisión (#mundo.decidiendo en el iframe, mismo origen): así respeta el
+  // ritmo del chat, que retiene los mensajes. Sin iframe (el banco), se escucha /api/eventos.
+  function vigilarPanel() {
+    const mirar = () => {
+      try {
+        const doc = iframeDemo.contentDocument; const mundoEl = doc && doc.getElementById('mundo'); if (!mundoEl) return;
+        if (observador) observador.disconnect();
+        let abierto = mundoEl.classList.contains('decidiendo');
+        observador = new MutationObserver(() => { const ahora = mundoEl.classList.contains('decidiendo'); if (ahora && !abierto) sonido.campana(); abierto = ahora; });
+        observador.observe(mundoEl, { attributes: true, attributeFilter: ['class'] });
+      } catch {}
+    };
+    iframeDemo.addEventListener('load', () => setTimeout(mirar, 500)); setTimeout(mirar, 1500);
+  }
+  if (iframeDemo) vigilarPanel(); else if (typeof sonido.vigilarPropuesta === 'function') vigia = sonido.vigilarPropuesta();
 
   function tecla(k) {
     if (k === 'm') { const activo = !sonido.silenciar(sonido.activo); return { hecho: true, aviso: activo ? 'Sonido prendido' : 'Sonido apagado' }; }
@@ -150,6 +178,7 @@ export async function crearEscena({ canvas, placa, capaDemo, deps, opciones = {}
   return {
     ir, paso: pasoA, demo, tecla,
     gesto() { sonido.habilitar(); },
+    apagar,
     pausar(si) { parada = si; if (!si) arrancar(); },
     estado() { return activa ? { activa, plano: fijo.plano, ...fijo, ...cur, ...camara.actual(), hd: luz.hd, fps: luz.fps } : { activa: false }; },
     get activa() { return activa; },

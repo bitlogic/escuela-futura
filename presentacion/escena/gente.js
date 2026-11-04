@@ -209,6 +209,7 @@ export async function crearGente({ cargarImagen, MODELOS, plantas, teñir: teñi
     // del hall, o sale por el patio hacia la derecha, una sola vez.
     const est = estado.sofia || null;
     if (est !== sofia.estado) {
+      if (est !== 'sale') sofia.salio = false;   // si se vuelve atrás y se avanza de nuevo, Sofía sale otra vez
       if (est === 'entra') { sofia.x = PUERTA.x + PUERTA.w / 2; sofia.y = MUNDO.PB; sofia.dir = 1; sofia.salio = false; }
       else if (est === 'sale') { if (sofia.salio) { /* ya se fue: no vuelve a aparecer */ } else { sofia.x = PUERTA.x + PUERTA.w / 2; sofia.y = MUNDO.SUELO + 34; sofia.dir = 1; } }
       else if (est === 'camina' && sofia.estado !== 'entra') { sofia.x = MARCAS[0] + (MARCAS[2] - MARCAS[0]) * (estado.sofiaK || 0); sofia.y = MUNDO.PB; }

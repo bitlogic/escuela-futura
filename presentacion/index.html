@@ -47,9 +47,7 @@
 </div>
 <script type="module">
 import { cargarDeck, escalar, mostrarPaso } from './reproductor.js';
-import { crearEscena } from './escena/escena.js';
-import { SALAS, TEMAS } from '/stage/oficina.js';
-import { MODELOS, cargarImagen } from '/stage/personajes.js';
+import { accionDeTecla } from './teclas.js';
 
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
@@ -57,6 +55,13 @@ const lienzo = $('ui-lienzo'), demo = $('ui-demo'), escuela = $('ui-escuela');
 const canal = ('BroadcastChannel' in window) ? new BroadcastChannel('charla') : null;
 
 let laminas = [], actual = -1, paso = 0, demoVisible = false, inicio = null, temporizador = null, escena = null;
+// Si la escena tira un error en vivo, se apaga y la charla sigue como sin escena (el fundido de siempre, la demo visible si corresponde).
+function apagarEscena(e) {
+  if (!escena) return; console.error('La escena falló; sigue la charla sin ella.', e);
+  try { escena.apagar(); } catch {} escena = null;
+  demo.classList.toggle('visible', demoVisible);
+}
+const conEscena = (f) => { if (!escena) return; try { return f(escena); } catch (e) { apagarEscena(e); } };
 
 // ---------- Láminas ----------
 // Va a la lámina n. `completa`: con todos sus pasos ya vistos (al volver atrás); si no, arranca en el paso 0.
@@ -75,7 +80,7 @@ function ir(n, { instantaneo = false, completa = false } = {}) {
   actual = n;
   history.replaceState(null, '', '#' + sig.id);
   numero();
-  if (escena) escena.ir(sig, paso, { instantaneo, indice: n });
+  conEscena((es) => es.ir(sig, paso, { instantaneo, indice: n }));
   if (n > 0 && inicio == null) inicio = Date.now();   // el reloj arranca al salir de la portada
   mostrarDemo(!!sig.demo);
   publicarEstado();
@@ -84,12 +89,12 @@ function numero() { $('ui-numero').innerHTML = `<b>${actual + 1}</b>`; }   // so
 // Siguiente: primero el próximo paso de la lámina; cuando no quedan, la lámina siguiente. Anterior: deshace el paso o vuelve.
 function avanzar() {
   const l = laminas[actual];
-  if (l && paso < l.pasos) { paso++; mostrarPaso(l.section, paso); if (escena) escena.paso(paso); numero(); publicarEstado(); }
+  if (l && paso < l.pasos) { paso++; mostrarPaso(l.section, paso); conEscena((es) => es.paso(paso)); numero(); publicarEstado(); }
   else ir(actual + 1);
 }
 function retroceder() {
   const l = laminas[actual];
-  if (l && paso > 0) { paso--; mostrarPaso(l.section, paso); if (escena) escena.paso(paso); numero(); publicarEstado(); }
+  if (l && paso > 0) { paso--; mostrarPaso(l.section, paso); conEscena((es) => es.paso(paso)); numero(); publicarEstado(); }
   else ir(actual - 1, { completa: true });
 }
 
@@ -97,7 +102,7 @@ function retroceder() {
 function mostrarDemo(si) {
   if (si === demoVisible) return;
   demoVisible = si;
-  if (escena) escena.demo(si); else demo.classList.toggle('visible', si);   // con escena, la lámina `vivo` entra con el giro
+  if (escena) escena.demo(si).catch(apagarEscena); else demo.classList.toggle('visible', si);   // con escena, la lámina `vivo` entra con el giro
   if (si) setTimeout(() => { try { escuela.contentWindow.focus(); } catch {} }, 60);
   else { try { escuela.blur(); } catch {} window.focus(); }
   publicarEstado();
@@ -142,16 +147,19 @@ document.addEventListener('keydown', (e) => {
   if (escena) escena.gesto();   // el primer gesto habilita el audio del navegador
   if (escena && escena.giro.enCurso) { e.preventDefault(); return; }   // mientras gira la cámara, ninguna tecla: el giro termina solo
   if ($('ui-ayuda').classList.contains('visible')) { if (k === 'Escape' || k === '?' || k === 'h') $('ui-ayuda').classList.remove('visible'); return; }
-  if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter') { e.preventDefault(); avanzar(); }
-  else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') { e.preventDefault(); retroceder(); }
-  else if (k === 'Home') ir(0);
-  else if (k === 'End') ir(laminas.length - 1);
-  else if (k === 'd') alternarDemo();
-  else if (k === 'n') abrirPresentador();
-  else if (escena) { const r = escena.tecla(k); if (r.hecho && r.aviso) aviso(r.aviso); }
-  else if (k === 'f') pantallaCompleta();
-  else if (k === 't') { inicio = Date.now(); aviso('Reloj en 0:00'); publicarEstado(); }
-  else if (k === '?' || k === 'h') $('ui-ayuda').classList.add('visible');
+  const accion = accionDeTecla(k, { conEscena: !!escena });
+  if (!accion) return;
+  if (accion === 'siguiente' || accion === 'anterior') e.preventDefault();
+  if (accion === 'siguiente') avanzar();
+  else if (accion === 'anterior') retroceder();
+  else if (accion === 'inicio') ir(0);
+  else if (accion === 'fin') ir(laminas.length - 1);
+  else if (accion === 'demo') alternarDemo();
+  else if (accion === 'presentador') abrirPresentador();
+  else if (accion === 'silencio') { const r = escena.tecla('m'); if (r.hecho && r.aviso) aviso(r.aviso); }
+  else if (accion === 'pantalla') pantallaCompleta();
+  else if (accion === 'reloj') { inicio = Date.now(); aviso('Reloj en 0:00'); publicarEstado(); }
+  else if (accion === 'ayuda') $('ui-ayuda').classList.add('visible');
 });
 lienzo.addEventListener('click', (e) => { if (escena) escena.gesto(); if (e.button === 0 && !(escena && escena.giro.enCurso)) avanzar(); });
 function pantallaCompleta() { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); }
@@ -188,9 +196,12 @@ try {
   ({ laminas } = await cargarDeck());
   for (const l of laminas) lienzo.appendChild(l.section);
   // La escena detrás de las láminas (?sin-escena=1 la apaga del todo; ?plano=1 apaga el HD-2D; ?mudo=1 arranca sin sonido).
+  // Los módulos se importan acá, dentro del try, para que un error en la escena (o en stage/) nunca rompa la charla.
   if (params.get('sin-escena') !== '1') {
-    try { escena = await crearEscena({ canvas: $('ui-escena'), placa: $('ui-placa'), capaDemo: demo, deps: { SALAS, TEMAS, MODELOS, cargarImagen }, opciones: { hd: params.get('plano') !== '1', mudo: params.get('mudo') === '1' } }); }
-    catch (e) { console.error('La escena no pudo arrancar; sigue la charla sin ella.', e); escena = null; }
+    try {
+      const [{ crearEscena }, { SALAS, TEMAS }, { MODELOS, cargarImagen }] = await Promise.all([import('./escena/escena.js'), import('/stage/oficina.js'), import('/stage/personajes.js')]);
+      escena = await crearEscena({ canvas: $('ui-escena'), placa: $('ui-placa'), capaDemo: demo, iframeDemo: escuela, deps: { SALAS, TEMAS, MODELOS, cargarImagen }, opciones: { hd: params.get('plano') !== '1', mudo: params.get('mudo') === '1' }, alFallar: apagarEscena });
+    } catch (e) { console.error('La escena no pudo arrancar; sigue la charla sin ella.', e); escena = null; }
   }
   window.charla = { get escena() { return escena; }, get laminas() { return laminas; }, ir };   // para diagnóstico (FPS, estado) desde la consola y Playwright
   const pedida = (params.get('lamina') || location.hash.slice(1) || '').trim();
