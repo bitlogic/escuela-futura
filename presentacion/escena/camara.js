@@ -33,6 +33,7 @@ export function crearCamara() {
       if (objetivo.plano === 'oficina' && objetivo.oficina && objetivo.camx == null) o.camx = OFICINAS[objetivo.oficina] ?? base.camx;
       if (objetivo.plano === 'hall' && objetivo.sofiaK != null && objetivo.camx == null) o.camx = lerp(HALL_TRAVELLING.desde, HALL_TRAVELLING.hasta, objetivo.sofiaK);
       for (const k of LENTAS) if (o[k] != null) obj[k] = o[k];
+      if (o.hora != null) obj.hora = o.hora;
       if (o.fachada != null) obj.fachada = o.fachada;
       const [dx, dy] = CORRIMIENTO[objetivo.placa] || CORRIMIENTO.ninguna; obj.dx = dx; obj.dy = dy;
     },

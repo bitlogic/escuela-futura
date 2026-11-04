@@ -56,7 +56,7 @@ export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, 
   const edificio = crearEdificio({ SALAS, TEMAS });
   const gente = await crearGente({ cargarImagen, MODELOS, plantas: edificio.plantas });
   const luz = crearLuz(canvas); luz.hd = op.hd;
-  const giro = crearGiro({ canvasEscena: canvas, capaDemo, simple: op.simple || !op.hd });
+  const giro = crearGiro({ canvasEscena: canvas, capaDemo, iframeDemo, simple: op.simple || !op.hd });
   const sonido = crearSonido(); if (op.mudo) sonido.silenciar(true);
 
   const mundo = lienzo(MUNDO.W, MUNDO.H), fachada = lienzo(MUNDO.W, MUNDO.H), lejana = lienzo(MUNDO.W, MUNDO.H), cercana = lienzo(MUNDO.W, MUNDO.H);

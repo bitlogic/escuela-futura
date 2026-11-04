@@ -50,6 +50,7 @@ test('los seis planos tienen cámara, hora y fachada; la cámara interpola hacia
   const a = c.actual(); assert.ok(Math.abs(a.camx - PLANOS.patio.camx) < .5 && Math.abs(a.zoom - PLANOS.patio.zoom) < .01 && Math.abs(a.dx) < .5, JSON.stringify(a));
   c.ir({ plano: 'hall', sofiaK: 0, placa: 'izq' }); const o0 = c.objetivo().camx; c.ir({ plano: 'hall', sofiaK: 1, placa: 'izq' }); assert.ok(c.objetivo().camx > o0, 'el travelling avanza con sofiaK');
   c.ir({ plano: 'oficina', oficina: 'direccion', placa: 'der' }); assert.ok(c.objetivo().camx < PLANOS.oficina.camx, 'Dirección está más a la izquierda que Coordinación');
+  c.ir({ plano: 'edificio', hora: 1, placa: 'izq' }); assert.equal(c.objetivo().hora, 1, 'la hora de la lámina se fija'); for (let i = 0; i < 300; i++) c.tick(1 / 60); assert.ok(Math.abs(c.actual().hora - 1) < .02, 'y amanece en menos de 5 s');
 });
 
 test('las plantas de perfil se derivan de las salas del plano: mismas salas físicas, mismos puestos, mismo orden', () => {
