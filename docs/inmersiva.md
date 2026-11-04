@@ -96,9 +96,9 @@ El travelling de Sofía (`hall`, `sofia: 'camina'`): camx va de 290 a 420 a lo l
 | 3 | sofia | `{"plano":"hall","sofia":"entra","esfera":true}` | izq | Sofía entra por la puerta y arranca; las marcas 2022 · 2024 · 2026 están en la pared del hall; la esfera se encoge en la marca de 2022 |
 | 4 | chatgpt | `{"plano":"hall","sofia":"camina"}` | izq | sigue el travelling |
 | 5 | carrera | `{"plano":"hall","sofia":"camina"}` | izq | sigue; los pasos de la lámina (2024, 2026) adelantan `sofiaK` |
-| 6 | entrevista | `{"plano":"hall","sofia":"puerta"}` | plena | Sofía al final del pasillo, de espaldas a la cámara, mirando la puerta |
+| 6 | entrevista | `{"plano":"hall","sofia":"puerta","quieto":true}` | plena | Sofía al final del pasillo, de espaldas a la cámara, mirando la puerta |
 | 7 | primera-vez | `{"plano":"edificio","hora":1}` | izq clara | amanece: el cambio de luz de las notas, literal |
-| 8 | ranking | `{"plano":"edificio","hora":1,"quieto":true}` | plena clara | quieto |
+| 8 | ranking | `{"plano":"edificio","hora":0.5,"quieto":true}` | plena | quieto; de noche, como su lámina |
 | 9 | manos | `{"plano":"aula","manos":"pasos"}` | izq | las manos suben con los pasos de la lámina (paso 1: todas, mientras la sala tiene la mano arriba; paso 2: bajan, quedan pocas) |
 | 10 | datos | `{"plano":"aula","zoom":1.6,"quieto":true}` | plena | quieto, un poco más lejos |
 | 11 | tesis | `{"plano":"edificio","hora":0.5,"luzInterior":1}` | abajo propia | todas las ventanas encendidas |
@@ -106,7 +106,7 @@ El travelling de Sofía (`hall`, `sofia: 'camina'`): camx va de 290 a 420 a lo l
 | 13 | agente | `{"plano":"oficina","oficina":"coordinacion","foco":"pasos"}` | izq | paso 1 rol (el agente se ilumina), 2 skills (el estante), 3 herramientas (la pantalla), 4 memoria (el cuaderno), 5 autonomía (se levanta y va a otra sala) |
 | 14 | escuela | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0}` | izq | mismo plano que capo, sin movimiento |
 | 15 | vivo | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0,"giro":true}` | ninguna | el giro |
-| 16 | decision | `{"plano":"oficina","oficina":"direccion","hora":0.55}` | der clara | la persona en el escritorio; un agente en la puerta con el papel |
+| 16 | decision | `{"plano":"oficina","oficina":"direccion","hora":0.95,"camx":185}` | der clara | la persona en el escritorio; un agente en la puerta con el papel |
 | 17 | aula | `{"plano":"aula","hora":0.2,"manos":0,"quieto":true,"vacia":true}` | izq | la misma aula, vacía, luz de la tarde |
 | 18 | criterio | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0,"quieto":true}` | plena | el edificio abierto, quieto |
 | 19 | recibe | `{"plano":"patio","sofia":"sale"}` | izq | Sofía sale por la puerta y cruza hacia fuera de cuadro; la esfera en la marca de 2026 |

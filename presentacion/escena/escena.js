@@ -174,7 +174,7 @@ export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, 
     const cam = camara.tick(dt);
     const k = 1 - Math.pow(0.05, dt), kr = 1 - Math.pow(0.03, dt);
     cur.luzInterior = lerp(cur.luzInterior, obj.luzInterior, kr); cur.sofiaK = lerp(cur.sofiaK, obj.sofiaK, k); cur.manos = lerp(cur.manos, obj.manos, kr);
-    cur.pausaLectura = Math.max(0, cur.pausaLectura - dt / SEGUNDOS_LECTURA);
+    cur.pausaLectura = girando ? 1 : Math.max(0, cur.pausaLectura - dt / SEGUNDOS_LECTURA);   // durante el giro, nadie empieza una ruta nueva
     const estado = estadoActual(cam);
     gente.tick(dt, estado);
     // El canvas de la escena cubre la ventana entera; la composición es de 1920×1080 escalada.

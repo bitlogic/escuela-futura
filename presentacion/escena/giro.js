@@ -36,6 +36,7 @@ export const ESCALA_MEDIA = .7;
 export const FUNDIDO_TAPA = .86;   // fracción del tiempo a partir de la cual la tapa deja ver el iframe (hacia la demo) o lo tapa (a la vuelta)
 export const ASENTADO = .97;      // fracción del progreso (de la curva) desde la que el cubo ya está exactamente plano: la tapa se funde sin desdoblar el mapa
 export const APAGADO_FRENTE = [.3, .5];   // el frente se apaga entre estas fracciones del tiempo (de -15° a -63°, donde su reverso quedaría a la vista)
+export const APAGADO_FRENTE_VUELTA = [.5, .7];   // en la vuelta (reproducida al revés) el frente se prende entre el 30 y el 50 % del tiempo: la planta no rueda sobre un bloque negro
 export const ID_TAPA = 'ui-giro-tapa';
 
 /** Las dos caras del cubo en un momento del giro: `angulo` va de 0 (perfil de frente) a -90 (planta de frente), `escala` es el alejamiento.
@@ -126,7 +127,7 @@ export function crearGiro({ canvasEscena, capaDemo, iframeDemo = null, duracion 
     const giro = { duration: duracion, easing: CURVA, fill: 'both', direction }, lineal = { duration: duracion, easing: 'linear', fill: 'both', direction };
     const base = { transformOrigin: '50% 0%', willChange: 'transform, opacity', backfaceVisibility: 'hidden' };
     poner(canvasEscena, base); poner(tapa, base);
-    const [f0, f1] = APAGADO_FRENTE;
+    const [f0, f1] = aDemo ? APAGADO_FRENTE : APAGADO_FRENTE_VUELTA;
     animaciones = [
       canvasEscena.animate([{ transform: a0.frente }, { transform: am.frente, offset: .5 }, { transform: a1.frente, offset: ASENTADO }, { transform: a1.frente }], giro),
       canvasEscena.animate([{ opacity: 1 }, { opacity: 1, offset: f0 }, { opacity: 0, offset: f1 }, { opacity: 0 }], lineal),

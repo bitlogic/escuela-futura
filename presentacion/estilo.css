@@ -44,7 +44,8 @@ html, body { margin: 0; height: 100%; background: #06050F; color: #F3F0FF; overf
 #ui-placa.pos-der { -webkit-mask-image: linear-gradient(270deg, #000 0%, #000 38%, rgba(0,0,0,.85) 45%, rgba(0,0,0,.25) 55%, transparent 64%); mask-image: linear-gradient(270deg, #000 0%, #000 38%, rgba(0,0,0,.85) 45%, rgba(0,0,0,.25) 55%, transparent 64%); }
 #ui-placa.pos-abajo { -webkit-mask-image: linear-gradient(0deg, #000 0%, #000 50%, rgba(0,0,0,.85) 57%, rgba(0,0,0,.25) 66%, transparent 74%); mask-image: linear-gradient(0deg, #000 0%, #000 50%, rgba(0,0,0,.85) 57%, rgba(0,0,0,.25) 66%, transparent 74%); }
 .lienzo { z-index: 2; }
-#ui-placa.pos-plena { opacity: .78; }   /* las láminas que son listas: la escuela queda detrás como textura, quieta */
+#ui-placa.pos-plena { opacity: .78; }
+body.con-escena .lienzo section[data-placa^="plena"] p[style*="#A8A2D0"] { color: rgba(243, 240, 255, .85) !important; }   /* el lavanda medio del deck no se lee sobre la plena texturada */   /* las láminas que son listas: la escuela queda detrás como textura, quieta */
 body.con-escena .lienzo section[data-escena] { background: transparent !important; }
 body.con-escena .lienzo section[data-escena] [data-marca-agua] { display: none; }
 /* Durante el giro, las láminas y la placa se apagan rápido: el perfil se acuesta limpio, sin texto fantasma. */
