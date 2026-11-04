@@ -1127,7 +1127,7 @@ addEventListener('message', (e) => {
   else if (d && d.tipo === 'agente') verAgente(d.id);   // clic en una tarjeta del organigrama
   else if (d && d.tipo === 'tema' && d.tema !== tema) aplicarTema(d.tema);
   else if (d && d.tipo === 'tablero-listo') tabPost({ tipo: 'tablero', reiniciar: true, eventos: tabEventos, vivo: modoVivo && !!enviarMensaje });
-  else if (d && d.tipo === 'cuadro' && e.source && e.source !== window) { try { e.source.postMessage(cuadroDelMapa(), '*'); } catch (err) { console.warn('cuadro:', err); } }   // el giro de la charla pide el mapa solo
+  else if (d && d.tipo === 'cuadro' && e.source === window.parent && e.source !== window && e.origin === location.origin) { try { e.source.postMessage(cuadroDelMapa(), e.origin); } catch (err) { console.warn('cuadro:', err); } }   // el giro de la charla pide el mapa solo: solo al padre del mismo origen
 });
 $('btn-grab').onclick = () => { desconectar(); cargarGrabacion(); };
 $('corridas').onchange = (e) => { desconectar(); cargarGrabacion(e.target.value); };
