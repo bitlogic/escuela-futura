@@ -38,6 +38,8 @@
   #mundo { position: relative; flex: 1; min-width: 0; min-height: 0; overflow: hidden; background: var(--fondo-pagina); }
   #mapa { position: absolute; left: 0; top: 0; --u: 1.25; z-index: 1; }   /* contexto propio: los globos y rótulos (z-index altos) no pisan al Tablero ni al organigrama */
   canvas#lienzo { position: absolute; left: 0; top: 0; width: 100%; height: 100%; image-rendering: auto; }
+  canvas#luz { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }   /* la luz cenital (luz.js): sobre el plano, debajo de globos y carteles */
+  #mapa.sin-luz canvas#luz { display: none; }
   #capa { position: absolute; inset: 0; pointer-events: none; }
 
   /* Chat del canal */
@@ -385,6 +387,7 @@
   <div id="mundo">
     <div id="mapa">
       <canvas id="lienzo"></canvas>
+      <canvas id="luz" aria-hidden="true"></canvas>
       <div id="capa"></div>
     </div>
     <div id="panel-decision" class="px" aria-live="polite"></div>
@@ -415,7 +418,7 @@
         <h4>Reproducción</h4>
         <div class="fila"><button id="btn-prev" title="Paso anterior (←)">‹</button><button id="btn-play" title="Play / pausa (espacio)">Pausa</button><button id="btn-next" title="Paso siguiente (→)">›</button><select id="velocidad" title="Velocidad"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></div>
       </section>
-      <p class="teclas"><kbd>o</kbd> organigrama · <kbd>b</kbd> tablero · <kbd>c</kbd> chat · <kbd>t</kbd> tema · <kbd>v</kbd> en vivo · <kbd>g</kbd> grabación · <kbd>r</kbd> reiniciar · <kbd>f</kbd> pantalla completa · <kbd>espacio</kbd> play · <kbd>← →</kbd> paso</p>
+      <p class="teclas"><kbd>o</kbd> organigrama · <kbd>b</kbd> tablero · <kbd>c</kbd> chat · <kbd>t</kbd> tema · <kbd>l</kbd> luz · <kbd>v</kbd> en vivo · <kbd>g</kbd> grabación · <kbd>r</kbd> reiniciar · <kbd>f</kbd> pantalla completa · <kbd>espacio</kbd> play · <kbd>← →</kbd> paso</p>
     </div>
     </div>
   </div>
@@ -429,6 +432,7 @@ import { crearHilo, trozos, bloques, primeraLinea, destinatario, esPropuesta, pr
 import { completarHerramienta } from './herramientas.js';
 import { crearSeguimiento, actividadDe, ETIQUETA_DECISION, palabraDe } from './seguimiento.js';
 import { crearTablero, ETIQUETAS as ETIQUETAS_TAREA } from './tablero.js';
+import { crearLuzCenital } from './luz.js';
 
 const $ = (id) => document.getElementById(id);
 const mundo = $('mundo'), mapa = $('mapa');
@@ -440,6 +444,10 @@ let ofi = null, fichas = null;
 let eventos = [], indice = 0, reloj = 0, reproduciendo = false, velocidad = 1, ultimoFrame = 0;
 let temporizadores = [], decisionPendiente = false, modoVivo = false, silencioso = false;
 let ritmoMs = 0, colaEventos = [], ultimoDiceEn = -Infinity;   // el ritmo en vivo (ver recibir/drenarEventos)
+// La luz cenital (luz.js): prendida por defecto en vivo, apagada en grabación (así el E2E y el juez ven lo de siempre);
+// ?luz=0|1 manda al abrir y la tecla l la cambia a mano (lo elegido vale hasta cerrar la pestaña).
+let luz = null, luzElegida = params.has('luz') ? params.get('luz') !== '0' : null;
+const luzActiva = () => (luzElegida ?? modoVivo);
 const programar = (ms, fn) => { const t = { t: reloj + ms, fn }; temporizadores.push(t); return t; };
 
 // ── Tema ─────────────────────────────────────────────────────────────────────
@@ -967,8 +975,30 @@ function loop(ts) {
     if (indice >= eventos.length && !temporizadores.length && ![...fichas.values()].some((f) => f.actual)) { reproduciendo = false; $('btn-play').textContent = 'Otra vez'; }
   }
   if (modoVivo) { reloj += dt; correrTemporizadores(); if (colaEventos.length) drenarEventos(); }
-  if (ofi) { ofi.velocidad = modoVivo ? 1 : velocidad; tickGlobos(); ofi.cuadro(ts); posicionar(); actualizarTrabajando(); latirObjetivo(); }
+  if (ofi) { ofi.velocidad = modoVivo ? 1 : velocidad; tickGlobos(); ofi.cuadro(ts); dibujarLuz(ts); posicionar(); actualizarTrabajando(); latirObjetivo(); }
   requestAnimationFrame(loop);
+}
+// La capa de luz va al ritmo del mapa (el mismo cuadro); apagada no dibuja ni consume, y el canvas se esconde.
+let luzVisible = null;
+function dibujarLuz(ts) {
+  if (!luz) return;
+  const on = luzActiva();
+  if (on !== luzVisible) { luzVisible = on; $('mapa').classList.toggle('sin-luz', !on); luz.activa = on; }
+  if (on) luz.render({ esperandoDecision: decisionPendiente, tema, t: ts / 1000 });
+}
+// El cuadro del mapa para el giro de la charla: el lienzo (con la luz si está prendida), sin chat ni interfaz, como PNG.
+// El padre manda { tipo: 'cuadro' } y recibe { tipo: 'cuadro', dataUrl, ancho, alto, escala, luz }; sin lienzo todavía, dataUrl es null.
+let cuadroLienzo = null;
+function cuadroDelMapa() {
+  const l = $('lienzo'); if (!ofi || !l.width) return { tipo: 'cuadro', dataUrl: null, ancho: 0, alto: 0, escala: 0, luz: false };
+  // el PNG se codifica a lo sumo a 4 px por px lógico (1600×1152): más grande tarda más de 50 ms y el giro no lo necesita
+  const S = Math.min(l.width / W, 4), w = Math.round(W * S), h = Math.round(H * S), con = luzActiva();
+  if (!cuadroLienzo) cuadroLienzo = document.createElement('canvas');
+  if (cuadroLienzo.width !== w || cuadroLienzo.height !== h) { cuadroLienzo.width = w; cuadroLienzo.height = h; }
+  const c = cuadroLienzo.getContext('2d'); c.imageSmoothingEnabled = w < l.width; c.globalCompositeOperation = 'source-over';
+  c.clearRect(0, 0, w, h); c.drawImage(l, 0, 0, w, h);
+  if (con) { c.imageSmoothingEnabled = true; c.drawImage($('luz'), 0, 0, w, h); }
+  return { tipo: 'cuadro', dataUrl: cuadroLienzo.toDataURL('image/png'), ancho: w, alto: h, escala: S, luz: con };
 }
 
 // Una corrida grabada tiene silencios largos (esperas del modelo): se acortan para sostener el ritmo.
@@ -1097,6 +1127,7 @@ addEventListener('message', (e) => {
   else if (d && d.tipo === 'agente') verAgente(d.id);   // clic en una tarjeta del organigrama
   else if (d && d.tipo === 'tema' && d.tema !== tema) aplicarTema(d.tema);
   else if (d && d.tipo === 'tablero-listo') tabPost({ tipo: 'tablero', reiniciar: true, eventos: tabEventos, vivo: modoVivo && !!enviarMensaje });
+  else if (d && d.tipo === 'cuadro' && e.source && e.source !== window) { try { e.source.postMessage(cuadroDelMapa(), '*'); } catch (err) { console.warn('cuadro:', err); } }   // el giro de la charla pide el mapa solo
 });
 $('btn-grab').onclick = () => { desconectar(); cargarGrabacion(); };
 $('corridas').onchange = (e) => { desconectar(); cargarGrabacion(e.target.value); };
@@ -1135,6 +1166,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'v') $('btn-vivo').click();
   if (e.key === 'g') $('btn-grab').click();
   if (e.key === 't') $('btn-tema').click();
+  if (e.key === 'l') { luzElegida = !luzActiva(); aviso(luzElegida ? 'Luz prendida.' : 'Luz apagada.'); }
   if (e.key === 'c') $('btn-chat').click();
   if (e.key === 'o') vista(vistaAbierta() === 'org' ? 'escuela' : 'org');
   if (e.key === 'b') vista(vistaAbierta() === 'tab' ? 'escuela' : 'tab');
@@ -1265,6 +1297,7 @@ try {
   llenarPara(); cargarAtajos();
   await cargarIndiceCorridas();
   ofi = await crearOficina($('lienzo')); ofi.tema(tema);
+  luz = crearLuzCenital($('luz'), { salas: ofi.SALAS, W, H, tema });
   $('perfil-cara').src = urlDeCara(null); $('perfil-nombre').textContent = CONFIG.personas.nombre;
   for (const t of CARTELES) { const c = document.createElement('div'); c.className = 'sala-cartel'; c.textContent = t.texto; c.dataset.x = t.x; c.dataset.y = t.y; $('capa').appendChild(c); }
   const m = document.createElement('div'); m.id = 'martina'; m.className = 'tag martina px'; m.textContent = 'Martina'; $('capa').appendChild(m);

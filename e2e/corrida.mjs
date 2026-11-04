@@ -128,7 +128,7 @@ async function correrEnVivo({ modelo, dir }) {
 
   // Capturas en los momentos clave, mientras pasa
   const capturas = []; let nav = null;
-  if (CON_CAPTURAS) { try { nav = await abrirNavegador(`${base}/stage/?nombre=${encodeURIComponent(NOMBRE)}&tema=oscuro`); } catch (e) { fallas.push('navegador: ' + e.message); } }
+  if (CON_CAPTURAS) { try { nav = await abrirNavegador(`${base}/stage/?nombre=${encodeURIComponent(NOMBRE)}&tema=oscuro&luz=0`);   // sin la luz cenital: las capturas del juez son comparables con las de antes } catch (e) { fallas.push('navegador: ' + e.message); } }
   let vigilando = true; const tomadas = new Set(), listas = new Set();
   const vigilante = (async () => {
     while (vigilando) {

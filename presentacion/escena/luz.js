@@ -19,9 +19,15 @@
 //
 //   crearLuz(canvas) → { render(args), medirFps(dt), hd (get/set), degradado, fps }
 // El módulo se importa en Node sin DOM: nada de document fuera de crearLuz.
+//
+// El modo cenital (la misma luz sobre el plano de la demo, stage/index.html) vive en /stage/luz.js, que es lo que
+// sirve también el servidor de la escuela; de ahí vienen los sprites radiales y el halo que se usan acá, y de ahí
+// se reexporta `crearLuzCenital` para que la charla tenga un solo punto de entrada a la luz.
 
 import { PANTALLA } from './camara.js';
 import { SUELO_COLOR, MUNDO } from './edificio.js';
+import { crearHalos } from '../../stage/luz.js';
+export { crearLuzCenital, lamparasDe } from '../../stage/luz.js';
 
 const rgb = (c, a = 1) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`;
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -60,19 +66,8 @@ export function crearLuz(canvas) {
   const lienzo = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
   const escalado = lienzo(1, 1);                                       // el recorte visible del mundo a S píxeles por píxel lógico
   const borrosas = new Map();                                          // capa → { img, radio, margen }: la capa pre-desenfocada
-  const sprites = new Map();                                           // color → sprite radial de 256×256 (blanco al centro, transparente al borde)
+  const { halo } = crearHalos(ctx);                                    // sprites radiales cacheados por color + el halo escalado (rx, ry pueden diferir para la niebla y los haces); compartidos con el modo cenital
   let vineta = null, grading = null, esferaDeg = null, esferaR = 0;
-
-  function sprite(color, suave = false) {
-    const k = color.join(',') + (suave ? 's' : '');
-    if (sprites.has(k)) return sprites.get(k);
-    const c = lienzo(256, 256), g = c.getContext('2d'), d = g.createRadialGradient(128, 128, 0, 128, 128, 128);
-    if (suave) { d.addColorStop(0, rgb(color, .55)); d.addColorStop(.5, rgb(color, .18)); d.addColorStop(1, rgb(color, 0)); }
-    else { d.addColorStop(0, rgb(color, 1)); d.addColorStop(.28, rgb(color, .55)); d.addColorStop(.62, rgb(color, .14)); d.addColorStop(1, rgb(color, 0)); }
-    g.fillStyle = d; g.fillRect(0, 0, 256, 256); sprites.set(k, c); return c;
-  }
-  /** Un halo radial en pantalla: sprite escalado (rx, ry pueden diferir para la niebla y los haces). */
-  function halo(x, y, rx, ry, color, a, suave = false) { if (a <= .003 || rx <= 0) return; ctx.globalAlpha = a; ctx.drawImage(sprite(color, suave), x - rx, y - ry, rx * 2, ry * 2); }
 
   /** La capa (640×288 lógico) desenfocada una sola vez, a 3 px por píxel lógico y con margen para que el borde se funda. */
   function borrosa(capa, radio) {
