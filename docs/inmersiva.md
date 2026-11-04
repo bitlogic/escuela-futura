@@ -272,6 +272,10 @@ El contrato, la integración de cada oleada, los commits y la mezcla a `main`, y
 
 El orden de las oleadas no depende del corte del jueves: la charla usa lo que haya y el programa sigue hasta el final.
 
+## Estado al 4/11 (construido)
+
+Las cinco oleadas se corrieron el 4/11 en una sola sesión con subagentes y todo está mezclado en `main` (`npm test`: 93 en verde; E2E contra el servidor real: 16/16 chequeos, juez 82, 91/100). Lo que quedó distinto del plan, y manda: la placa **mide el texto** de cada lámina (§3.4 y `CONTRATO.md`, "Ajustes de la oleada 1"); `ranking` es oscura y `cierre` va con placa izquierda; `carrera` y `agente` pasaron a una columna; el giro es un **cubo** con el cuadro del mapa que la vista entrega por `postMessage` (`giro.js`), y la vista de la demo lleva luz cenital (`stage/luz.js`, tecla `l`); la campana suena cuando la vista abre el panel; `p` apaga el HD-2D en vivo. Críticas: 25/40 (oleada 3) → **32/40** (oleada 5, sin P0), en `.impeccable/critique/`. Rendimiento: 120 fps en las 21 láminas, el giro y la demo viva, sin fugas en 30 min (`evaluaciones/escena/rendimiento.md`). Falta solo el auditorio: la lista de control está al final de la crítica final.
+
 ## 7. Riesgos y cómo se cubren
 
 - **El corte del jueves.** `?sin-escena=1` deja la app idéntica al plan B sin cambiar de rama; el tag deja el repo idéntico. Se decide a las 18:00 del miércoles con el ensayo, no a último momento.
