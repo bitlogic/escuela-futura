@@ -18,6 +18,7 @@ stage/                    la vista: escuela desde arriba + chat + organigrama ·
 scripts/generar_datos.py  regenera data/
 docs/bus.md               cómo funciona el bus y la API de la vista
 docs/guion.md             guion de la demo en vivo · docs/e2e.md: el ensayo automático
+docs/plan-b.md            la versión asegurada de la charla (tag plan-b-2026-11-05) y cómo levantarla
 ```
 
 ## Puesta en marcha
@@ -28,6 +29,7 @@ Requisitos: Node 20+ y una API key de Anthropic.
 npm install
 cp .env.example .env      # y completá ANTHROPIC_API_KEY
 ./escenario               # levanta el servidor y abre http://localhost:8080/stage/
+./charla                  # la charla completa: láminas + demo embebida en http://localhost:8090/
 ```
 
 En la vista, escribí en la caja del chat como la persona que decide (por defecto "Alfredo"; `ESCUELA_DIRECTOR` en `.env` o `?nombre=Ana` en la URL lo cambian; sin `@mención` le hablás a Coordinación) y seguí `docs/escenario.md`. **Reiniciar** arranca una sesión nueva; **Guardar corrida** descarga lo que pasó para reproducirlo después (`stage/corridas/`). Sin servidor (o sin red), la vista reproduce la corrida grabada: plan B de la demo.

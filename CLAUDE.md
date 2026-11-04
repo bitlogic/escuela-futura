@@ -46,5 +46,6 @@ Reingeniería sin Buzz hecha el 16/10 (servidor, bus con tests, pack adaptado, v
 
 - Los prompts de los agentes son cortos, en español, y cada agente usa solo sus herramientas (`tools:` del frontmatter). Nunca contactan a un estudiante ni ejecutan algo con consecuencias: proponen, una persona decide.
 - `npm test` antes de commitear: tests del bus (turnos guionados, reloj manual), del corredor (cliente falso), del verificador, del pack, del HTTP, del chat, del seguimiento y de los chequeos del E2E (sobre la corrida grabada; sin API).
+- La versión asegurada de la charla es el tag `plan-b-2026-11-05` (cómo levantarla y los tres escalones de respaldo: `docs/plan-b.md`); lo inmersivo se construye encima sin tocarla.
 - Para levantar la demo, siempre `./escenario`; para la charla completa (láminas + demo), `./charla`; para una sesión nueva, el botón **Reiniciar** de la vista (o `POST /api/reiniciar`).
 - La vista tiene que seguir reproduciendo las corridas grabadas sin servidor (plan B si falla la red).
