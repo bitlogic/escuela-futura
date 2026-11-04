@@ -112,7 +112,7 @@ export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, 
       const frac = pos === 'izq' ? (m.right + MARGEN_PLACA) / 1920 : pos === 'der' ? 1 - (m.left - MARGEN_PLACA) / 1920 : 1 - (m.top - MARGEN_PLACA) / 1080;
       if (frac > TOPE_PLACA) pos = 'plena';
     }
-    placa.className = 'pos-' + pos + (pl.clara ? ' clara' : '') + (pos === 'ninguna' ? '' : ' visible');
+    placa.className = 'pos-' + pos + (pl.clara ? ' clara' : '') + (pos === 'ninguna' ? '' : ' visible') + (placa.classList.contains('en-giro') ? ' en-giro' : '');   // durante el giro, la placa sigue apagada aunque cambie la lámina
     placa.style.background = pl.propia ? (l.section.style.background || PLACA_COLOR.oscura) : (pl.clara ? PLACA_COLOR.clara : PLACA_COLOR.oscura);
     let mascara = '';
     if (m && pos !== 'plena') {
@@ -144,13 +144,13 @@ export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, 
   function apagar() { activa = false; canvas.classList.remove('visible'); placa.className = ''; document.body.classList.remove('con-escena'); if (rafId) { cancelAnimationFrame(rafId); rafId = 0; } clearTimeout(senalDiferida); if (vigia && vigia.cerrar) vigia.cerrar(); if (observador) observador.disconnect(); }
 
   // ---------- La demo ----------
-  let entroConGiro = false;   // la demo entró con el giro: sale con el giro, aunque la lámina ya sea otra (PageDown a "decision")
+  let entroConGiro = false, girando = false;   // la demo entró con el giro: sale con el giro, aunque la lámina ya sea otra (PageDown a "decision"); girando: la escena sigue dibujando todo el giro
   async function demo(si) {
     if (si === demoVisible) return;
     demoVisible = si;
     const enGiro = (on) => { placa.classList.toggle('en-giro', on); if (lienzoLaminas) lienzoLaminas.classList.toggle('en-giro', on); };
-    if (si) { entroConGiro = activa && fijo.giro; if (entroConGiro) { enGiro(true); sonido.giro(); await new Promise((r) => setTimeout(r, 200)); await giro.aCenital(); } else capaDemo.classList.add('visible'); }
-    else { const conGiro = entroConGiro && activa; entroConGiro = false; arrancar(); if (conGiro) { sonido.giro(); await giro.aPerfil(); enGiro(false); } else capaDemo.classList.remove('visible'); }
+    if (si) { entroConGiro = activa && fijo.giro; if (entroConGiro) { girando = true; arrancar(); enGiro(true); sonido.giro(); await new Promise((r) => setTimeout(r, 200)); try { await giro.aCenital(); } finally { girando = false; } } else capaDemo.classList.add('visible'); }
+    else { const conGiro = entroConGiro && activa; entroConGiro = false; if (conGiro) { girando = true; arrancar(); enGiro(true); sonido.giro(); try { await giro.aPerfil(); } finally { girando = false; } enGiro(false); } else { arrancar(); capaDemo.classList.remove('visible'); } }
   }
 
   // ---------- El bucle ----------
@@ -165,7 +165,7 @@ export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, 
   }
   function cuadro(ahora) {
     rafId = 0;
-    if (!activa || parada || (demoVisible && !giro.enCurso)) return;   // con la demo en pantalla no se dibuja ni se re-pide; demo(false) rearma. Durante el giro sí: la cámara viaja mientras el perfil se acuesta o se levanta
+    if (!activa || parada || (demoVisible && !giro.enCurso && !girando)) return;   // con la demo en pantalla no se dibuja ni se re-pide; demo(false) rearma. Durante el giro sí: la cámara viaja mientras el perfil se acuesta o se levanta
     try { paso(ahora); } catch (e) { apagar(); if (alFallar) alFallar(e); else console.error('[escena] error en el cuadro; la escena se apaga', e); return; }
     rafId = requestAnimationFrame(cuadro);
   }
