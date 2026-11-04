@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Banco de pruebas · la escena</title>
+<link rel="stylesheet" href="../estilo.css">
+<style>
+  /* El banco: la escena sola, sin láminas, con el estado fijado por la URL o por window.banco. Para que cada agente vea su módulo. */
+  body { background: #000; }
+  #ui-escena { display: block; }
+  #ui-placa { display: none; }
+  #ui-placa.visible { display: block; }
+  #panel { position: fixed; left: 12px; top: 12px; z-index: 5; font: 500 12px/1.5 'JetBrains Mono', monospace; color: #A8A2D0; background: rgba(6,5,15,.8); border: 1px solid #262046; border-radius: 8px; padding: 8px 12px; white-space: pre; pointer-events: none; }
+  #panel.oculto { display: none; }
+</style>
+</head>
+<body>
+<canvas id="ui-escena" aria-hidden="true"></canvas>
+<div id="ui-placa" aria-hidden="true"></div>
+<div id="ui-demo" style="display:none"></div>
+<pre id="panel"></pre>
+<script type="module">
+// ?plano=hall&hora=.5&fachada=0&zoom=2&hd=1&sofia=camina&sofiaK=.5&foco=skills&manos=1&quieto=1&vacia=1&oficina=direccion&placa=izq&paso=2&panel=0
+import { crearEscena } from './escena.js';
+import { SALAS, TEMAS } from '/stage/oficina.js';
+import { MODELOS, cargarImagen } from '/stage/personajes.js';
+
+const q = new URLSearchParams(location.search);
+const num = (k, d) => (q.has(k) ? Number(q.get(k)) : d);
+const escena = await crearEscena({ canvas: document.getElementById('ui-escena'), placa: document.getElementById('ui-placa'), capaDemo: document.getElementById('ui-demo'), deps: { SALAS, TEMAS, MODELOS, cargarImagen }, opciones: { hd: q.get('hd') !== '0', mudo: true } });
+
+// Una lámina ficticia con lo que pida la URL; lo que no esté, lo pone el plano.
+function laminaDe(p) {
+  const e = { plano: p.get('plano') || 'fachada' };
+  for (const k of ['camx', 'camy', 'zoom', 'hora', 'fachada', 'luzInterior', 'manos']) if (p.has(k)) e[k] = Number(p.get(k));
+  for (const k of ['sofia', 'foco', 'oficina']) if (p.has(k)) e[k] = p.get(k);
+  for (const k of ['vacia', 'quieto', 'esfera', 'giro']) if (p.has(k)) e[k] = p.get(k) === '1';
+  const section = document.createElement('section'); section.style.background = '#0B0920';
+  return { id: p.get('lamina') || 'banco', escena: e, placa: p.get('placa') || 'ninguna', pasos: num('pasos', 0), section };
+}
+const lamina = laminaDe(q);
+escena.ir(lamina, num('paso', 0), { instantaneo: q.get('instantaneo') !== '0' });
+if (q.has('sofiaK')) { escena.camara.ir({ plano: lamina.escena.plano, sofiaK: num('sofiaK', 0), placa: lamina.placa }); escena.camara.saltar(); }
+
+const panel = document.getElementById('panel'); if (q.get('panel') === '0') panel.classList.add('oculto');
+escena.alFin((estado) => { panel.textContent = `plano ${estado.plano} · zoom ${estado.zoom.toFixed(2)} · hora ${estado.hora.toFixed(2)} · fachada ${estado.fachada.toFixed(2)}\nsofia ${estado.sofia || '-'} k ${estado.sofiaK.toFixed(2)} · manos ${estado.manos.toFixed(2)} · foco ${estado.foco || '-'} · quieto ${estado.quieto}\nhd ${estado.hd} · fps ${escena.luz.fps.toFixed(0)} · lectura ${estado.pausaLectura.toFixed(2)}`; });
+
+// Para Playwright y para probar a mano desde la consola: banco.estado({ hora: .5, sofia: 'camina' }) cambia la lámina ficticia.
+window.banco = {
+  escena,
+  estado(cambios = {}, paso = 0, instantaneo = true) { const p = new URLSearchParams(q); for (const [k, v] of Object.entries(cambios)) p.set(k, String(v)); const l = laminaDe(p); escena.ir(l, paso, { instantaneo }); return l; },
+};
+</script>
+</body>
+</html>

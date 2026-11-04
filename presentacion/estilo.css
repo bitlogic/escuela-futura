@@ -34,3 +34,14 @@ html, body { margin: 0; height: 100%; background: #06050F; color: #F3F0FF; overf
 .lienzo section x-shape[kind="ellipse"] { border-radius: 50%; }
 .lienzo section .x-icon svg { display: block; }
 .lienzo section iframe { display: block; }
+
+/* La escena (presentacion/escena/): el mundo detrás de las láminas y la placa del texto. Solo cuando la lámina lo declara. */
+#ui-escena { position: fixed; inset: 0; z-index: 0; display: none; width: 100%; height: 100%; }
+#ui-escena.visible { display: block; }
+#ui-placa { position: fixed; inset: 0; z-index: 1; display: none; pointer-events: none; }
+#ui-placa.visible { display: block; }
+#ui-placa.pos-izq { -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 38%, rgba(0,0,0,.85) 45%, rgba(0,0,0,.25) 55%, transparent 64%); mask-image: linear-gradient(90deg, #000 0%, #000 38%, rgba(0,0,0,.85) 45%, rgba(0,0,0,.25) 55%, transparent 64%); }
+#ui-placa.pos-der { -webkit-mask-image: linear-gradient(270deg, #000 0%, #000 38%, rgba(0,0,0,.85) 45%, rgba(0,0,0,.25) 55%, transparent 64%); mask-image: linear-gradient(270deg, #000 0%, #000 38%, rgba(0,0,0,.85) 45%, rgba(0,0,0,.25) 55%, transparent 64%); }
+#ui-placa.pos-abajo { -webkit-mask-image: linear-gradient(0deg, #000 0%, #000 50%, rgba(0,0,0,.85) 57%, rgba(0,0,0,.25) 66%, transparent 74%); mask-image: linear-gradient(0deg, #000 0%, #000 50%, rgba(0,0,0,.85) 57%, rgba(0,0,0,.25) 66%, transparent 74%); }
+.lienzo { z-index: 2; }
+body.con-escena .lienzo section[data-escena] { background: transparent !important; }

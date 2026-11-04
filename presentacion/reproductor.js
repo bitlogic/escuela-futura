@@ -60,8 +60,11 @@ export function prepararLamina(id, html) {
   // Pasos: los elementos con data-paso="N" (N ≥ 1) quedan ocultos hasta el clic N de la lámina (ver mostrarPaso).
   const pasos = Math.max(0, ...[...section.querySelectorAll('[data-paso]')].map((e) => Number(e.dataset.paso) || 0));
   const titulo = ((section.querySelector('h1, h2, h3') || {}).textContent || id).replace(/\s+/g, ' ').trim();
+  // La puesta en escena de la lámina (presentacion/escena/): data-escena (JSON) y data-placa. Sin ellos, la lámina se ve como siempre.
+  let escena = null; try { escena = section.dataset.escena ? JSON.parse(section.dataset.escena) : null; } catch (e) { console.error(`La lámina ${id} tiene un data-escena inválido:`, e.message); }
+  const placa = section.dataset.placa || null;
   const t = notas.match(/^\[(\d{1,2}:\d{2})(?:\s*[–-]\s*(\d{1,2}:\d{2}))?/) || [];
-  return { id, section: document.importNode(section, true), notas, titulo, pasos, demo: section.dataset.demo || null, desde: t[1] || null, hasta: t[2] || null, transicion: section.dataset.transition || 'fade' };
+  return { id, section: document.importNode(section, true), notas, titulo, pasos, demo: section.dataset.demo || null, escena, placa, desde: t[1] || null, hasta: t[2] || null, transicion: section.dataset.transition || 'fade' };
 }
 
 // Deja vistos los elementos de la lámina con data-paso ≤ k (k = 0: solo lo que no tiene paso).
