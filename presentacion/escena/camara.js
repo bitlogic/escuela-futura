@@ -15,8 +15,9 @@ export const PLANOS = {
 export const OFICINAS = { coordinacion: 240, direccion: 160 };
 // El travelling de Sofía por el hall: camx según sofiaK (0 = la puerta de calle, 1 = el final del pasillo).
 export const HALL_TRAVELLING = { desde: 330, hasta: 378 };
-// Corrimiento de la escena cuando hay placa (píxeles de pantalla): la escena se va al lado libre.
-export const CORRIMIENTO = { izq: [440, 0], der: [-440, 0], abajo: [0, -150], plena: [0, 0], ninguna: [0, 0] };
+// Corrimiento de la escena cuando hay placa (píxeles de pantalla): la escena se va al lado libre. Con `arriba` (el título sobre la
+// escuela) baja 200 px para que el edificio entero quede bajo el texto; con `llamadas` no se corre: el texto flota en sus recuadros.
+export const CORRIMIENTO = { izq: [440, 0], der: [-440, 0], abajo: [0, -150], arriba: [0, 200], plena: [0, 0], ninguna: [0, 0], llamadas: [0, 0] };
 
 const lerp = (a, b, k) => a + (b - a) * k;
 

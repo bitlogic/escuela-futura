@@ -48,7 +48,7 @@ Verificar antes de empezar: `http://localhost:8090/` muestra la portada; `d` tra
 
 La demo aparece sola al llegar a la lámina `vivo` (después de "Les presentamos a Escuela Futura"). Adentro, las teclas son de la escuela (`Enter` escribe, `b` Tablero, `o` organigrama, `Escape` vuelve al plano); para seguir con las láminas, `PageDown` (lo que manda el clicker), `Shift+→` o `d`.
 
-`http://localhost:8090/?nombre=Greyla` hace que decida Greyla en vez de Alfredo; `?ritmo=pausado` retiene los mensajes de los agentes 4 s para que la sala los lea. `#id` o `?lamina=N` abren en una lámina puntual, y el `#` de la URL se actualiza al navegar, así que recargar no pierde el lugar.
+`http://localhost:8090/?nombre=Greyla` hace que decida Greyla en vez de Alfredo; `?ritmo=pausado` retiene los mensajes de los agentes 4 s para que la sala los lea (sin parámetro, el ritmo es Lento, 7 s, o lo que se haya elegido en el perfil de ese navegador). `#id` o `?lamina=N` abren en una lámina puntual, y el `#` de la URL se actualiza al navegar, así que recargar no pierde el lugar.
 
 ## Los tres escalones de respaldo
 

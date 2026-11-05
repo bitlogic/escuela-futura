@@ -1,4 +1,4 @@
-// Capturas de la charla con escena: las 21 láminas a 1920×1080 (y el giro a mitad de camino), para revisar y para la crítica.
+// Capturas de la charla con escena: las 22 láminas a 1920×1080 (y el giro a mitad de camino), para revisar y para la crítica.
 // Levanta el servidor de la charla solo (sin escuela) en el puerto 8091, saca las capturas y lo cierra.
 //
 //   node presentacion/escena/capturas.mjs                 # evaluaciones/escena/<fecha>/
@@ -44,7 +44,7 @@ try {
     for (const modo of conPlano ? ['hd', 'plano'] : ['hd']) {
       for (const id of ids) {
         const n = deck.order.indexOf(id) + 1;
-        await pagina.goto(`${base}/?lamina=${id}${modo === 'plano' ? '&plano=1' : ''}`, { waitUntil: 'networkidle' }); await espera(3000);
+        await pagina.goto(`${base}/?lamina=${id}&auto=0${modo === 'plano' ? '&plano=1' : ''}`, { waitUntil: 'networkidle' }); await espera(3000);
         await pagina.screenshot({ path: join(salida, `${String(n).padStart(2, '0')}-${id}${modo === 'plano' ? '-plano' : ''}.png`) });
         // los pasos de la lámina, si tiene
         const pasos = await pagina.evaluate(() => document.querySelectorAll('.lienzo section.actual [data-paso]').length ? Math.max(...[...document.querySelectorAll('.lienzo section.actual [data-paso]')].map((e) => Number(e.dataset.paso) || 0)) : 0);
@@ -53,7 +53,7 @@ try {
     }
     // el giro, a mitad de camino y al final
     if (!solo || solo.includes('vivo')) {
-      await pagina.goto(`${base}/?lamina=escuela`, { waitUntil: 'networkidle' }); await espera(2500);
+      await pagina.goto(`${base}/?lamina=escuela&auto=0`, { waitUntil: 'networkidle' }); await espera(2500);
       // "escuela" tiene pasos: se pasan primero, y el PageDown siguiente es el que entra a "vivo" con el giro
       const pasosEscuela = await pagina.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.lienzo section.actual [data-paso]')].map((e) => Number(e.dataset.paso) || 0)));
       for (let p = 0; p < pasosEscuela; p++) { await pagina.keyboard.press('PageDown'); await espera(400); }

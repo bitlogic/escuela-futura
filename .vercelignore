@@ -1,0 +1,20 @@
+# Despliegue estático (scripts/armar-estatico.mjs): solo sube lo que arma public/.
+# Todo lo demás (pack, data, docs, evaluaciones, .env) queda afuera.
+/*
+!/presentacion
+!/stage
+!/scripts
+!/vercel.json
+/scripts/*
+!/scripts/armar-estatico.mjs
+
+# Fuentes licenciadas del brand kit: nunca se publican
+stage/assets/Plain-*
+stage/assets/AppleGaramond-*
+.DS_Store
+
+# Música con derechos: nunca se publica
+presentacion/musica/
+
+# Música con derechos: solo en esta máquina
+*.mp3

@@ -1,0 +1,19 @@
+#!/bin/sh
+# Apaga la charla (puerto 8090) y la escuela (puerto 8080), estén donde estén (busca los procesos de node que corren cada servidor):
+# en otra terminal, en segundo plano o huérfanas. Sin argumentos apaga las dos; `./apagar charla` o `./apagar escuela`, una sola.
+que="${1:-todo}"
+apagar() {   # $1 = nombre para mostrar, $2 = patrón del proceso
+  pids=$(pgrep -f "$2")
+  if [ -z "$pids" ]; then echo "$1: no estaba corriendo"; return; fi
+  kill $pids 2>/dev/null
+  for i in $(seq 1 20); do sleep 0.3; pgrep -f "$2" >/dev/null || { echo "$1: apagada"; return; }; done
+  kill -9 $pids 2>/dev/null; echo "$1: apagada (a la fuerza)"
+}
+case "$que" in
+  todo)    habia=$(pgrep -f "node[^ ]* .*servidor/escuela\.mjs")   # la charla apaga la escuela que levantó ella; si ya no está, fue con la charla
+           apagar "la charla" "node[^ ]* .*presentacion/servidor\.mjs"
+           if [ -n "$habia" ] && ! pgrep -f "node[^ ]* .*servidor/escuela\.mjs" >/dev/null; then echo "la escuela: apagada (con la charla)"; else apagar "la escuela" "node[^ ]* .*servidor/escuela\.mjs"; fi ;;
+  charla)  apagar "la charla" "node[^ ]* .*presentacion/servidor\.mjs" ;;
+  escuela) apagar "la escuela" "node[^ ]* .*servidor/escuela\.mjs" ;;
+  *) echo "uso: ./apagar [charla|escuela]" >&2; exit 2 ;;
+esac

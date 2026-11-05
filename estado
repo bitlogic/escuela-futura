@@ -1,0 +1,22 @@
+#!/bin/sh
+# Cómo está la charla (8090) y la escuela (8080): proceso, si responden, y lo que la escuela dice de sí misma (modelo, en vivo, mensajes).
+cd "$(dirname "$0")" || exit 1
+linea() {   # $1 nombre, $2 patrón del proceso, $3 URL de prueba
+  pid=$(pgrep -f "$2" | head -1)
+  if curl -s -o /dev/null --max-time 2 "$3"; then resp="responde"; else resp="NO responde"; fi
+  if [ -n "$pid" ]; then echo "$1: corriendo (pid $pid), $resp"
+  elif [ "$resp" = "responde" ]; then echo "$1: sin proceso propio, pero el puerto responde (¿otro servidor en ese puerto?)"
+  else echo "$1: apagada"; fi
+}
+linea "Charla  (http://localhost:8090/)      " 'node[^ ]* .*presentacion/servidor\.mjs' http://localhost:8090/deck.json
+linea "Escuela (http://localhost:8080/stage/)" 'node[^ ]* .*servidor/escuela\.mjs' http://localhost:8080/stage/agentes.json
+est=$(curl -s --max-time 2 http://localhost:8080/api/estado)
+if [ -n "$est" ]; then
+  echo "$est" | node -e '
+    let s = ""; process.stdin.on("data", (d) => s += d).on("end", () => {
+      const j = JSON.parse(s); const ocupados = (j.agentes || []).filter((a) => a.estado !== "inactivo").map((a) => a.id);
+      console.log(`Demo: ${j.vivo ? "en vivo" : "sin agentes (grabación)"} · modelo ${j.modelo} · decide ${j.persona} · ${j.mensajes} mensajes en la sesión` + (ocupados.length ? ` · trabajando: ${ocupados.join(", ")}` : " · agentes quietos"));
+    });'
+fi
+[ -f .charla.log ] && { echo "Log (.charla.log), últimas líneas:"; tail -n 4 .charla.log | sed 's/^/  /'; }
+exit 0

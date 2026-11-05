@@ -27,3 +27,15 @@ evaluaciones/
 
 # Informes de /impeccable critique (locales)
 .impeccable/
+
+# Log de ./arrancar
+.charla.log
+
+# Despliegue estático (scripts/armar-estatico.mjs) y Vercel
+public/
+.vercel/
+.vercel
+.env*
+
+# Música de la charla (con derechos: queda en esta máquina, no se sube)
+presentacion/musica/*.mp3

@@ -27,7 +27,7 @@ import { MODELOS, cargarImagen } from '/stage/personajes.js';
 
 const q = new URLSearchParams(location.search);
 const num = (k, d) => (q.has(k) ? Number(q.get(k)) : d);
-const escena = await crearEscena({ canvas: document.getElementById('ui-escena'), placa: document.getElementById('ui-placa'), capaDemo: document.getElementById('ui-demo'), deps: { SALAS, TEMAS, MODELOS, cargarImagen }, opciones: { hd: q.get('hd') !== '0', mudo: true } });
+const escena = await crearEscena({ canvas: document.getElementById('ui-escena'), placa: document.getElementById('ui-placa'), capaDemo: document.getElementById('ui-demo'), deps: { SALAS, TEMAS, MODELOS, cargarImagen }, opciones: { hd: q.get('hd') !== '0' } });
 
 // Una lámina ficticia con lo que pida la URL; lo que no esté, lo pone el plano.
 function laminaDe(p) {

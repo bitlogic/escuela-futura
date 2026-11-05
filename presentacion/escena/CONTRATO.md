@@ -31,6 +31,7 @@ Un objeto plano que `escena.js` interpola cuadro a cuadro hacia el objetivo de l
   oficina: 'coordinacion'|'direccion',
   esfera: { on: bool, x, y, r },    // el tercer invitado, en coordenadas de pantalla
   pausaLectura: 0..1,               // 1 = acaba de entrar texto: nadie empieza nada nuevo
+  saludo: bool,                     // gracias: con el paso 1 en pantalla, los agentes salen a la vereda a saludar (globo "¡Gracias!")
   paso: n,                          // el paso actual de la lámina
   hd: bool, placa: 'izq'|'der'|'abajo'|'ninguna', placaClara: bool,
 }
@@ -55,27 +56,28 @@ El travelling de Sofía (`hall`, `sofia: 'camina'`): camx va de 290 a 420 a lo l
 
 | # | Lámina | `data-escena` | `data-placa` | Qué pasa |
 |---|---|---|---|---|
-| 1 | cover | `{"plano":"fachada","hora":0,"esfera":true}` | izq | ventanas prendiéndose; la esfera sobre el edificio, arriba a la derecha |
-| 2 | equipo | `{"plano":"fachada","hora":0.05,"zoom":1.4,"camx":340,"camy":200}` | izq | la cámara se acerca a la puerta |
-| 3 | sofia | `{"plano":"hall","sofia":"entra"}` | izq | Sofía entra por la puerta y arranca; las marcas 2022 · 2024 · 2026 están en la pared del hall; la esfera se encoge en la marca de 2022 |
-| 4 | chatgpt | `{"plano":"hall","sofia":"camina"}` | izq | sigue el travelling |
-| 5 | carrera | `{"plano":"hall","sofia":"camina"}` | izq | sigue; los pasos de la lámina (2024, 2026) adelantan `sofiaK` |
-| 6 | entrevista | `{"plano":"hall","sofia":"puerta"}` | izq | Sofía al final del pasillo, de espaldas a la cámara, mirando la puerta |
-| 7 | primera-vez | `{"plano":"edificio","hora":1}` | izq clara | amanece: el cambio de luz de las notas, literal |
-| 8 | ranking | `{"plano":"edificio","hora":1,"quieto":true}` | izq clara | quieto |
-| 9 | manos | `{"plano":"aula","manos":"pasos"}` | izq | las manos suben con los pasos de la lámina (paso 1: un tercio; paso 2: todas) |
-| 10 | datos | `{"plano":"aula","zoom":1.6,"quieto":true}` | izq | quieto, un poco más lejos |
-| 11 | tesis | `{"plano":"edificio","hora":0.5,"luzInterior":1}` | abajo | todas las ventanas encendidas |
-| 12 | capo | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0}` | izq | la fachada se desvanece al entrar: casa de muñecas con los seis trabajando |
-| 13 | agente | `{"plano":"oficina","oficina":"coordinacion","foco":"pasos"}` | izq | paso 1 rol (el agente se ilumina), 2 skills (el estante), 3 herramientas (la pantalla), 4 memoria (el cuaderno), 5 autonomía (se levanta y va a otra sala) |
-| 14 | escuela | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0}` | izq | mismo plano que capo, sin movimiento |
-| 15 | vivo | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0,"giro":true}` | ninguna | el giro |
-| 16 | decision | `{"plano":"oficina","oficina":"direccion","hora":0.55}` | der clara | la persona en el escritorio; un agente en la puerta con el papel |
-| 17 | aula | `{"plano":"aula","hora":0.2,"manos":0,"quieto":true,"vacia":true}` | izq | la misma aula, vacía, luz de la tarde |
-| 18 | criterio | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0,"quieto":true}` | izq | el edificio abierto, quieto |
-| 19 | recibe | `{"plano":"patio","sofia":"sale","esfera":true}` | izq | Sofía sale por la puerta y cruza hacia fuera de cuadro; la esfera en la marca de 2026 |
-| 20 | cierre | `{"plano":"fachada","hora":0.85,"esfera":true}` | abajo | el mismo encuadre que la portada; la esfera se expande |
-| 21 | gracias | `{"plano":"fachada","hora":0.5,"luzInterior":1}` | izq | ventanas prendidas durante las preguntas |
+| 1 | cover | (sin escena) | — | el fondo del deck con la esfera grande, sin la escuela: suspenso; sin la línea de nombres |
+| 2 | equipo | (sin escena) | — | el fondo del deck |
+| 3 | fachada | `{"plano":"fachada","hora":0.04,"zoom":0.94,"camy":164,"luzInterior":0,"viaje":{"zoom":1.08,"hora":0.3,"camy":158,"luzInterior":1,"segundos":18}}` | ninguna | **aparece la escuela** (4/11): el canvas entra con un fundido de 1,8 s y después, en 18 s, la cámara se acerca despacio, cae el sol y las ventanas se prenden de a una (el `viaje`); sin texto, sin esfera |
+| 4 | sofia | `{"plano":"edificio","hora":0.15,"camx":230,"camy":142,"zoom":1.05,"sofia":"calle"}` | llamadas | la escuela de afuera, un poco más lejos; Sofía entra caminando por la vereda desde la izquierda; el texto en recuadros arriba a la izquierda |
+| 5 | chatgpt | (la misma) | llamadas | Sofía sigue por la vereda (`sofiaK` avanza con las láminas y los pasos, no con el tiempo) |
+| 6 | carrera | (la misma) | llamadas | tres recuadros en fila sobre el cielo (2022 · 2024 · 2026), uno por paso, cada uno sobre su año de la línea de tiempo |
+| 7 | entrevista | `{…,"sofia":"frente","quieto":true}` | llamadas | Sofía llega a la puerta y se queda frente a ella, de espaldas; la pregunta en recuadros centrados |
+| 8 | primera-vez | `{"plano":"edificio","hora":1}` | llamadas clara | amanece: el cambio de luz de las notas, literal |
+| 9 | ranking | `{"plano":"edificio","hora":1,"quieto":true}` | izq clara | quieto |
+| 10 | manos | `{"plano":"aula","manos":"pasos","camx":100,"camy":190,"zoom":1.9}` | llamadas | el aula entera a la derecha, más lejos; las manos suben con los pasos (paso 1: todas; paso 2: bajan) |
+| 11 | datos | `{"plano":"aula","zoom":1.6,"quieto":true}` | izq | quieto, un poco más lejos |
+| 12 | tesis | (sin escena) | — | la lámina entera, centrada: la escuela se apaga un minuto y vuelve con el fundido en `capo` |
+| 13 | capo | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0,"camx":180,"quieto":true}` | llamadas | la fachada se desvanece al entrar: casa de muñecas con los seis trabajando |
+| 14 | agente | `{"plano":"oficina","oficina":"coordinacion","foco":"pasos","camx":215}` | llamadas | título “¿Qué es un agente?” y los cinco puntos como recuadros a la izquierda, uno por paso; la oficina entera a la derecha: paso 1 rol (el agente se ilumina), 2 skills (el estante), 3 herramientas (la pantalla), 4 memoria (el cuaderno), 5 autonomía (se levanta y va a otra sala) |
+| 15 | escuela | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0}` | arriba | el título en una banda arriba y la escuela abierta entera debajo (la escena baja 200 px); sin esfera |
+| 16 | vivo | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0,"giro":true}` | arriba | el giro; la banda de arriba (“Entramos a Escuela Futura.”) solo se ve antes del giro o al volver con `d` |
+| 17 | decision | `{"plano":"oficina","oficina":"direccion","hora":0.95,"camx":200,"camy":86}` | llamadas clara | la frase en recuadros de papel arriba a la derecha; la persona en el escritorio y el agente con el papel debajo |
+| 18 | aula | `{"plano":"aula","hora":0.2,"manos":0,"quieto":true,"vacia":true,"camx":100,"camy":190,"zoom":1.9}` | llamadas | la misma aula, vacía, luz de la tarde |
+| 19 | criterio | `{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0,"quieto":true,"camx":180}` | llamadas | el edificio abierto, quieto |
+| 20 | recibe | `{"plano":"patio","sofia":"sale","camx":250,"camy":170,"zoom":1.3}` | llamadas | el texto en recuadros a la izquierda; Sofía sale por la puerta (a la derecha) y cruza hacia fuera de cuadro |
+| 21 | cierre | `{"plano":"fachada","hora":0.85}` | llamadas | el mismo encuadre que cuando apareció la escuela, de madrugada; sin esfera |
+| 22 | gracias | `{"plano":"fachada","hora":0.3,"luzInterior":1,"viaje":{"hora":0.5,"luzInterior":0.2,"segundos":40}}` | llamadas | en 40 s se hace de noche y las ventanas se apagan de a una; quedan Bienestar y Coordinación trabajando |
 
 Las láminas de fondo claro (primera-vez, ranking, decision) llevan placa clara y escena de día. Dos láminas mueven su bloque de texto al pie para la placa de abajo (tesis, cierre): es layout, no contenido.
 
@@ -95,15 +97,13 @@ export function crearCamara() → { ir(objetivo), tick(dt) → estadoParcial, aP
 export function crearLuz(canvas) → { render({ mundo, fachada, capas, estado, aPantalla, ventanas, lamparas, foco }), medirFps(dt), hd, degradado }
 // giro.js
 export function crearGiro({ canvasEscena, capaDemo, duracion: 900 }) → { aCenital() → Promise, aPerfil() → Promise, enCurso }
-// sonido.js
-export function crearSonido() → { timbre(), luces(), motivo(sube), giro(), tic(), campana(), silenciar(si), activo, habilitar() }
 // escena.js
-export async function crearEscena({ canvas, placa, laminas, demo, opciones: { hd, sinEscena, mudo } }) → { ir(lamina, paso, { instantaneo }), paso(n), demo(si) → Promise, pausar(si), tecla(k) → bool, estado() }
+export async function crearEscena({ canvas, placa, laminas, demo, opciones: { hd, sinEscena } }) → { ir(lamina, paso, { instantaneo }), paso(n), demo(si) → Promise, pausar(si), tecla(k) → bool, estado() }
 ```
 
 ### 3.6 El banco de pruebas (`banco.html`)
 
-Una página servida por el mismo servidor (`http://localhost:8091/escena/banco.html` con `--sin-escuela`) que monta un módulo con el resto en relleno: `?modulo=edificio|gente|luz|giro|sonido&plano=hall&hora=.5&fachada=0&hd=1&sofia=camina&foco=skills&manos=1&quieto=1`. Dibuja a 1920×1080 y expone `window.banco.estado` para que Playwright pueda fijar un estado y capturar. Es lo que cada agente usa para verse sin la app entera.
+Una página servida por el mismo servidor (`http://localhost:8091/escena/banco.html` con `--sin-escuela`) que monta un módulo con el resto en relleno: `?modulo=edificio|gente|luz|giro&plano=hall&hora=.5&fachada=0&hd=1&sofia=camina&foco=skills&manos=1&quieto=1`. Dibuja a 1920×1080 y expone `window.banco.estado` para que Playwright pueda fijar un estado y capturar. Es lo que cada agente usa para verse sin la app entera.
 
 ### 3.7 Reglas para todos los agentes
 
@@ -124,7 +124,7 @@ Una página servida por el mismo servidor (`http://localhost:8091/escena/banco.h
 - **`manos: "pasos"`** → por paso: 0 → 0, 1 → 1, 2 → .15. **`foco: "pasos"`** → por paso: 1 rol, 2 skills, 3 herramientas, 4 memoria, 5 autonomía.
 - **`luz.render` recibe `vista`** `{ esc, ox, oy }`: la composición de 1920×1080 entra entera en la ventana, centrada como el lienzo; las bandas sobrantes se pintan del color de arriba del cielo.
 - **El banco** (`banco.html`) arma una lámina ficticia con la URL y expone `window.banco.estado(cambios, paso)`; el estado por cuadro llega a `escena.alFin(f)`.
-- `escena.tecla(k)` devuelve `{ hecho, aviso }`; `escena.gesto()` habilita el audio con la primera tecla.
+- `escena.tecla(k)` devuelve `{ hecho, aviso }`.
 
 ## Ajustes de la oleada 1 (lo que trajeron los módulos reales; mandan sobre lo de arriba)
 
@@ -132,10 +132,24 @@ Una página servida por el mismo servidor (`http://localhost:8091/escena/banco.h
 - **`data-marca-agua`** en los elementos del deck que son un año o una palabra gigante de fondo (sofia, chatgpt, recibe): con escena no se ven; sin escena, como siempre. Los anchos de texto que pisaban la escena se angostaron (primera-vez, manos, aula) y `decision` quedó alineada a la derecha, con su placa.
 - **`edificio.js`** exporta además `ESCALERA = { x, w, pie: { x, y }, cima: { x, y } }` (la cima en el descanso de planta alta), `PATIO`, `MUROS`, `MARGEN`, `SUELO_COLOR`; cada puesto trae `mesa { x0, x1, y }`, `pantalla { x, y, w, h }`, `silla { x }`, `asiento` (x del centro, número), `mostrador`, y `estante` / `cuaderno` `{ x, y, w, h }` donde corresponde; `plantas[p3]` trae `pupitres [{ x, y, mesa, fila }]` y `pizarron`. `lamparas()` devuelve `{ x, y, r, sala, x0, w }`; `proyector(estado)` y `farolas()` existen para la luz.
 - **`luz.render`** recibe además `sofiaEn` (posición de Sofía en el mundo o null), `proyector` y `farolas`; `escena.js` los pasa cada cuadro.
-- **`sonido.js`**: `VECES.campana` es 2 (la propuesta de Martina y la rutina del acto 7); `vigilarPropuesta` suena una vez por propuesta (no por sesión) y expone `vigia`; `esEventoPropuesta(ev)` usa el mismo criterio que la vista (`esPropuesta` de `stage/chat.js`).
-- **Las señales por lámina** viven en `escena.js` (`SENALES`): al entrar yendo hacia adelante (nunca al abrir en la lámina ni al volver), `sofia` → timbre y, 1,2 s después, el motivo al revés; `tesis` → luces; `recibe` y `cierre` → el motivo al derecho. En esas láminas no suena el tic del cambio de plano. El tic suena en los demás cambios de plano; el giro, al entrar y salir de la demo.
-- **La demo sale con el giro si entró con el giro**, aunque la lámina ya sea otra (PageDown en `vivo` va a `decision`); mientras `giro.enCurso`, la app ignora las teclas y la escena sigue dibujando (la cámara viaja mientras el perfil se levanta). El gesto que habilita el audio llega por teclado, por clic en el lienzo y desde adentro de la demo; `m` silencia también adentro.
+- **La demo sale con el giro si entró con el giro**, aunque la lámina ya sea otra (PageDown en `vivo` va a `decision`); mientras `giro.enCurso`, la app ignora las teclas y la escena sigue dibujando (la cámara viaja mientras el perfil se levanta). Las teclas de la charla llegan también desde adentro de la demo.
 - **`escena.fijar(cambios)`** pisa el estado interpolado o fijo (para el banco: `sofiaK`, `manos`, `foco`); `banco.html` lo usa con `?sofiaK=`.
 - **El giro real (oleada 4)**: `crearGiro` recibe `iframeDemo`; al entrar pide a la vista el cuadro del mapa (`postMessage({ tipo: 'cuadro' })` → `{ tipo: 'cuadro', dataUrl, ancho, alto, escala, luz }`, solo al padre del mismo origen) y arma un cubo: el perfil es la cara de frente que se acuesta y el mapa la cara de arriba que baja hasta quedar plana, 900 ms, una sola curva; al final se funde con el iframe real, que no se tocó. Sin cuadro en 150 ms, sin `iframeDemo`, con `simple` o con `prefers-reduced-motion`, el giro de antes (inclinación simulada o fundido). Durante todo el giro la escena sigue dibujando y la placa queda apagada (`en-giro`). Constantes para afinar en el proyector: `ESCALA_MEDIA`, `FUNDIDO_TAPA`, `APAGADO_FRENTE`, `ASENTADO`.
 - **La luz de la demo (oleada 4)**: `stage/luz.js` es la luz compartida (modo cenital, halos); `presentacion/escena/luz.js` la importa. En la demo: `<canvas id="luz">` sobre el mapa, tecla `l`, `?luz=0|1`, prendida en vivo y apagada en grabación (el E2E en vivo abre con `luz=0`).
 - **El presentador** recibe `escena` en el mensaje `estado` del `BroadcastChannel` y muestra el plano actual con sus parámetros y si la siguiente lámina mueve la cámara.
+
+## Ajustes del 4/11 a la tarde (mandan sobre todo lo anterior)
+
+- **Sin sonido.** `sonido.js` se sacó entero (timbre, luces, motivo, giro, tic, campana), con `SENALES`, `gesto()`, `vigilarPanel`, la tecla `m` y `?mudo=1`. Se va a repensar desde cero para que tenga sentido; hasta entonces la charla es muda. La firma de `crearEscena` ya no acepta `mudo`.
+- **Las dos primeras láminas van sin escena** (`cover`, `equipo`: sin `data-escena` ni `data-placa`): el fondo del deck con la esfera, como en el tag `plan-b-2026-11-05`, para generar suspenso. `escena.ir()` con una lámina sin escena apaga el canvas (ya era así).
+- **Lámina 3, `fachada`: aparece la escuela.** Plano `fachada`, hora 0,1, placa `ninguna`, sin texto; la esfera de la portada, más chica, sobre el edificio arriba a la derecha (el mismo `<x-embed>`). Cuando la escena pasa de apagada a prendida sin `instantaneo`, `escena.js` salta la cámara al objetivo y arranca `luzInterior` en 0 (las ventanas se prenden en unos 3 s), y `#ui-escena.visible` entra con un fundido de 1,8 s (`estilo.css`, `escena-aparece`; sin fundido con `prefers-reduced-motion`). El deck tiene 22 láminas; la tabla de 3.4 está renumerada.
+
+## Ajustes del 4/11 a la noche (la revisión de las 22 láminas; mandan sobre todo lo anterior)
+
+- **Dos posiciones nuevas de placa.** `llamadas`: no hay placa; cada texto marcado con la clase `.llamada` lleva su propio recuadro del tamaño de lo que dice (`estilo.css`; en una lámina `clara`, recuadros de papel). Sin escena es texto común. Reemplaza al panel izquierdo en sofia, chatgpt, carrera, entrevista, manos, agente, decision y recibe (el panel dejaba media pantalla vacía y tapaba la escena). `arriba`: la placa va arriba, hasta el borde inferior del texto, y la escena baja 200 px (`CORRIMIENTO.arriba`) para que la escuela entera quede debajo del título (escuela, vivo).
+- **`viaje`** en `data-escena`: una deriva lenta de `camx`, `camy`, `zoom`, `hora`, `fachada` y `luzInterior` desde lo que declara la lámina hasta lo que dice el viaje, en `segundos` (20 por defecto), con una curva suave en los extremos. Lo usa `fachada` (la cámara se acerca, cae el sol, las ventanas se prenden) y `gracias` (se hace de noche, las ventanas se apagan). `escena.estado().viaje` es la fracción recorrida (o null).
+- **Las ventanas de la fachada tienen umbral** (`edificio.ventanas()`, `UMBRALES` por puesto; `ventanaPrendida(v, estado)`): con `luzInterior` fraccionario se prenden y apagan de a una, en el orden Dirección → Secretaría → Admisiones → Biblioteca → Academia → Aula → Bienestar → Coordinación. `luz.js` usa lo mismo para los halos.
+- **Sofía afuera**: `sofia: "calle"` (viene por la vereda desde fuera de cuadro hasta la puerta, x proporcional a `sofiaK`, `CALLE` en `gente.js`) y `"frente"` (parada frente a la puerta, de espaldas). Las cuatro láminas de Sofía pasaron del hall a la calle, con la escuela de afuera un poco más lejos (`edificio`, zoom 0,85). Los estados `entra`, `camina` y `puerta` siguen existiendo (el banco los usa) pero ninguna lámina los pide.
+- **La esfera quedó solo en la portada**: se sacó de fachada, escuela y cierre (no sumaba sobre la escena). La portada va sin la línea de nombres. **Tesis va sin escena**, centrada (la lámina entera, como en el deck). El tope de la placa para pasar a `plena` (72 %) también vale para `arriba`.
+- **Revisión del 4/11 a la noche, segunda vuelta (Alfredo):** la placa izquierda tapaba más de media pantalla y dejaba la escuela cortada (primera-vez, aula, capo, criterio, cierre, gracias), así que esas seis pasaron a `llamadas`, el diseño de entrevista: la escena entera y el texto en recuadros arriba a la izquierda. Quedan con placa solo `plena` (ranking, datos) y `arriba` (escuela, vivo). Como sin placa la escena no se corre, `aula` toma el encuadre de `manos` (`camx` 90, zoom 1,5) y `capo` y `criterio` llevan `camx` 180 (el edificio a la derecha, donde antes lo dejaba el corrimiento de 440 px). Y la franja de desenfoque de abajo (tilt-shift, `luz.js`) ya no tapa a Sofía ni al agente del foco: lo nítido baja hasta donde están.
+- **Crítica del 4/11 a la noche (29/40), aplicada:** las listas en recuadros suben a 56/36 px y `agente` muestra solo la palabra de cada fila (la descripción la dice Alfredo); en `capo`, "Preguntar" se achica a una línea cuando entra "Delegar" (`data-hasta="1"`: el reproductor oculta el elemento desde ese paso) y la consigna va en `.cita` (48 px); el número de lista va en gris y toma color solo por clase; las tres frases grandes miden 112 px también con escena; `--tenue` sube a `#7F79B0` (4,9:1); Sofía más cerca en la calle (zoom 1,05, `camy` 142) con más luz; `manos` y `aula` muestran el aula entera (zoom 1,9, `camx` 100); `decision` corta en la losa (`camy` 86); la placa `plena` al 0,95.

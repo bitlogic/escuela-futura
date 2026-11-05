@@ -128,7 +128,7 @@ async function correrEnVivo({ modelo, dir }) {
 
   // Capturas en los momentos clave, mientras pasa
   const capturas = []; let nav = null;
-  if (CON_CAPTURAS) { try { nav = await abrirNavegador(`${base}/stage/?nombre=${encodeURIComponent(NOMBRE)}&tema=oscuro&luz=0`); } catch (e) { fallas.push('navegador: ' + e.message); } }
+  if (CON_CAPTURAS) { try { nav = await abrirNavegador(`${base}/stage/?nombre=${encodeURIComponent(NOMBRE)}&tema=oscuro&luz=0&ritmo=normal`); } catch (e) { fallas.push('navegador: ' + e.message); } }
   let vigilando = true; const tomadas = new Set(), listas = new Set();
   const vigilante = (async () => {
     while (vigilando) {

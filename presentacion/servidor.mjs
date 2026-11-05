@@ -18,7 +18,7 @@ import { spawn } from 'node:child_process';
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const RAIZ = join(AQUI, '..');
 const STAGE = join(RAIZ, 'stage');
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.woff': 'font/woff', '.ttf': 'font/ttf', '.otf': 'font/otf', '.md': 'text/markdown; charset=utf-8' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.woff': 'font/woff', '.ttf': 'font/ttf', '.otf': 'font/otf', '.md': 'text/markdown; charset=utf-8', '.mp3': 'audio/mpeg' };
 
 // Ruta pedida → archivo dentro de `base`, o null si se sale de la carpeta o no existe.
 function archivoEn(base, ruta) {
@@ -29,11 +29,21 @@ function archivoEn(base, ruta) {
   if (!f.startsWith(base + sep) && f !== base) return null;
   try { let st = statSync(f); if (st.isDirectory()) { f = join(f, 'index.html'); st = statSync(f); } return st.isFile() ? f : null; } catch { return null; }
 }
-function servirArchivo(res, f) {
+function servirArchivo(res, f, req = null) {
   const tipo = MIME[extname(f).toLowerCase()];
   if (!tipo) { res.writeHead(404); return res.end('No está.'); }
-  res.writeHead(200, { 'Content-Type': tipo, 'Cache-Control': 'no-cache' });
-  res.end(readFileSync(f));
+  const datos = readFileSync(f);
+  // Rangos (bytes=a-b): sin esto el navegador trata el mp3 como una transmisión sin duración y la música en loop no vuelve a empezar.
+  const r = req && /^bytes=(\d*)-(\d*)$/.exec(String(req.headers.range || ''));
+  if (r && (r[1] || r[2])) {
+    let desde = r[1] ? Number(r[1]) : Math.max(0, datos.length - Number(r[2])), hasta = r[1] && r[2] ? Number(r[2]) : datos.length - 1;
+    hasta = Math.min(hasta, datos.length - 1);
+    if (desde > hasta) { res.writeHead(416, { 'Content-Range': `bytes */${datos.length}` }); return res.end(); }
+    res.writeHead(206, { 'Content-Type': tipo, 'Cache-Control': 'no-cache', 'Accept-Ranges': 'bytes', 'Content-Range': `bytes ${desde}-${hasta}/${datos.length}`, 'Content-Length': hasta - desde + 1 });
+    return res.end(datos.subarray(desde, hasta + 1));
+  }
+  res.writeHead(200, { 'Content-Type': tipo, 'Cache-Control': 'no-cache', 'Accept-Ranges': 'bytes' });
+  res.end(datos);
 }
 
 // Crea el servidor. `escuela` = { host, port } del servidor de la escuela.
@@ -48,7 +58,7 @@ export function crearServidorCharla({ escuela = { host: '127.0.0.1', port: 8080 
       if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405); return res.end(); }
       const f = archivoEn(AQUI, ruta === '/' ? 'index.html' : ruta);
       if (!f || /\.(test\.mjs|mjs)$/.test(f) && f !== join(AQUI, 'reproductor.js')) { res.writeHead(404); return res.end('No está.'); }
-      return servirArchivo(res, f);
+      return servirArchivo(res, f, req);
     } catch (e) { log('error', e.message); if (!res.headersSent) res.writeHead(500); res.end('Error.'); }
   });
 
@@ -77,7 +87,7 @@ export function crearServidorCharla({ escuela = { host: '127.0.0.1', port: 8080 
   return {
     server,
     escuchar: (puerto) => new Promise((ok, no) => { server.on('error', no); server.listen(puerto, '127.0.0.1', () => ok(server.address().port)); }),
-    cerrar: () => new Promise((ok) => server.close(() => ok())),
+    cerrar: () => new Promise((ok) => { server.close(() => ok()); if (server.closeAllConnections) server.closeAllConnections(); }),   // también las conexiones abiertas (SSE, keep-alive): si no, close() espera para siempre
   };
 }
 
@@ -117,6 +127,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const cmd = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'start' : 'xdg-open';
     setTimeout(() => spawn(cmd, [url], { stdio: 'ignore', detached: true, shell: process.platform === 'win32' }).on('error', () => {}).unref(), 400);
   }
-  const salir = () => { if (hija) hija.kill('SIGTERM'); cerrar().finally(() => process.exit(0)); };
+  const salir = () => { if (hija) hija.kill('SIGTERM'); setTimeout(() => process.exit(0), 1000).unref(); cerrar().finally(() => process.exit(0)); };   // y si algo no cierra, en 1 s se va igual
   process.on('SIGINT', salir); process.on('SIGTERM', salir);
 }

@@ -30,6 +30,9 @@ npm install
 cp .env.example .env      # y completá ANTHROPIC_API_KEY
 ./escenario               # levanta el servidor y abre http://localhost:8080/stage/
 ./charla                  # la charla completa: láminas + demo embebida en http://localhost:8090/
+./arrancar                # las dos en segundo plano (devuelve la terminal, log en .charla.log) y abre el navegador; --sin-navegador no lo abre
+./estado                  # qué está corriendo, si responde, y cómo está la demo (en vivo o grabación, modelo, mensajes)
+./apagar                  # apaga las dos (o ./apagar charla, ./apagar escuela); Ctrl+C en su terminal también sirve
 ```
 
 En la vista, escribí en la caja del chat como la persona que decide (por defecto "Alfredo"; `ESCUELA_DIRECTOR` en `.env` o `?nombre=Ana` en la URL lo cambian; sin `@mención` le hablás a Coordinación) y seguí `docs/escenario.md`. **Reiniciar** arranca una sesión nueva; **Guardar corrida** descarga lo que pasó para reproducirlo después (`stage/corridas/`). Sin servidor (o sin red), la vista reproduce la corrida grabada: plan B de la demo.

@@ -405,7 +405,7 @@
       <section>
         <h4>Vista</h4>
         <div class="fila"><button id="btn-tema" title="Tema claro / oscuro (t)">Claro</button><button id="btn-chat" title="Mostrar u ocultar el chat (c)">Chat</button></div>
-        <div class="fila"><label for="ritmo" class="pista" style="margin:0">Ritmo en vivo</label><select id="ritmo" title="Cuánto espacio dejar entre mensaje y mensaje de los agentes, para leer y narrar"><option value="0">Normal (como llegan)</option><option value="4000">Pausado (4 s entre mensajes)</option><option value="7000">Lento (7 s entre mensajes)</option><option value="11000">Muy lento (11 s)</option></select></div>
+        <div class="fila"><label for="ritmo" class="pista" style="margin:0">Ritmo en vivo</label><select id="ritmo" title="Cuánto espacio dejar entre mensaje y mensaje de los agentes, para leer y narrar"><option value="0">Normal (como llegan)</option><option value="4000">Pausado (4 s entre mensajes)</option><option value="7000" selected>Lento (7 s entre mensajes)</option><option value="11000">Muy lento (11 s)</option></select></div>
         <p class="pista">El servidor va a su velocidad; la vista retiene cada mensaje de los agentes el tiempo elegido antes de mostrarlo, en orden. Los tiempos de la franja siguen siendo los reales.</p>
       </section>
       <section>
@@ -443,7 +443,8 @@ let CONFIG = { agentes: [], personas: { nombre: 'Dirección', casa: 'direccion' 
 let ofi = null, fichas = null;
 let eventos = [], indice = 0, reloj = 0, reproduciendo = false, velocidad = 1, ultimoFrame = 0;
 let temporizadores = [], decisionPendiente = false, modoVivo = false, silencioso = false;
-let ritmoMs = 0, colaEventos = [], ultimoDiceEn = -Infinity;   // el ritmo en vivo (ver recibir/drenarEventos)
+const RITMO_POR_DEFECTO = 7000;   // Lento: 7 s entre mensajes de los agentes, para que la sala lea y quien narra explique (decisión del 4/11)
+let ritmoMs = RITMO_POR_DEFECTO, colaEventos = [], ultimoDiceEn = -Infinity;   // el ritmo en vivo (ver recibir/drenarEventos)
 // La luz cenital (luz.js): prendida por defecto en vivo, apagada en grabación (así el E2E y el juez ven lo de siempre);
 // ?luz=0|1 manda al abrir y la tecla l la cambia a mano (lo elegido vale hasta cerrar la pestaña).
 let luz = null, luzElegida = params.has('luz') ? params.get('luz') !== '0' : null;
@@ -1015,7 +1016,7 @@ $('btn-prev').onclick = () => { if (modoVivo) return; setPlay(false); irAlPaso(i
 $('velocidad').onchange = (e) => { velocidad = Number(e.target.value); };
 $('btn-tema').onclick = () => aplicarTema(tema === 'oscuro' ? 'claro' : 'oscuro');
 $('ritmo').onchange = (e) => fijarRitmo(e.target.value);
-{ const q = params.get('ritmo'); const guardado = (() => { try { return localStorage.getItem('ritmo'); } catch { return null; } })(); fijarRitmo(q != null ? ({ normal: 0, pausado: 4000, lento: 7000, 'muy-lento': 11000 }[q] ?? q) : guardado ?? 0, false); }   // ?ritmo=pausado o lo guardado
+{ const q = params.get('ritmo'); const guardado = (() => { try { return localStorage.getItem('ritmo'); } catch { return null; } })(); fijarRitmo(q != null ? ({ normal: 0, pausado: 4000, lento: 7000, 'muy-lento': 11000 }[q] ?? q) : guardado ?? RITMO_POR_DEFECTO, false); }   // ?ritmo=pausado, lo guardado en este navegador, o Lento (decisión del 4/11)
 $('btn-reiniciar').onclick = async () => {
   if (!modoVivo) { irAlPaso(-1); return; }
   if (!confirm('¿Sesión nueva? Se borra la corrida actual y los agentes arrancan de cero.')) return;
@@ -1152,7 +1153,7 @@ $('form-nombre').onsubmit = async (e) => {
   nombrarPersona(n); ajustes(false);
 };
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) { e.preventDefault(); $('texto').focus(); return; }
+  if (e.key === 'Enter' && !/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) { e.preventDefault(); if ($('escenario').classList.contains('sin-chat')) chatVisible(true); $('texto').focus(); return; }   // con el chat cerrado, Enter lo abre y deja el cursor en la caja
   if (e.key === 'Escape' && $('atajos').classList.contains('abierto')) { cerrarAtajos(); cajaTexto.focus(); return; }
   if (e.key === 'Escape' && !$('ajustes').hidden) { ajustes(false); $('perfil').focus(); return; }   // antes del filtro de campos: el foco suele estar en el nombre
   if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.closest('#atajos, .tarjeta')) return;

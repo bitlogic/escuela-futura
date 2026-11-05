@@ -9,6 +9,7 @@
   "order": [
     "cover",
     "equipo",
+    "fachada",
     "sofia",
     "chatgpt",
     "carrera",
@@ -22,6 +23,7 @@
     "agente",
     "escuela",
     "vivo",
+    "volvemos",
     "decision",
     "aula",
     "criterio",
@@ -31,7 +33,7 @@
   ],
   "sections": {
     "apertura": {
-      "description": "Portada, quiénes somos, y la historia de Sofía: tres paradigmas en una sola carrera.",
+      "description": "Portada, quiénes somos, aparece la escuela, y la historia de Sofía: tres paradigmas en una sola carrera.",
       "start": "cover"
     },
     "velocidad": {

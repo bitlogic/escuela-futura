@@ -1,49 +1,13 @@
-<section id="escuela" data-escena='{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0}' data-placa="izq" data-transition="fade" style="background:radial-gradient(ellipse at 50% 40%, #1A1540 0%, #0B0920 65%);color:#F3F0FF;font-family:'Outfit', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:40px">
-<div id="esfera" style="position:absolute;left:1248px;top:308px;width:384px;height:384px;border-radius:50%;background:radial-gradient(circle at 38% 32%, #7B5CFF 0%, #3A24A8 28%, #1C1250 58%, #0B0920 100%);box-shadow:0 0 80px 10px rgba(123,92,255,0.35)"></div>
-<x-embed style="position:absolute;left:1120px;top:180px;width:640px;height:640px"><style>
-html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}
-.c{position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%)}
-.halo{width:100%;height:100%;background:radial-gradient(circle,rgba(123,92,255,.5) 0%,rgba(46,230,210,.2) 34%,rgba(255,79,216,.1) 50%,rgba(255,79,216,0) 66%);filter:blur(26px);animation:pulse 7s ease-in-out infinite}
-.base{width:60%;height:60%;background:radial-gradient(circle at 50% 50%,#1C1250 0%,#140B3C 62%,#0B0920 100%)}
-.luz{width:60%;height:60%;overflow:visible;-webkit-mask:radial-gradient(circle closest-side,#000 0%,#000 62%,rgba(0,0,0,0) 100%);mask:radial-gradient(circle closest-side,#000 0%,#000 62%,rgba(0,0,0,0) 100%);animation:gira 48s linear infinite}
-.b{position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%);mix-blend-mode:screen}
-.b1{width:88%;height:88%;background:radial-gradient(circle,rgba(46,230,210,1) 0%,rgba(46,230,210,0) 60%);filter:blur(12px);animation:d1 9s ease-in-out infinite}
-.b2{width:96%;height:96%;background:radial-gradient(circle,rgba(255,79,216,1) 0%,rgba(255,79,216,0) 58%);filter:blur(14px);animation:d2 11s ease-in-out infinite}
-.b3{width:84%;height:84%;background:radial-gradient(circle,rgba(155,92,255,1) 0%,rgba(155,92,255,0) 60%);filter:blur(12px);animation:d3 13s ease-in-out infinite}
-.b4{width:46%;height:46%;background:radial-gradient(circle,rgba(255,227,249,.95) 0%,rgba(255,227,249,0) 60%);filter:blur(8px);animation:d4 7s ease-in-out infinite}
-.sombra{width:60%;height:60%;background:radial-gradient(circle at 36% 30%,rgba(255,255,255,.22) 0%,rgba(255,255,255,0) 28%,rgba(11,9,32,0) 52%,rgba(11,9,32,.55) 82%,rgba(11,9,32,.92) 100%)}
-.borde{width:60%;height:60%;box-shadow:inset 0 0 3px 1px rgba(243,240,255,.22),inset 0 0 28px 6px rgba(46,230,210,.14),0 0 60px 8px rgba(123,92,255,.3)}
-.brillo{width:22%;height:12%;left:38%;top:24%;transform:translate(-50%,-50%) rotate(-18deg);background:radial-gradient(ellipse,rgba(255,255,255,.7) 0%,rgba(255,255,255,0) 70%);filter:blur(4px)}
-.anillo{width:78%;height:78%;background:conic-gradient(from 0deg,rgba(46,230,210,0) 0%,rgba(46,230,210,.9) 16%,rgba(255,79,216,0) 38%,rgba(255,79,216,.8) 60%,rgba(155,92,255,0) 80%,rgba(46,230,210,0) 100%);-webkit-mask:radial-gradient(circle closest-side,transparent 95.5%,#000 96.5%,#000 98.5%,transparent 99.5%);mask:radial-gradient(circle closest-side,transparent 95.5%,#000 96.5%,#000 98.5%,transparent 99.5%);filter:blur(1px);animation:spin 16s linear infinite}
-.anillo2{width:90%;height:90%;background:conic-gradient(from 180deg,rgba(255,79,216,0) 0%,rgba(255,79,216,.45) 30%,rgba(46,230,210,0) 55%,rgba(46,230,210,.4) 80%,rgba(255,79,216,0) 100%);-webkit-mask:radial-gradient(circle closest-side,transparent 97%,#000 97.8%,#000 98.8%,transparent 99.6%);mask:radial-gradient(circle closest-side,transparent 97%,#000 97.8%,#000 98.8%,transparent 99.6%);filter:blur(1px);animation:spinr 26s linear infinite}
-@keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.75}50%{transform:translate(-50%,-50%) scale(1.06);opacity:1}}
-@keyframes gira{to{transform:translate(-50%,-50%) rotate(360deg)}}
-@keyframes d1{0%,100%{transform:translate(-72%,-42%) scale(1)}50%{transform:translate(-28%,-60%) scale(1.15)}}
-@keyframes d2{0%,100%{transform:translate(-28%,-34%) scale(1)}50%{transform:translate(-70%,-66%) scale(1.1)}}
-@keyframes d3{0%,100%{transform:translate(-50%,-76%) scale(1)}33%{transform:translate(-32%,-32%) scale(1.2)}66%{transform:translate(-72%,-56%) scale(.95)}}
-@keyframes d4{0%,100%{transform:translate(-58%,-60%) scale(1);opacity:.9}50%{transform:translate(-42%,-42%) scale(1.3);opacity:.6}}
-@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
-@keyframes spinr{to{transform:translate(-50%,-50%) rotate(-360deg)}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important}}
-</style>
-<div class="c halo"></div>
-<div class="c base"></div>
-<div class="c luz"><div class="b b2"></div><div class="b b1"></div><div class="b b3"></div><div class="b b4"></div></div>
-<div class="c sombra"></div>
-<div class="c borde"></div>
-<div class="c brillo"></div>
-<div class="c anillo2"></div>
-<div class="c anillo"></div></x-embed>
-<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;letter-spacing:4px;color:#2EE6D2;text-transform:uppercase">Les presentamos a</p>
-<h1 style="font-size:136px;font-weight:700;line-height:1;letter-spacing:-4px;width:1000px">Escuela Futura</h1>
-<p style="font-size:40px;font-weight:300;line-height:1.3;color:#A8A2D0;width:960px">Una institución donde seis agentes trabajan junto a las personas. Y una persona decide.</p>
-<div data-paso="1" style="display:flex;flex-direction:row;gap:20px;font-family:'JetBrains Mono', 'Courier New', monospace">
-<p style="font-size:24px;color:#A8A2D0;border:1px solid #5E5889;border-radius:50%;padding:10px 28px">es ficticia</p>
-<p style="font-size:24px;color:#A8A2D0;border:1px solid #5E5889;border-radius:50%;padding:10px 28px">datos sintéticos</p>
-<p style="font-size:24px;color:#FF4FD8;border:1px solid #FF4FD8;border-radius:50%;padding:10px 28px">puede fallar en vivo</p>
+<section id="escuela" class="lamina" data-escena='{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0}' data-placa="arriba" data-transition="fade" style="padding:88px 128px 160px;justify-content:flex-start;gap:0">
+<div class="pie" style="align-items:flex-start;gap:72px">
+<div style="gap:12px;flex-shrink:0"><p class="marca">Les presentamos a</p><h1>Escuela Futura</h1></div>
+<div class="col" style="gap:18px;padding-top:44px">
+<p class="cuerpo suave">Una institución donde seis agentes trabajan junto a las personas. Y una persona decide.</p>
+<p data-paso="1" class="secundario">Es ficticia · datos sintéticos · <span class="papel">puede fallar en vivo</span></p>
+<p data-paso="2" class="cuerpo"><b>Regla de la casa:</b> nada con consecuencias para una persona sale sin que una persona lo apruebe.</p>
 </div>
-<p data-paso="2" style="font-size:34px;font-weight:400;line-height:1.3;color:#F3F0FF;background:#15112F;border:1px solid #7B5CFF;border-radius:16px;padding:28px 40px;width:1000px"><span style="color:#2EE6D2"><b>Regla de la casa:</b></span> nada con consecuencias para una persona sale sin que una persona lo apruebe.</p>
-<aside>[8:45–9:30 · GREYLA presenta, ALFREDO aclara] Las descripciones de los agentes salieron de la lámina (ensayo del 3/11): se muestran adentro de la app, en el organigrama y en la ficha de cada uno. Dos pasos: (clic) las tres aclaraciones; (clic) la regla de la casa.
+</div>
+<aside>[8:45–9:30 · GREYLA presenta, ALFREDO aclara] Las descripciones de los agentes salieron de la lámina (ensayo del 3/11): se muestran adentro de la app, en el organigrama y en la ficha de cada uno. Dos pasos: (clic) las tres aclaraciones; (clic) la regla de la casa. EN ESCENA (4/11): el título va en una banda arriba y la escuela abierta, con los seis trabajando, queda entera debajo; sin esfera.
 
 GREYLA (desde la honestidad, en primera persona): “En los proyectos que hacemos con instituciones de todo tipo, a veces cuesta visualizar cómo funciona esto de verdad. A mí me costaba imaginármelo hasta que Alfredo y su equipo nos mostraron esto: una simulación que se parece mucho al mundo real. Y está en vivo.” “Les presentamos a Escuela Futura: una institución capaz de orquestar inteligencia humana y artificial para acompañar, anticipar y decidir.”
 
@@ -55,3 +19,4 @@ CHISTE OPCIONAL (Alfredo): “Lo único que no le pusimos es mesa de entradas, p
 
 PUENTE: “Vamos a entrar.” (pasar: la lámina siguiente es la app)</aside>
 </section>
+

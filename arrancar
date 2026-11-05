@@ -1,0 +1,22 @@
+#!/bin/sh
+# Levanta la charla y la demo en segundo plano y devuelve la terminal: las láminas en http://localhost:8090/ (presentacion/servidor.mjs)
+# y la escuela en http://localhost:8080/stage/ (servidor/escuela.mjs, la levanta la charla). El log queda en .charla.log.
+# Abre el navegador salvo --sin-navegador. Para apagar: ./apagar. Para ver cómo está: ./estado.
+cd "$(dirname "$0")" || exit 1
+if pgrep -f 'node[^ ]* .*presentacion/servidor\.mjs' >/dev/null; then
+  echo "La charla ya está corriendo. ./estado para verla, ./apagar para cortarla."; exit 0
+fi
+[ -f .env ] && grep -q 'ANTHROPIC_API_KEY=.' .env || echo "Ojo: no hay ANTHROPIC_API_KEY en .env; la demo va a reproducir la grabación (plan B)."
+abrir=1; for a in "$@"; do [ "$a" = "--sin-navegador" ] && abrir=0; done
+( nohup node presentacion/servidor.mjs --sin-navegador "$@" > .charla.log 2>&1 < /dev/null & )   # doble fork: queda huérfano a propósito y sobrevive al cierre de esta shell
+printf "Levantando la charla y la escuela"
+for i in $(seq 1 60); do
+  sleep 0.5; printf "."
+  if curl -s -o /dev/null --max-time 1 http://localhost:8090/deck.json && curl -s -o /dev/null --max-time 1 http://localhost:8080/stage/agentes.json; then
+    echo; echo "Charla  → http://localhost:8090/   (láminas + demo)"; echo "Escuela → http://localhost:8080/stage/"; echo "Log: .charla.log · ./estado · ./apagar"
+    [ "$abrir" = 1 ] && { sleep 0.5; open "http://localhost:8090/" 2>/dev/null || true; }
+    exit 0
+  fi
+  pgrep -f 'node[^ ]* .*presentacion/servidor\.mjs' >/dev/null || { echo; echo "La charla se cayó al arrancar. Últimas líneas de .charla.log:"; tail -n 15 .charla.log; exit 1; }
+done
+echo; echo "Pasaron 30 s y todavía no responden las dos. Mirá .charla.log (tail -f .charla.log) o ./estado."; exit 1

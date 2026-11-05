@@ -93,6 +93,20 @@ export function crearGiro({ canvasEscena, capaDemo, iframeDemo = null, duracion 
     }
     if (!imagen && lienzo && lienzo.width) imagen = lienzo;   // puente del mismo origen: el canvas del mapa, tal cual está
     if (!imagen) return null;
+    // El panel del chat (un tercio de la ventana) no está en el cuadro: se lee del DOM de la vista (mismo origen) lo justo para
+    // pintarlo en la tapa: fondo, bordes, la cabecera y su título. Sin eso, el giro mostraba el mapa solo sobre negro.
+    let panel = null;
+    try {
+      const ch = doc && doc.getElementById('chat');
+      if (ch && typeof getComputedStyle === 'function') {
+        const r = ch.getBoundingClientRect(), cs = getComputedStyle(ch), cab = doc.getElementById('chat-cab'), canal = cab && cab.querySelector('.canal'), acento = canal && canal.querySelector('b');
+        if (r.width && r.height) {
+          panel = { x: r.left, y: r.top, ancho: r.width, alto: r.height, fondo: cs.backgroundColor, borde: cs.borderRightColor, bordeAncho: parseFloat(cs.borderRightWidth) || 0, bordeArriba: parseFloat(cs.borderTopWidth) || 0 };
+          if (cab) { const rc = cab.getBoundingClientRect(), cc = getComputedStyle(cab); panel.cab = { y: rc.top, alto: rc.height, borde: cc.borderBottomColor, bordeAncho: parseFloat(cc.borderBottomWidth) || 0 }; }
+          if (canal) { const rt = canal.getBoundingClientRect(), ct = getComputedStyle(canal); panel.titulo = { texto: canal.textContent || '', x: rt.left, y: rt.top + rt.height / 2, font: ct.font, color: ct.color, acento: acento ? getComputedStyle(acento).color : ct.color, mayusculas: ct.textTransform === 'uppercase', espaciado: ct.letterSpacing }; }
+        }
+      }
+    } catch { panel = null; }
     let rect = respuesta && respuesta.rect && respuesta.rect.ancho ? respuesta.rect : null;
     if (!rect && lienzo) { const r = lienzo.getBoundingClientRect(); if (r.width) rect = { x: r.left, y: r.top, ancho: r.width, alto: r.height }; }
     if (!rect) {   // sin dónde ponerlo: el mapa entero centrado, sin deformar
@@ -102,16 +116,41 @@ export function crearGiro({ canvasEscena, capaDemo, iframeDemo = null, duracion 
     let fondo = (respuesta && respuesta.fondo) || '';
     if (!fondo && doc && typeof getComputedStyle === 'function') { try { fondo = getComputedStyle(doc.body).backgroundColor || ''; } catch {} }
     if (!fondo || fondo === 'rgba(0, 0, 0, 0)' || fondo === 'transparent') fondo = '#06050F';
-    return { imagen, rect, fondo };
+    return { imagen, rect, fondo, panel };
+  }
+  // La tipografía del título del chat (Silkscreen, de la vista) se carga en este documento una vez, así la tapa la pinta igual.
+  let fuenteTitulo = null;
+  function cargarFuenteTitulo() {
+    if (fuenteTitulo || typeof FontFace !== 'function' || !document.fonts) return;
+    try { fuenteTitulo = new FontFace('Silkscreen', 'url(/stage/assets/Silkscreen-Bold.ttf)', { weight: '700' }); document.fonts.add(fuenteTitulo); fuenteTitulo.load().catch(() => {}); } catch { fuenteTitulo = null; }
+  }
+  if (puedeCubo) cargarFuenteTitulo();
+  function pintarPanel(ctx, p) {
+    if (!p) return;
+    ctx.fillStyle = p.fondo || '#15112F'; ctx.fillRect(p.x, p.y, p.ancho, p.alto);
+    if (p.bordeAncho) { ctx.fillStyle = p.borde || '#2A2452'; ctx.fillRect(p.x + p.ancho - p.bordeAncho, p.y, p.bordeAncho, p.alto); }
+    if (p.bordeArriba) { ctx.fillStyle = p.borde || '#2A2452'; ctx.fillRect(p.x, p.y, p.ancho, p.bordeArriba); }
+    if (p.cab && p.cab.bordeAncho) { ctx.fillStyle = p.cab.borde || '#2A2452'; ctx.fillRect(p.x, p.cab.y + p.cab.alto - p.cab.bordeAncho, p.ancho, p.cab.bordeAncho); }
+    if (p.titulo && p.titulo.texto) {
+      const t = p.titulo, texto = t.mayusculas ? t.texto.toUpperCase() : t.texto;
+      try { ctx.font = t.font; } catch { ctx.font = '700 24px monospace'; }
+      if ('letterSpacing' in ctx && t.espaciado && t.espaciado !== 'normal') ctx.letterSpacing = t.espaciado;
+      ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+      const primero = texto[0] === '#' ? '#' : '';   // el numeral va en el acento, como en la vista
+      let x = t.x;
+      if (primero) { ctx.fillStyle = t.acento; ctx.fillText(primero, x, t.y); x += ctx.measureText(primero).width; }
+      ctx.fillStyle = t.color; ctx.fillText(texto.slice(primero.length), x, t.y);
+    }
   }
   // La tapa: un canvas del tamaño de la ventana con el fondo de la vista y el mapa en su lugar, encima de la capa de la demo.
-  function crearTapa({ imagen, rect, fondo }) {
+  function crearTapa({ imagen, rect, fondo, panel = null }) {
     const dpr = Math.min(1.5, devicePixelRatio || 1), W = innerWidth, H = innerHeight;
     const c = document.createElement('canvas'); c.id = ID_TAPA; c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
     poner(c, { position: 'fixed', left: '0', top: '0', width: '100%', height: '100%', zIndex: '11', pointerEvents: 'none', display: 'block' });
     const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = fondo; ctx.fillRect(0, 0, W, H);
     ctx.imageSmoothingEnabled = true; ctx.drawImage(imagen, rect.x, rect.y, rect.ancho, rect.alto);
+    pintarPanel(ctx, panel);
     (capaDemo.parentNode || document.body).appendChild(c);
     return c;
   }

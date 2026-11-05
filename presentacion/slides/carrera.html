@@ -1,21 +1,16 @@
-<section id="carrera" data-escena='{"plano":"hall","sofia":"camina"}' data-placa="izq" data-transition="fade" style="background:radial-gradient(ellipse at 85% 80%, #2A1040 0%, #0B0920 60%);color:#F3F0FF;font-family:'Outfit', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:56px">
-<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;letter-spacing:4px;color:#2EE6D2;text-transform:uppercase">Una sola carrera</p>
-<div style="display:grid;grid-template-columns:200px 560px;gap:36px 0;align-items:baseline">
-<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:36px;color:#A8A2D0">2022</p>
-<div style="gap:4px"><h2 style="font-size:88px;font-weight:600;line-height:1.05;letter-spacing:-2px">Pregunta.</h2><p style="font-size:40px;font-weight:300;color:#A8A2D0">La IA le responde.</p></div>
-<p data-paso="1" style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:36px;color:#A8A2D0">2024</p>
-<div data-paso="1" style="gap:4px"><h2 style="font-size:88px;font-weight:600;line-height:1.05;letter-spacing:-2px">Copiloto.</h2><p style="font-size:40px;font-weight:300;color:#A8A2D0">La IA le sugiere.</p></div>
-<p data-paso="2" style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:36px;color:#FF4FD8">2026</p>
-<div data-paso="2" style="gap:4px"><h2 style="font-size:88px;font-weight:600;line-height:1.05;letter-spacing:-2px;color:#FF4FD8">Agente.</h2><p style="font-size:40px;font-weight:300;color:#F3F0FF">La IA actúa.</p></div>
+<section id="carrera" class="lamina" data-escena='{"plano":"edificio","hora":0.15,"camx":230,"camy":142,"zoom":1.05,"sofia":"calle"}' data-placa="llamadas" data-auto="7,7,7" data-transition="fade" style="padding:96px 128px 160px;justify-content:flex-start;gap:28px">
+<p class="marca llamada">Una sola carrera</p>
+<div style="flex-direction:row;justify-content:space-between;align-items:flex-start;gap:24px">
+<div class="llamada" style="gap:4px;width:520px"><p class="secundario">2022</p><h2>Pregunta.</h2><p class="cuerpo suave">La IA le responde.</p></div>
+<div data-paso="1" class="llamada" style="gap:4px;width:520px"><p class="secundario">2024</p><h2>Copiloto.</h2><p class="cuerpo suave">La IA le sugiere.</p></div>
+<div data-paso="2" class="llamada" style="gap:4px;width:520px"><p class="secundario teal">2026</p><h2 class="teal">Agente.</h2><p class="cuerpo">La IA actúa.</p></div>
 </div>
-<hr style="position:absolute;left:128px;right:128px;bottom:120px;border-top:2px solid #2A2452">
-<x-shape id="punto" kind="ellipse" style="position:absolute;left:1754px;top:950px;width:20px;height:20px;background:#FF4FD8;box-shadow:0 0 28px 8px rgba(255,79,216,0.55)"></x-shape>
-<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between;font-family:'JetBrains Mono', 'Courier New', monospace">
-<p style="font-size:24px;letter-spacing:3px;color:#F3F0FF">2022</p>
-<p style="font-size:24px;letter-spacing:3px;color:#F3F0FF">2024</p>
-<p style="font-size:24px;letter-spacing:3px;color:#F3F0FF">2026</p>
+<div class="regla-tiempo" style="position:absolute;left:128px;right:128px;bottom:138px"></div>
+<div class="punto" style="position:absolute;left:1754px;top:931px"></div>
+<div class="linea-tiempo" style="position:absolute;left:128px;right:128px;bottom:64px">
+<p>2022</p><p>2024</p><p class="activo">2026</p>
 </div>
-<aside>[2:00–2:45 · GREYLA] La fila de 2022 ya está; 2024 y 2026 entran con un clic cada una (dos pasos). No apurarse: una por una.
+<aside>[2:00–2:45 · GREYLA] El recuadro de 2022 ya está; 2024 y 2026 entran solos, cada 7 s (dos pasos automáticos; a los 21 s pasa sola; Sofía camina un tramo por paso), en fila sobre el cielo, cada uno encima de su año en la línea de tiempo. No apurarse: uno por uno. Sofía sigue avanzando por la vereda con cada clic.
 
 “2022: rinde su primer parcial con una IA que le responde preguntas.” (clic) “2024: escribe la tesis con un copiloto que le sugiere qué escribir.” (clic) “2026: la IA ya no sugiere. Recibe un objetivo… y lo ejecuta.”
 
@@ -23,3 +18,4 @@ EN ESCENA: NO explicar qué es un agente acá. La curiosidad es el motor; lo abr
 
 RESPALDO (solo si hace falta anclar la velocidad, una frase, sin slide): “En México, el uso de IA para estudiar pasó del 33% al 83% en dos años” (Stanford AI Index 2026).</aside>
 </section>
+

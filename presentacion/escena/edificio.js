@@ -73,6 +73,13 @@ const hexA = (hex) => { const n = parseInt(hex.slice(1), 16); return [(n >> 16) 
 // Tres paletas: atardecer (naranja → violeta → azul), noche (azul profundo) y mañana (celeste).
 const CIELOS = { tarde: [[24, 20, 66], [126, 62, 142], [252, 142, 82]], noche: [[6, 5, 18], [12, 10, 34], [22, 20, 56]], manana: [[64, 104, 186], [138, 184, 236], [206, 230, 250]] };
 
+/** Cuánto está prendida una ventana de la fachada (0..1) con el luzInterior del estado: cada una tiene su umbral, así se prenden y
+ *  se apagan de a una (ver ventanas()). Sin umbral, todas a la vez. */
+export function ventanaPrendida(v, estado) {
+  const l = Math.max(0, Math.min(1, estado.luzInterior ?? 1));
+  if (v.umbral == null) return l;
+  return Math.max(0, Math.min(1, (l - v.umbral) / .08));
+}
 /** Cielo por hora: [arriba, medio, horizonte] en rgb. 0 atardecer · .5 noche · 1 mañana. */
 export function cielo(hora) {
   const h = Math.min(1, Math.max(0, Number(hora) || 0));
@@ -91,7 +98,50 @@ const GLIFOS = {
   F: ['#####', '#....', '#....', '####.', '#....', '#....', '#....'],
   T: ['#####', '..#..', '..#..', '..#..', '..#..', '..#..', '..#..'],
   R: ['####.', '#...#', '#...#', '####.', '#.#..', '#..#.', '#...#'],
+  // los de "¡GRACIAS!" (el globo con que los agentes saludan en la última lámina)
+  G: ['.###.', '#...#', '#....', '#.###', '#...#', '#...#', '.###.'],
+  I: ['#####', '..#..', '..#..', '..#..', '..#..', '..#..', '#####'],
+  '!': ['..#..', '..#..', '..#..', '..#..', '..#..', '.....', '..#..'],
+  '¡': ['..#..', '.....', '..#..', '..#..', '..#..', '..#..', '..#..'],
+  // el resto del alfabeto, dígitos y signos (4/11): la charla de los agentes en la última lámina va en mayúsculas, sin tildes
+  B: ['####.', '#...#', '#...#', '####.', '#...#', '#...#', '####.'],
+  D: ['####.', '#...#', '#...#', '#...#', '#...#', '#...#', '####.'],
+  H: ['#...#', '#...#', '#...#', '#####', '#...#', '#...#', '#...#'],
+  J: ['..###', '...#.', '...#.', '...#.', '...#.', '#..#.', '.##..'],
+  K: ['#...#', '#..#.', '#.#..', '##...', '#.#..', '#..#.', '#...#'],
+  M: ['#...#', '##.##', '#.#.#', '#.#.#', '#...#', '#...#', '#...#'],
+  N: ['#...#', '##..#', '#.#.#', '#..##', '#...#', '#...#', '#...#'],
+  Ñ: ['.#.#.', '#.#..', '#...#', '##..#', '#.#.#', '#..##', '#...#'],
+  O: ['.###.', '#...#', '#...#', '#...#', '#...#', '#...#', '.###.'],
+  P: ['####.', '#...#', '#...#', '####.', '#....', '#....', '#....'],
+  Q: ['.###.', '#...#', '#...#', '#...#', '#.#.#', '#..#.', '.##.#'],
+  V: ['#...#', '#...#', '#...#', '#...#', '#...#', '.#.#.', '..#..'],
+  W: ['#...#', '#...#', '#...#', '#.#.#', '#.#.#', '##.##', '#...#'],
+  X: ['#...#', '#...#', '.#.#.', '..#..', '.#.#.', '#...#', '#...#'],
+  Y: ['#...#', '#...#', '.#.#.', '..#..', '..#..', '..#..', '..#..'],
+  Z: ['#####', '....#', '...#.', '..#..', '.#...', '#....', '#####'],
+  0: ['.###.', '#...#', '#..##', '#.#.#', '##..#', '#...#', '.###.'],
+  1: ['..#..', '.##..', '..#..', '..#..', '..#..', '..#..', '.###.'],
+  2: ['.###.', '#...#', '....#', '...#.', '..#..', '.#...', '#####'],
+  3: ['####.', '....#', '....#', '.###.', '....#', '....#', '####.'],
+  4: ['...#.', '..##.', '.#.#.', '#..#.', '#####', '...#.', '...#.'],
+  5: ['#####', '#....', '####.', '....#', '....#', '#...#', '.###.'],
+  6: ['.###.', '#....', '#....', '####.', '#...#', '#...#', '.###.'],
+  7: ['#####', '....#', '...#.', '..#..', '.#...', '.#...', '.#...'],
+  8: ['.###.', '#...#', '#...#', '.###.', '#...#', '#...#', '.###.'],
+  9: ['.###.', '#...#', '#...#', '.####', '....#', '....#', '.###.'],
+  '.': ['.....', '.....', '.....', '.....', '.....', '.....', '..#..'],
+  ',': ['.....', '.....', '.....', '.....', '.....', '..#..', '.#...'],
+  ':': ['.....', '.....', '..#..', '.....', '.....', '..#..', '.....'],
+  '?': ['.###.', '#...#', '....#', '...#.', '..#..', '.....', '..#..'],
+  '¿': ['..#..', '.....', '..#..', '.#...', '#....', '#...#', '.###.'],
+  "'": ['..#..', '..#..', '.....', '.....', '.....', '.....', '.....'],
 };
+/** Un texto con esos glifos (5×7, 6 px por letra, 4 por espacio), para el cartel y los globos. */
+export function textoPixel(c, x, y, t, col) {
+  let cx = x;
+  for (const ch of t) { if (ch === ' ') { cx += 4; continue; } const g = GLIFOS[ch]; if (g) for (let j = 0; j < 7; j++) for (let i = 0; i < 5; i++) if (g[j][i] === '#') { c.fillStyle = col; c.fillRect(cx + i, y + j, 1, 1); } cx += 6; }
+}
 /** Ancho en px de un texto con esos glifos (6 por letra, 4 por espacio). */
 export function anchoCartel(texto) { let w = 0; for (const ch of texto) w += ch === ' ' ? 4 : 6; return w - 1; }
 
@@ -106,6 +156,7 @@ export function crearEdificio({ SALAS, TEMAS }) {
   const LIBROS = ['#d9604c', '#e0b93c', '#4f95c9', '#5b8f6a', '#c96aa0', '#f4f0e6', '#6f6fd1'];
   const HIERRO = '#1c1b2e', VIDRIO_OSC = '#2a2f4a';
   const CARTEL = { texto: 'ESCUELA FUTURA', y: 150, h: 16 };
+  const UMBRALES = { direccion: .9, secretaria: .8, admisiones: .68, biblioteca: .56, academia: .44, 'aula-bio1': .32, bienestar: .12, coordinacion: .02 };   // en qué orden se apagan las ventanas (de mayor a menor) cuando luzInterior baja
   const PROYECTOR = { x: 186, y: MUNDO.TECHO_BAJA + 6 };        // el proyector del aula, colgado del techo; el haz cae sobre el pizarrón
   const FAROLAS = [{ x: 150, y: 141 }, { x: 490, y: 141 }];     // las cabezas de las farolas de la capa cercana (coordenadas del mundo)
   CARTEL.w = anchoCartel(CARTEL.texto) + 8; CARTEL.x = Math.round((MUNDO.X0 + MUNDO.X1) / 2 - CARTEL.w / 2);
@@ -333,15 +384,15 @@ export function crearEdificio({ SALAS, TEMAS }) {
     dibujarFachada(c, estado) {
       c.clearRect(0, 0, MUNDO.W, MUNDO.H);
       const [, medio, horizonte] = cielo(estado.hora), noche = 1 - Math.abs(estado.hora - .5) * 2;
-      const luz = (estado.luzInterior ?? 1) * (.3 + .7 * Math.max(0, noche));
-      const vidrio = rgb(mezcla(mezcla(medio, horizonte, .4), [255, 214, 150], Math.min(1, luz)));
+      const vidrioDe = (prendida) => rgb(mezcla(mezcla(medio, horizonte, .4), [255, 214, 150], Math.min(1, prendida * (.3 + .7 * Math.max(0, noche)))));
+      const vidrio = vidrioDe(estado.luzInterior ?? 1);
       const y0 = MUNDO.AZOTEA + 8, y1 = MUNDO.SUELO;
       r(c, FACHADA_X0, y0, FACHADA_W, y1 - y0, PAL.paredClara);
       r(c, FACHADA_X0, y1 - 8, FACHADA_W, 8, PAL.zocalo); r(c, FACHADA_X0, y1 - 8, FACHADA_W, 1, PAL.paredOsc);      // el zócalo de la calle
       r(c, FACHADA_X0, MUNDO.PA + 1, FACHADA_W, 4, PAL.paredOsc); r(c, FACHADA_X0, MUNDO.PA, FACHADA_W, 1, '#5a5f7e');   // la cornisa entre plantas
       r(c, FACHADA_X0, y0, 4, y1 - y0, PAL.pared); r(c, FACHADA_X0 + FACHADA_W - 4, y0, 4, y1 - y0, PAL.pared);          // pilastras
       r(c, FACHADA_X0 + 4, y0, 1, y1 - y0, PAL.paredOsc); r(c, FACHADA_X0 + FACHADA_W - 5, y0, 1, y1 - y0, PAL.paredOsc);
-      for (const v of this.ventanas(estado)) ventanaFachada(c, v, vidrio);
+      for (const v of this.ventanas(estado)) ventanaFachada(c, v, vidrioDe(ventanaPrendida(v, estado)));
       puertaCalle(c, vidrio);
       cartel(c);
     },
@@ -377,10 +428,11 @@ export function crearEdificio({ SALAS, TEMAS }) {
       const rama = (x0, y0r, dx, largo) => { let x = x0, y = y0r; for (let i = 0; i < largo; i++) { r(c, x, y, 4, 3, '#1a1410'); x += dx; y += (i % 2 === 0) ? 1 : 0; if (i % 3 === 1) racimo(x + (dx > 0 ? 8 : -8), y - 6 + (i % 2) * 6, 26 + (i % 3) * 6, 12); } };
       rama(-12, 0, 6, 22); rama(-8, 16, 6, 10); rama(MUNDO.W + 10, -2, -6, 24); rama(MUNDO.W + 6, 18, -6, 9);
     },
-    /** Una ventana de la fachada por puesto. */
+    /** Una ventana de la fachada por puesto. `umbral`: la ventana está prendida mientras luzInterior lo supera, así con luzInterior
+     *  fraccionario se prenden (lámina 3) y se apagan (gracias) de a una; en Coordinación y Bienestar se quedan trabajando hasta el final. */
     ventanas() {
       const v = [];
-      for (const p of plantas) for (const q of p.puestos) v.push({ x: q.x - 10, y: techo(p) + 18, w: 20, h: 24, puesto: q.id });
+      for (const p of plantas) for (const q of p.puestos) v.push({ x: q.x - 10, y: techo(p) + 18, w: 20, h: 24, puesto: q.id, umbral: UMBRALES[q.id] ?? .5 });
       return v;
     },
     /** Una lámpara por sala, en el techo; x0 y w son los de la sala, para recortar la luz. */

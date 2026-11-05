@@ -10,8 +10,8 @@ import { crearServidorCharla, escuelaResponde } from './servidor.mjs';
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const deck = JSON.parse(readFileSync(join(AQUI, 'deck.json'), 'utf8'));
 
-test('el índice del deck lista 21 láminas y cada una tiene su archivo con una <section> del mismo id', () => {
-  assert.equal(deck.order.length, 21);
+test('el índice del deck lista 23 láminas y cada una tiene su archivo con una <section> del mismo id', () => {
+  assert.equal(deck.order.length, 23);
   assert.equal(new Set(deck.order).size, deck.order.length, 'ids repetidos');
   for (const id of deck.order) {
     const f = join(AQUI, 'slides', `${id}.html`);
@@ -28,6 +28,7 @@ test('el índice del deck lista 21 láminas y cada una tiene su archivo con una 
 
 test('la demo embebida va justo después de "Escuela Futura" y es la única con data-demo', () => {
   assert.equal(deck.order[deck.order.indexOf('escuela') + 1], 'vivo');
+  assert.equal(deck.order[deck.order.indexOf('vivo') + 1], 'volvemos', 'al salir de la demo hay una lámina de transición');
   for (const id of deck.order) {
     const html = readFileSync(join(AQUI, 'slides', `${id}.html`), 'utf8');
     assert.equal(/data-demo=/.test(html), id === 'vivo', id);
@@ -106,4 +107,21 @@ test('sin escuela, /stage/* se sirve desde el repo (plan B) y /api/* contesta 50
     assert.equal((await fetch(base + '/stage/../package.json')).status, 404);
     const api = await fetch(base + '/api/eventos'); assert.equal(api.status, 502);
   } finally { await charla.cerrar(); }
+});
+
+test('el servidor sirve por rangos (la música en loop lo necesita) y las láminas con música apuntan a presentacion/musica/', async () => {
+  const { escuchar, cerrar } = crearServidorCharla({ escuela: { host: '127.0.0.1', port: 1 } });
+  const puerto = await escuchar(0);
+  try {
+    const entero = readFileSync(join(AQUI, 'deck.json'));
+    const r = await fetch(`http://localhost:${puerto}/deck.json`, { headers: { range: 'bytes=2-11' } });
+    assert.equal(r.status, 206);
+    assert.equal(r.headers.get('content-range'), `bytes 2-11/${entero.length}`);
+    assert.deepEqual(Buffer.from(await r.arrayBuffer()), entero.subarray(2, 12));
+    const todo = await fetch(`http://localhost:${puerto}/deck.json`);
+    assert.equal(todo.status, 200); assert.equal(todo.headers.get('accept-ranges'), 'bytes');
+  } finally { await cerrar(); }
+  const conMusica = deck.order.filter((id) => /data-musica=/.test(readFileSync(join(AQUI, 'slides', `${id}.html`), 'utf8')));
+  assert.deepEqual(conMusica, ['cover', 'gracias'], 'suena en la portada (en loop) y en el cierre');
+  for (const id of conMusica) assert.match(readFileSync(join(AQUI, 'slides', `${id}.html`), 'utf8'), /data-musica="musica\/[\w-]+\.mp3"/);
 });

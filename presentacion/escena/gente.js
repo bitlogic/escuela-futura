@@ -21,9 +21,15 @@ export const AGENTES = [
 const CASAS = { coordinacion: 'coordinacion', tutor: 'aula-bio1', advisor: 'biblioteca', bienestar: 'bienestar', admisiones: 'admisiones', academia: 'academia' };
 const SOFIA_K = { sofia: [0, .25], chatgpt: [.25, .5], carrera: [.5, .85], entrevista: [.85, 1] };
 export { SOFIA_K };
+// El paseo por la calle (4/11): Sofía viene caminando por la vereda desde la izquierda hasta la puerta, proporcional a sofiaK (no al tiempo).
+export const CALLE = { desde: 20, hasta: PUERTA.x + PUERTA.w / 2, y: MUNDO.SUELO + 34 };
 
 const FILA = { abajo: 0, arriba: 1, perfil: 2 };
 const VEL = 28, VEL_ESCALERA = 18, VEL_SOFIA = 22;        // px lógicos por segundo
+const VEL_SOFIA_CALLE = 12;
+// El saludo (gracias): los agentes salen por la puerta de a uno, se reparten por la vereda, saludan con el brazo y dicen "¡Gracias!".
+const SALUDO_CADA = 1.1, SALUDO_PUESTOS = [-14, 14, -42, 42, -70, 70];   // segundos entre uno y otro; dónde se para cada uno respecto de la puerta
+const SALUDO_TEXTO = '¡GRACIAS!';                               // por la vereda (láminas 4 a 7) va más despacio: camina casi toda la lámina en vez de llegar y quedarse parada
 const ASIENTO_DX = -15;                                   // sin q.asiento de edificio.js: el que trabaja se sienta a la izquierda del escritorio, mirando a la derecha
 const VISITA_DX = { der: [18, 30, -24], izq: [-22, -34, 30], biblioteca: [12, -34] };   // dónde se para el que visita, según de qué lado está el dueño
 const FONDO = 30;                                         // cuánto "entra" el personaje en la escalera (sube hacia el fondo) antes de reaparecer en la otra planta
@@ -106,6 +112,7 @@ export async function crearGente({ cargarImagen, MODELOS, plantas, teñir: teñi
   const sDir = qDir ? asiento(qDir) : { x: 150, dir: 1 };
   const persona = { x: sDir.x, y: MUNDO.PA, dir: sDir.dir, hoja: hojaDe('persona'), color: '#eeeeee' };
   const sofia = { x: PUERTA.x + PUERTA.w / 2, y: MUNDO.PB, k: 0, dir: 1, paso: 0, visible: false, color: '#ff4fd8', hoja: hojaSofia, estado: null, salio: false, moviendo: false };
+  const xCalle = (k) => CALLE.desde + (CALLE.hasta - CALLE.desde) * Math.max(0, Math.min(1, k || 0));
   // El aula: tres filas de siete, sentados de espaldas; las filas de atrás un poco más arriba y corridas. Si edificio.js deja
   // los pupitres en la planta (p3.pupitres: [{ x, y }]), la gente se sienta ahí y no se dibujan pupitres propios.
   const aulaGente = [];
@@ -178,8 +185,11 @@ export async function crearGente({ cargarImagen, MODELOS, plantas, teñir: teñi
   function tick(dt, estado) {
     reloj += dt;
     const quieto = !!estado.quieto, pausa = (estado.pausaLectura || 0) > 0;
+    saludar(dt, estado);
     const focoCoord = !!estado.foco && estado.foco !== 'autonomia';       // con el foco en rol/skills/herramientas/memoria, Coordinación se queda en su puesto
+    const enFoco = !!estado.foco;                                          // y mientras dura el foco ("agente"), los demás se quedan en su puesto: la atención va a Coordinación
     for (const a of agentes) {
+      if (a.fase === 'saluda') continue;
       a.t -= dt; a.habla = Math.max(0, a.habla - dt);
       if (a.responde > 0) { a.responde -= dt; if (a.responde <= 0) a.habla = 1.5; }
       const esCoord = a.id === 'coordinacion';
@@ -190,43 +200,115 @@ export async function crearGente({ cargarImagen, MODELOS, plantas, teñir: teñi
         if (q && !(a.dest && a.dest.puesto.id === q.id && a.dest.mision)) salirA(a, q, { mision: true });
       }
       if (a.fase === 'sentado') {
-        if (quieto || pausa || (esCoord && focoCoord)) { a.t = Math.max(a.t, 1); continue; }
+        if (quieto || pausa || (esCoord && focoCoord) || (!esCoord && enFoco)) { a.t = Math.max(a.t, 1); continue; }
         if (a.t <= 0) { const d = candidatos(a); if (!d.length || !salirA(a, d[Math.floor(Math.random() * d.length)])) a.t = 3; }
       } else if (a.fase === 'va') {
-        if ((quieto || (esCoord && focoCoord && !mision)) && !a.dest.mision && !enEscalera(a)) { volver(a); continue; }
+        if ((quieto || (esCoord && focoCoord && !mision) || (!esCoord && enFoco)) && !a.dest.mision && !enEscalera(a)) { volver(a); continue; }
         if (avanzar(a, dt)) {
           a.fase = 'visita'; a.dir = a.dest.dir; a.t = a.dest.mision ? Infinity : azar(2.5, 5); a.habla = 1.5; a.paso = 0;
           const dueño = agentes.find((b) => b.casa && b.casa.id === a.dest.puesto.id && b.fase === 'sentado');
           if (dueño) dueño.responde = 1.9;
         }
       } else if (a.fase === 'visita') {
-        if (a.t <= 0 || (quieto && !a.dest.mision) || (a.dest.mision && !mision)) volver(a);
+        if (a.t <= 0 || ((quieto || (!esCoord && enFoco)) && !a.dest.mision) || (a.dest.mision && !mision)) volver(a);
       } else if (a.fase === 'vuelve') {
         if (avanzar(a, dt)) { a.fase = 'sentado'; a.dir = a.dirCasa; a.t = azar(4, 12); a.paso = 0; }
       }
     }
     // Sofía: entra por la puerta hasta la marca de 2022, recorre el hall según sofiaK (no con el tiempo), se para de espaldas al final
-    // del hall, o sale por el patio hacia la derecha, una sola vez.
+    // del hall, o sale por el patio hacia la derecha, una sola vez. Afuera (4/11): viene por la calle desde la izquierda hasta la
+    // puerta según sofiaK ('calle') y se queda frente a la puerta, de espaldas a la cámara ('frente').
     const est = estado.sofia || null;
+    const afuera = (e) => e === 'calle' || e === 'frente';
     if (est !== sofia.estado) {
       if (est !== 'sale') sofia.salio = false;   // si se vuelve atrás y se avanza de nuevo, Sofía sale otra vez
       if (est === 'entra') { sofia.x = PUERTA.x + PUERTA.w / 2; sofia.y = MUNDO.PB; sofia.dir = 1; sofia.salio = false; }
-      else if (est === 'sale') { if (sofia.salio) { /* ya se fue: no vuelve a aparecer */ } else { sofia.x = PUERTA.x + PUERTA.w / 2; sofia.y = MUNDO.SUELO + 34; sofia.dir = 1; } }
+      else if (est === 'sale') { if (sofia.salio) { /* ya se fue: no vuelve a aparecer */ } else { sofia.x = PUERTA.x + PUERTA.w / 2; sofia.y = CALLE.y; sofia.dir = 1; } }
       else if (est === 'camina' && sofia.estado !== 'entra') { sofia.x = MARCAS[0] + (MARCAS[2] - MARCAS[0]) * (estado.sofiaK || 0); sofia.y = MUNDO.PB; }
       else if (est === 'puerta' && sofia.estado !== 'camina') { sofia.x = MARCAS[2] + 4; sofia.y = MUNDO.PB; }
+      else if (est === 'calle' && !afuera(sofia.estado)) { sofia.x = CALLE.desde - 60; sofia.y = CALLE.y; sofia.dir = 1; }   // entra caminando desde fuera de cuadro
+      else if (est === 'frente' && !afuera(sofia.estado)) { sofia.x = xCalle(1); sofia.y = CALLE.y; }
       sofia.estado = est;
     }
     sofia.visible = !!est && !(est === 'sale' && sofia.salio);
     sofia.moviendo = false;
-    const irSofia = (tx) => { const dx = tx - sofia.x; if (Math.abs(dx) < .5) { sofia.x = tx; return; } sofia.dir = dx > 0 ? 1 : -1; const d = Math.min(Math.abs(dx), VEL_SOFIA * dt); sofia.x += sofia.dir * d; sofia.paso += d; sofia.moviendo = true; };
+    const irSofia = (tx) => { const dx = tx - sofia.x; if (Math.abs(dx) < .5) { sofia.x = tx; return; } sofia.dir = dx > 0 ? 1 : -1; const d = Math.min(Math.abs(dx), (est === 'calle' || est === 'frente' ? VEL_SOFIA_CALLE : VEL_SOFIA) * dt); sofia.x += sofia.dir * d; sofia.paso += d; sofia.moviendo = true; };
     if (est === 'entra') { sofia.y = MUNDO.PB; irSofia(MARCAS[0]); if (!sofia.moviendo) sofia.dir = 1; }
     else if (est === 'camina') { sofia.y = MUNDO.PB; irSofia(MARCAS[0] + (MARCAS[2] - MARCAS[0]) * (estado.sofiaK || 0)); if (!sofia.moviendo) sofia.dir = 1; }
     else if (est === 'puerta') { sofia.y = MUNDO.PB; irSofia(MARCAS[2] + 4); }
-    else if (est === 'sale' && !sofia.salio) { irSofia(MUNDO.W + 20); if (sofia.x >= MUNDO.W + 10) sofia.salio = true; }
+    else if (est === 'calle') { sofia.y = CALLE.y; irSofia(xCalle(estado.sofiaK)); if (!sofia.moviendo) sofia.dir = 1; }
+    else if (est === 'frente') { sofia.y = CALLE.y; irSofia(xCalle(1)); }
+    else if (est === 'sale' && !sofia.salio && !pausa) { irSofia(MUNDO.W + 20); if (sofia.x >= MUNDO.W + 10) sofia.salio = true; }   // mientras la sala lee el título (pausaLectura), Sofía espera en la puerta; después cruza
     // Las manos del aula suben una por una según la fracción pedida.
     const manos = estado.manos || 0;
     for (const g of aulaGente) { const obj = Math.max(0, Math.min(1, (manos - g.sem) / .06)); g.brazo += (obj - g.brazo) * Math.min(1, dt * 8); }
   }
+
+  // ---------- El saludo (gracias) ----------
+  // Con estado.saludo y el paso 1 ya en pantalla, cada agente espera su turno adentro, aparece en la puerta de calle, camina a su
+  // lugar en la vereda, se da vuelta hacia la sala, saluda con el brazo y dice "¡Gracias!" en un globo; cada uno lo dice dos veces.
+  // Después Coordinación dice la línea de CHARLA (los demás la miran), vuelven adentro por la puerta de a uno y, a medida que
+  // entran, se prenden las luces (luzPedida). Si la lámina cambia (o se vuelve atrás), todos vuelven a su puesto.
+  const puertaX = PUERTA.x + PUERTA.w / 2;
+  const CHARLA = [['coordinacion', 'BUENO... VOLVAMOS A TRABAJAR.']];   // una sola línea (4/11): con eso alcanza; los demás la miran y entran
+  const GRACIAS_VECES = 2;
+  let globoHasta = 0;   // los globos van de a uno (una cola): dos vecinos hablando a la vez se tapaban
+  const saludoG = { etapa: null, charlaI: 0, charlaT: 0, habla: null, entrados: 0 };   // etapa: 'saludo' | 'charla' | 'vuelven' | 'adentro'
+  function saludar(dt, estado) {
+    const activo = !!estado.saludo && (estado.paso || 0) >= 1;
+    if (!activo) {
+      for (const a of agentes) if (a.fase === 'saluda') sentar(a);
+      Object.assign(saludoG, { etapa: null, charlaI: 0, charlaT: 0, habla: null, entrados: 0 });
+      return;
+    }
+    if (!saludoG.etapa) saludoG.etapa = 'saludo';
+    agentes.forEach((a, i) => {
+      if (a.fase !== 'saluda' && saludoG.etapa === 'saludo') { liberar(a); a.dest = null; a.ruta = []; a.vista = 0; a.fondo = 0; a.habla = 0; a.fase = 'saluda'; a.saludo = { etapa: 'espera', t: .3 + i * SALUDO_CADA, destino: puertaX + SALUDO_PUESTOS[i % SALUDO_PUESTOS.length], habla: 0, ola: 0, dichos: 0, texto: SALUDO_TEXTO }; a.alfa = 0; }
+      if (a.fase !== 'saluda') return;
+      const s = a.saludo; s.t -= dt;
+      if (s.etapa === 'espera') { if (s.t <= 0) { s.etapa = 'sale'; a.x = puertaX; a.y = CALLE.y; a.dir = s.destino < puertaX ? -1 : 1; a.paso = 0; } return; }
+      if (s.etapa === 'sale') {
+        a.alfa = Math.min(1, a.alfa + dt * 3);
+        const dx = s.destino - a.x, d = Math.min(Math.abs(dx), VEL * dt); a.x += Math.sign(dx) * d; a.paso += d;
+        if (Math.abs(s.destino - a.x) < .5) { a.x = s.destino; s.etapa = 'parado'; s.pendiente = true; s.ola = 3.5; s.t = Infinity; }
+        return;
+      }
+      if (s.etapa === 'vuelve') {
+        const dx = puertaX - a.x, d = Math.min(Math.abs(dx), VEL * dt); a.x += Math.sign(dx) * d; a.paso += d; a.dir = dx < 0 ? -1 : 1;
+        if (Math.abs(dx) < 10) a.alfa = Math.max(0, a.alfa - dt * 3);   // se va fundiendo al entrar
+        if (Math.abs(puertaX - a.x) < .5 && a.alfa <= 0) { sentar(a); saludoG.entrados++; if (saludoG.entrados >= agentes.length) saludoG.etapa = 'adentro'; }
+        return;
+      }
+      // parado: en la vereda, mirando a la sala
+      const hablaba = s.habla > 0;
+      s.habla = Math.max(0, s.habla - dt); s.ola = Math.max(0, s.ola - dt);
+      if (hablaba && s.habla <= 0 && saludoG.etapa === 'saludo' && s.dichos < GRACIAS_VECES) s.t = azar(2, 6);   // la segunda vez, después de una pausa
+      if (s.t <= 0 && saludoG.etapa === 'saludo') { s.pendiente = true; s.t = Infinity; }
+    });
+    if (saludoG.etapa === 'saludo') {
+      if (reloj >= globoHasta) {
+        const a = agentes.find((b) => b.saludo && b.saludo.etapa === 'parado' && b.saludo.pendiente);
+        if (a) { a.saludo.pendiente = false; a.saludo.texto = SALUDO_TEXTO; a.saludo.habla = 1.8; a.saludo.ola = Math.max(a.saludo.ola, 1.8); a.saludo.dichos++; globoHasta = reloj + 2.1; }
+        else if (agentes.every((b) => b.saludo && b.saludo.etapa === 'parado' && b.saludo.dichos >= GRACIAS_VECES)) { saludoG.etapa = 'charla'; saludoG.charlaI = 0; saludoG.charlaT = 2; }
+      }
+    } else if (saludoG.etapa === 'charla') {
+      saludoG.charlaT -= dt;
+      if (reloj >= globoHasta && saludoG.charlaT <= 0) {
+        if (saludoG.charlaI >= CHARLA.length) { saludoG.etapa = 'vuelven'; saludoG.habla = null; agentes.forEach((a, i) => { a.saludo.t = .6 + i * .9; }); }
+        else {
+          const [id, texto] = CHARLA[saludoG.charlaI++]; const a = agentes.find((b) => b.id === id); if (!a) return;
+          const dur = 1.6 + texto.length * .07; a.saludo.texto = texto; a.saludo.habla = dur; saludoG.habla = a; globoHasta = reloj + dur + .4; saludoG.charlaT = .4;
+        }
+      }
+    } else if (saludoG.etapa === 'vuelven') {
+      for (const a of agentes) if (a.saludo && a.saludo.etapa === 'parado' && a.saludo.t <= 0) { a.saludo.etapa = 'vuelve'; a.saludo.habla = 0; a.saludo.ola = 0; a.paso = 0; }
+    }
+  }
+  function sentar(a) { a.saludo = null; a.fase = 'sentado'; a.dir = a.dirCasa; a.x = a.casa ? asiento(a.casa).x : 300; a.y = a.casa ? pies(a.casa.planta) : MUNDO.PB; a.ruta = []; a.dest = null; a.t = azar(4, 12); a.alfa = 1; }
+  /** Para luz.js: dónde están los que saludan en la vereda (halo y nitidez), o []. */
+  function saludando() { return agentes.filter((a) => a.fase === 'saluda' && a.saludo && a.saludo.etapa !== 'espera' && a.alfa > 0).map((a) => ({ x: a.x, y: a.y - 10 })); }
+  /** Para escena.js: cuánta luz interior pide el final del saludo (se prenden de a una a medida que entran), o null si no manda. */
+  function luzPedida() { if (saludoG.etapa !== 'vuelven' && saludoG.etapa !== 'adentro') return null; return .06 + .52 * saludoG.entrados / agentes.length; }
 
   // ---------- Dibujo ----------
   function sprite(c, hoja, cuadro, fila, dir, x, y) {
@@ -254,6 +336,14 @@ export async function crearGente({ cargarImagen, MODELOS, plantas, teñir: teñi
     const k = (reloj * 4 | 0) % 3; for (let i = 0; i < 3; i++) r(c, bx + 2 + i * 3, by + 4 - (i === k ? 1 : 0), 2, 2, i === k ? color : '#9a9aa8');
     r(c, bx + 4, by + 10, 4, 2, '#1a1a2e');
   }
+  /** Un globo con texto en píxeles (el "¡Gracias!" del saludo), centrado sobre el personaje. */
+  function globoTexto(c, x, y, t, color) {
+    const w = ED.anchoCartel(t) + 6, h = 11, bx = Math.round(x) - (w >> 1), by = Math.round(y) - 48;
+    r(c, bx - 1, by - 1, w + 2, h + 2, '#1a1a2e'); r(c, bx, by, w, h, '#fff'); r(c, bx, by, w, 1, color);
+    ED.textoPixel(c, bx + 3, by + 2, t, '#1a1a2e'); r(c, Math.round(x) - 2, by + h, 4, 2, '#1a1a2e'); r(c, Math.round(x) - 1, by + h, 2, 1, '#fff');
+  }
+  /** El brazo que saluda: arriba y a medio bajar, alternando. */
+  function brazoSaludo(c, a) { const alto = (reloj * 4 | 0) % 2 ? 9 : 6, x = Math.round(a.x) + 7, y0 = Math.round(a.y) - 19; r(c, x - 1, y0 - alto - 1, 4, alto + 2, PIEL_OSC); r(c, x, y0 - alto, 2, alto + 1, PIEL); r(c, x - 1, y0 - alto - 2, 4, 2, PIEL); }
   function sombra(c, x, y) { c.fillStyle = 'rgba(0,0,0,.28)'; c.fillRect(Math.round(x) - 6, Math.round(y) - 1, 12, 2); }
   function papel(c, a) { const x = Math.round(a.x) + (a.dir > 0 ? 6 : -10), y = Math.round(a.y) - 17; r(c, x, y, 4, 5, '#f4efe2'); r(c, x + 1, y + 1, 2, 1, '#9a9aa8'); r(c, x + 1, y + 3, 2, 1, '#9a9aa8'); }
   /** El estante de Coordinación y el cuaderno sobre su escritorio (solo si edificio.js no los dibuja). */
@@ -275,6 +365,15 @@ export async function crearGente({ cargarImagen, MODELOS, plantas, teñir: teñi
     if (!estado.vacia) for (const g of aulaGente) { pupitre(c, g); estudiante(c, g); }   // de atrás hacia adelante: cada pupitre tapa al de la fila de atrás
     personaje(c, persona, { cuadro: 3 + ((reloj / .9 | 0) % 2), y: persona.y + 3 });
     for (const a of agentes) {
+      if (a.fase === 'saluda') {
+        const s = a.saludo; if (!s || s.etapa === 'espera') continue;
+        if (s.etapa === 'sale' || s.etapa === 'vuelve') { if (a.alfa > .3) sombra(c, a.x, a.y); personaje(c, a, { cuadro: cuadroCaminar(a.paso), alfa: a.alfa }); continue; }
+        const h = saludoG.habla;
+        if (saludoG.etapa === 'charla' && h && h !== a && h.saludo && h.saludo.habla > 0) personaje(c, { ...a, dir: h.x < a.x ? -1 : 1 }, { cuadro: 1 });   // mira al que habla
+        else personaje(c, a, { cuadro: 1, fila: FILA.abajo });
+        if (s.ola > 0) brazoSaludo(c, a);   // el globo va en dibujarEncima: la pared de frente taparía lo que queda sobre la cabeza
+        continue;
+      }
       const camina = a.fase === 'va' || a.fase === 'vuelve';
       if (camina && a.vista) personaje(c, a, { cuadro: cuadroCaminar(a.paso), fila: a.vista < 0 ? FILA.arriba : FILA.abajo, alfa: 1 - a.fondo });   // en la escalera: hacia el fondo o saliendo de él
       else if (camina) { sombra(c, a.x, a.y); personaje(c, a, { cuadro: cuadroCaminar(a.paso) }); }
@@ -285,9 +384,14 @@ export async function crearGente({ cargarImagen, MODELOS, plantas, teñir: teñi
       if (a.habla > 0 && !camina) globo(c, a.x, a.y - (a.fase === 'sentado' && a.casa && a.casa.escritorio ? -3 : 0), a.color);
     }
     if (sofia.visible) {
-      if (sofia.estado === 'puerta' && !sofia.moviendo) personaje(c, sofia, { cuadro: 1, fila: FILA.arriba });
+      if ((sofia.estado === 'puerta' || sofia.estado === 'frente') && !sofia.moviendo) personaje(c, sofia, { cuadro: 1, fila: FILA.arriba });
       else { if (sofia.moviendo) sombra(c, sofia.x, sofia.y); personaje(c, sofia, { cuadro: sofia.moviendo ? cuadroCaminar(sofia.paso) : 1 }); }
     }
+  }
+  /** Lo que va por encima de la pared de frente: los globos de "¡Gracias!" de los que saludan en la vereda (la cabeza queda al ras del zócalo y el globo, sobre la pared). */
+  function dibujarEncima(c, estado) {
+    if (!estado.saludo) return;
+    for (const a of agentes) if (a.fase === 'saluda' && a.saludo && a.saludo.etapa === 'parado' && a.saludo.habla > 0) globoTexto(c, a.x, a.y, a.saludo.texto || SALUDO_TEXTO, a.color);
   }
   /** Dónde poner el halo del foco en "agente" (coordenadas del mundo), o null. El halo lo dibuja luz.js. */
   function focoEn(estado) {
@@ -295,5 +399,5 @@ export async function crearGente({ cargarImagen, MODELOS, plantas, teñir: teñi
     const sobre = { x: a.x, y: a.y - 14 };
     return { rol: sobre, autonomia: sobre, skills: { x: MUEBLES.estante.x, y: MUEBLES.estante.y }, herramientas: { x: MUEBLES.pantalla.x, y: MUEBLES.pantalla.y }, memoria: { x: MUEBLES.cuaderno.x, y: MUEBLES.cuaderno.y } }[estado.foco] || null;
   }
-  return { tick, dibujar, focoEn, agentes, sofia, aulaGente, persona, hojas };
+  return { tick, dibujar, dibujarEncima, focoEn, saludando, luzPedida, agentes, sofia, aulaGente, persona, hojas };
 }

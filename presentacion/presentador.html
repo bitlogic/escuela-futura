@@ -9,10 +9,10 @@
   html, body { overflow: auto; background: #0B0920; }
   body { display: grid; grid-template-rows: auto 1fr; height: 100vh; }
   header { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: stretch; padding: 16px 20px 0; }
-  .mini { position: relative; overflow: hidden; border-radius: 10px; background: #06050F; border: 1px solid #2A2452; aspect-ratio: 16 / 9; }
+  .mini { position: relative; overflow: hidden; border-radius: 10px; background: #0B0920; border: 1px solid #2A2452; aspect-ratio: 16 / 9; }
   .mini .lienzo section { opacity: 1; visibility: visible; transition: none; }
   .mini .lienzo section [data-paso] { transition: none; }
-  .rotulo { font: 500 12px/1.4 'JetBrains Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: #5E5889; margin: 0 0 6px; }
+  .rotulo { font: 500 13px/1.4 'JetBrains Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: #7F79B0; margin: 0 0 6px; }
   .mini.oscura { opacity: .55; }
   #p-reloj { display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 10px 18px; border-radius: 10px; background: #15112F; border: 1px solid #2A2452; }
   #p-transcurrido { font: 600 64px/1 'JetBrains Mono', monospace; color: #F3F0FF; letter-spacing: -2px; }
@@ -20,20 +20,25 @@
   #p-plan, #p-hora { font: 400 16px/1.4 'JetBrains Mono', monospace; color: #A8A2D0; }
   #p-plan b { color: #2EE6D2; font-weight: 500; }
   #p-cual { font: 500 15px/1.4 'JetBrains Mono', monospace; color: #A8A2D0; }
+  #p-auto { font: 500 13px/1.5 'JetBrains Mono', monospace; color: #2EE6D2; margin: 2px 0 0; min-height: 1.5em; }
   #p-escena { font: 400 13px/1.5 'JetBrains Mono', monospace; color: #A8A2D0; margin: 6px 0 0; min-height: 1.5em; }
   #p-escena b { color: #2EE6D2; font-weight: 500; }
   #p-escena .mueve { color: #FF4FD8; }
   #demo-chip { display: none; font: 500 13px/1 'JetBrains Mono', monospace; color: #FF4FD8; border: 1px solid #FF4FD8; border-radius: 999px; padding: 6px 12px; width: max-content; }
   #demo-chip.visible { display: inline-block; }
+  #p-escuela { font: 500 14px/1.5 'JetBrains Mono', monospace; color: #A8A2D0; margin: 8px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; min-height: 1.5em; }
+  #p-escuela .ok { color: #2EE6D2; } #p-escuela .mal { color: #FF4FD8; font-weight: 700; }
+  #p-reiniciar { display: none; font: 500 13px/1 'JetBrains Mono', monospace; color: #F3F0FF; background: #15112F; border: 1px solid #FF4FD8; border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+  #p-reiniciar.visible { display: inline-block; }
   main { padding: 16px 20px 24px; overflow: auto; }
   #p-notas { white-space: pre-wrap; font-size: 22px; line-height: 1.5; color: #F3F0FF; max-width: 1100px; }
   #p-notas .tiempo { color: #2EE6D2; font-family: 'JetBrains Mono', monospace; font-size: 18px; }
-  footer { position: fixed; right: 16px; bottom: 10px; font: 400 12px/1.4 'JetBrains Mono', monospace; color: #5E5889; }
+  footer { position: fixed; right: 16px; bottom: 10px; font: 400 13px/1.4 'JetBrains Mono', monospace; color: #7F79B0; }
 </style>
 </head>
 <body>
 <header>
-  <div><p class="rotulo" id="p-cual">Actual</p><div class="mini"><div id="p-actual" class="lienzo"></div></div><p id="p-escena"></p><p id="demo-chip">● la demo está en pantalla</p></div>
+  <div><p class="rotulo" id="p-cual">Actual</p><div class="mini"><div id="p-actual" class="lienzo"></div></div><p id="p-escena"></p><p id="p-auto"></p><p id="demo-chip">● la demo está en pantalla</p><p id="p-escuela"></p><button id="p-reiniciar" type="button">Reiniciar la escuela</button></div>
   <div><p class="rotulo">Siguiente</p><div class="mini oscura"><div id="p-siguiente" class="lienzo"></div></div></div>
   <div id="p-reloj"><p id="p-transcurrido">0:00</p><p id="p-plan"></p><p id="p-hora"></p></div>
 </header>
@@ -63,8 +68,29 @@ function pintar() {
   $('p-plan').innerHTML = l.desde ? `Plan: <b>${l.desde}</b>${l.hasta ? ' – <b>' + l.hasta + '</b>' : ''}` : '';
   $('demo-chip').classList.toggle('visible', !!estado.demo);
   escenaTexto(l, sig);
+  escuelaTexto();
   reloj();
 }
+// La escuela: en vivo o en grabación, sesión limpia o con mensajes, y si el HD-2D de la escena se degradó. Lo que el presentador
+// necesita saber antes de apretar PageDown en "escuela".
+function escuelaTexto() {
+  const p = $('p-escuela'), es = estado.escuela, esc = estado.escena; p.replaceChildren();
+  const parte = (texto, clase) => { const s = document.createElement('span'); if (clase) s.className = clase; s.textContent = texto; p.appendChild(s); };
+  if (!es) parte('escuela: sin datos todavía');
+  else if (!es.servidor) parte('ESCUELA SIN SERVIDOR: la demo reproduce la grabación', 'mal');
+  else if (es.conectada === false) parte('la vista está en GRABACIÓN (la escuela responde: recargá la vista)', 'mal');
+  else {
+    parte('escuela en vivo' + (es.modelo ? ' · ' + es.modelo : ''), 'ok');
+    if (es.mensajes) parte(`sesión con ${es.mensajes} mensaje${es.mensajes === 1 ? '' : 's'} de agentes`, 'mal'); else parte('sesión limpia', 'ok');
+  }
+  if (esc && esc.activa && esc.degradado) parte('HD-2D degradado por FPS (p lo apaga)', 'mal');
+  else if (esc && esc.activa && esc.hd === false) parte('HD-2D apagado');
+  $('p-reiniciar').classList.toggle('visible', !!(es && es.servidor && es.mensajes));
+}
+$('p-reiniciar').addEventListener('click', async () => {
+  if (!confirm('¿Reiniciar la sesión de la escuela? Se borra la conversación de la demo.')) return;
+  try { const r = await fetch('/api/reiniciar', { method: 'POST', headers: { 'Content-Type': 'application/json' } }); if (!r.ok) throw new Error(); } catch { alert('No se pudo reiniciar la escuela.'); }
+});
 // La puesta en escena: el plano actual con sus parámetros, y si la siguiente lámina mueve la cámara.
 function escenaTexto(l, sig) {
   const e = estado.escena, p = $('p-escena');
@@ -82,11 +108,12 @@ function reloj() {
   const l = laminas[estado.actual]; const tope = l && segundos(l.hasta);
   t.classList.toggle('fuera', !!(estado.inicio && tope != null && seg > tope));
   $('p-hora').textContent = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+  const a = $('p-auto'); a.textContent = estado.auto ? `▶ avanza sola en ${Math.max(0, Math.ceil((estado.auto - Date.now()) / 1000))} s (una tecla la pisa)` : '';
 }
 setInterval(reloj, 1000);
 addEventListener('resize', pintar);
 
-canal.onmessage = (ev) => { const m = ev.data || {}; if (m.tipo === 'estado') { estado = m; pintar(); } };
+canal.onmessage = (ev) => { const m = ev.data || {}; if (m.tipo === 'estado') { estado = m; pintar(); reloj(); } };
 document.addEventListener('keydown', (e) => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key;

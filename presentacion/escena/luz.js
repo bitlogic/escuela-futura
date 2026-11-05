@@ -29,7 +29,7 @@
 // se reexporta `crearLuzCenital` para que la charla tenga un solo punto de entrada a la luz.
 
 import { PANTALLA } from './camara.js';
-import { SUELO_COLOR, MUNDO } from './edificio.js';
+import { SUELO_COLOR, MUNDO, ventanaPrendida } from './edificio.js';
 import { crearHalos } from '../../stage/luz.js';
 export { crearLuzCenital, lamparasDe } from '../../stage/luz.js';
 
@@ -37,11 +37,11 @@ const rgb = (c, a = 1) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`;
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const lerp = (a, b, k) => a + (b - a) * k;
 
-// Colores de la luz (rgb). Cálidos para lo que viene de adentro; el deck para la esfera y el grading.
+// Colores de la luz (rgb). Cálidos para lo que viene de adentro; los del sistema del deck (azul BIT, celeste, durazno) para la esfera y el grading.
 export const COLORES = {
   lampara: [255, 214, 160], ventana: [255, 196, 120], proyector: [190, 225, 255], foco: [220, 255, 248],
   sofia: [255, 170, 235], niebla: [150, 140, 200], sol: [255, 150, 90], suelo: [14, 18, 20], sueloDia: [52, 66, 56], dia: [150, 185, 230],
-  teal: [46, 230, 210], violeta: [123, 92, 255], magenta: [255, 79, 216],
+  celeste: [159, 182, 243], azul: [62, 107, 232], durazno: [254, 175, 155],
 };
 export const DESENFOQUES = { lejana: 7, cercana: 9, franja: 3 };     // px de pantalla (a esc 1)
 export const FPS_MINIMO = 40, SEGUNDOS_LENTOS = 3;
@@ -84,7 +84,7 @@ export function crearLuz(canvas) {
   }
   function tapa() {
     if (!vineta) { vineta = ctx.createRadialGradient(W / 2, H / 2, H * .5, W / 2, H / 2, H * 1.15); vineta.addColorStop(0, 'rgba(3,2,10,0)'); vineta.addColorStop(.6, 'rgba(3,2,10,.3)'); vineta.addColorStop(1, 'rgba(3,2,10,.95)'); }
-    if (!grading) { grading = ctx.createLinearGradient(0, 0, W, H); grading.addColorStop(0, rgb(COLORES.teal)); grading.addColorStop(1, rgb(COLORES.magenta)); }
+    if (!grading) { grading = ctx.createLinearGradient(0, 0, W, H); grading.addColorStop(0, rgb(COLORES.azul)); grading.addColorStop(1, rgb(COLORES.durazno)); }
   }
 
   // ---------- Capas ----------
@@ -100,7 +100,7 @@ export function crearLuz(canvas) {
     ctx.globalAlpha = 1;
   }
   /** El mundo y la fachada, nítidos: solo el recorte visible, a S entero sin suavizar, y a la escala exacta con suavizado. */
-  function mundoNitido(mundo, fachada, estado, aPantalla, v) {
+  function mundoNitido(mundo, fachada, encima, estado, aPantalla, v) {
     const [x0, y0, s] = aPantalla(0, 0);
     const S = clamp(Math.ceil(s * v.esc), 1, 16);
     // el recorte del mundo que entra en la composición (más un píxel de margen)
@@ -112,6 +112,7 @@ export function crearLuz(canvas) {
     e.clearRect(0, 0, w * S, h * S);
     e.drawImage(mundo, vx0, vy0, w, h, 0, 0, w * S, h * S);
     if (estado.fachada > .01) { e.globalAlpha = clamp(estado.fachada, 0, 1); e.drawImage(fachada, vx0, vy0, w, h, 0, 0, w * S, h * S); e.globalAlpha = 1; }
+    if (encima) e.drawImage(encima, vx0, vy0, w, h, 0, 0, w * S, h * S);   // lo que va por encima de la pared (los globos del saludo)
     ctx.imageSmoothingEnabled = true;
     ctx.drawImage(escalado, 0, 0, w * S, h * S, x0 + vx0 * s, y0 + vy0 * s, w * s, h * s);
   }
@@ -148,7 +149,7 @@ export function crearLuz(canvas) {
   }
 
   // ---------- Las luces ----------
-  function luces({ estado, aPantalla, ventanas, lamparas, foco, sofiaEn, t, dt }) {
+  function luces({ estado, aPantalla, ventanas, lamparas, foco, sofiaEn, saludos = [], t, dt }) {
     const fach = clamp(estado.fachada, 0, 1), interior = clamp(estado.luzInterior ?? 1, 0, 1), prendido = encendido(estado.hora);
     const haz = estado.plano === 'aula' && !estado.vacia ? 1 : 0;
     tHaz = lerp(tHaz, haz, 1 - Math.pow(.05, dt)); tFoco = lerp(tFoco, foco ? 1 : 0, 1 - Math.pow(.02, dt));
@@ -162,9 +163,10 @@ export function crearLuz(canvas) {
       halo(x, y, r * .22, r * .12, [255, 240, 210], .5 * aLamp);        // el tubo mismo, un punto de luz
       ctx.restore();
     }
-    // ventanas: con la fachada puesta, cada ventana irradia según la hora
-    const aVent = fach * interior * prendido;
-    if (aVent > .01) for (const v of ventanas) {
+    // ventanas: con la fachada puesta, cada ventana irradia según la hora (y según su propio umbral: se prenden y apagan de a una)
+    const aVentBase = fach * prendido;
+    if (aVentBase > .01) for (const v of ventanas) {
+      const aVent = aVentBase * ventanaPrendida(v, estado); if (aVent < .01) continue;
       const [x, y, s] = aPantalla(v.x + v.w / 2, v.y + v.h / 2);
       halo(x, y, v.w * s * 1.7, v.h * s * 1.5, COLORES.ventana, .42 * aVent);
       halo(x, y + v.h * s * .9, v.w * s * 1.1, v.h * s * .6, COLORES.ventana, .22 * aVent);   // el charco de luz sobre la pared de abajo
@@ -184,18 +186,19 @@ export function crearLuz(canvas) {
       halo(x, y, 52 * s * lat, 52 * s * lat, COLORES.foco, .35 * tFoco); halo(x, y, 14 * s, 14 * s, [255, 255, 255], .18 * tFoco);
     }
     // el halo de Sofía: solo cuando escena.js pasa su posición (sofiaEn, en coordenadas del mundo)
-    if (estado.sofia && sofiaEn) { const [x, y, s] = aPantalla(sofiaEn.x, sofiaEn.y); halo(x, y, 20 * s, 20 * s, COLORES.sofia, .45); }
+    if (estado.sofia && sofiaEn) { const [x, y, s] = aPantalla(sofiaEn.x, sofiaEn.y); halo(x, y, 30 * s, 30 * s, COLORES.sofia, .6); }
+    for (const p of saludos) { const [x, y, s] = aPantalla(p.x, p.y); halo(x, y, 30 * s, 30 * s, COLORES.ventana, .5); }   // los agentes que saludan en la vereda (gracias), de noche   // más luz: Sofía mide 10 cm en la pantalla de 4 m
     // la esfera: el tercer invitado, con el degradado del deck y un halo violeta
     if (estado.esfera && estado.esfera.on && estado.esfera.r > 0) esfera(estado.esfera, t);
     ctx.globalCompositeOperation = 'source-over';
   }
   function esfera({ x, y, r }, t) {
     const lat = quieto ? 1 : 1 + .04 * Math.sin(t * 1.7);
-    halo(x, y, r * 3.2 * lat, r * 3.2 * lat, COLORES.violeta, .55); halo(x, y, r * 1.8, r * 1.8, COLORES.magenta, .35);
+    halo(x, y, r * 3.2 * lat, r * 3.2 * lat, [123, 92, 255], .5); halo(x, y, r * 1.8, r * 1.8, [46, 230, 210], .3);   // violeta y teal: el orb del deck
     ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
     if (!esferaDeg || Math.abs(esferaR - r) > .5) {       // el degradado se cachea por radio (cambia solo cuando la esfera crece o se encoge)
       esferaR = r; esferaDeg = ctx.createRadialGradient(-r * .3, -r * .32, 0, 0, 0, r);
-      esferaDeg.addColorStop(0, '#ffffff'); esferaDeg.addColorStop(.22, rgb(COLORES.teal)); esferaDeg.addColorStop(.6, rgb(COLORES.violeta)); esferaDeg.addColorStop(1, rgb(COLORES.magenta));
+      esferaDeg.addColorStop(0, '#FFE3F9'); esferaDeg.addColorStop(.22, '#2EE6D2'); esferaDeg.addColorStop(.6, '#7B5CFF'); esferaDeg.addColorStop(1, '#B0179F');
     }
     ctx.save(); ctx.translate(x, y); ctx.fillStyle = esferaDeg; ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     ctx.globalCompositeOperation = 'lighter';
@@ -214,9 +217,10 @@ export function crearLuz(canvas) {
 
   // ---------- Franja de foco, viñeta, grading ----------
   /** Tilt-shift: lo de arriba y lo de abajo de la franja nítida se redibuja desenfocado, en dos escalones para que la transición no se vea. */
-  function franja(estado, v, t) {
+  function franja(estado, v, t, nitidoHasta = 0) {
     const centro = H / 2 + (estado.zoom >= 1.8 ? 40 : 0) + (quieto ? 0 : Math.sin(t * .5) * 14);
     const medio = H * (estado.zoom >= 1.8 ? .36 : .28);
+    const abajo = Math.max(centro + medio, nitidoHasta);   // la gente (Sofía, el agente del foco) queda nítida aunque camine por la franja de abajo
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.filter = `blur(${(DESENFOQUES.franja * v.esc).toFixed(2)}px)`; ctx.imageSmoothingEnabled = true;
     const cw = canvas.width, ch = canvas.height, m = Math.ceil(DESENFOQUES.franja * v.esc * 3);
@@ -227,35 +231,43 @@ export function crearLuz(canvas) {
       ctx.drawImage(canvas, 0, s0, cw, s1 - s0, 0, s0, cw, s1 - s0); ctx.restore();
     };
     paso(-40, centro - medio - 60, 1); paso(centro - medio - 60, centro - medio, .45);
-    paso(centro + medio + 60, H + 40, 1); paso(centro + medio, centro + medio + 60, .45);
+    paso(abajo + 60, H + 40, 1); paso(abajo, abajo + 60, .45);
     ctx.filter = 'none'; ctx.restore();
   }
 
   // ---------- Render ----------
   // `vista` = { esc, ox, oy }: la composición de 1920×1080 entra entera en la ventana, centrada (como el lienzo de las láminas);
   // las bandas que sobren se pintan del color de arriba del cielo.
-  function render({ mundo, fachada, capas, estado, aPantalla, aPantallaCapa, ventanas = [], lamparas = [], foco = null, sofiaEn = null, cielo, vista }) {
+  function render({ mundo, fachada, encima = null, capas, estado, aPantalla, aPantallaCapa, ventanas = [], lamparas = [], foco = null, sofiaEn = null, saludos = [], cielo, vista }) {
     const t = reloj(), dt = clamp(t - ultimoReloj, 0, .1); ultimoReloj = t;
     const C = cielo(estado.hora), noche = 1 - Math.abs(estado.hora - .5) * 2;
     const v = vista || { esc: canvas.width / W, ox: 0, oy: 0 };
     const hd = luz.hd, desenfoque = hd && !luz.degradado && conFiltro;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; if (conFiltro) ctx.filter = 'none';
-    ctx.fillStyle = rgb(C[0]); ctx.fillRect(0, 0, canvas.width, canvas.height);
-    { const hy = aPantalla(0, MUNDO.SUELO)[1] * v.esc + v.oy; if (hy < canvas.height) { ctx.fillStyle = SUELO_COLOR; ctx.fillRect(0, hy, canvas.width, canvas.height - hy); } }   // debajo del horizonte, suelo (las bandas en ventanas que no son 16:9)
+    {   // las bandas de una ventana que no es 16:9 (el auditorio es 2:1): el mismo cielo degradado y el mismo suelo que la composición, no una franja de otro color
+      const hy = aPantalla(0, MUNDO.SUELO)[1] * v.esc + v.oy;
+      if (hd) { const sky = ctx.createLinearGradient(0, v.oy, 0, Math.max(v.oy + 1, hy)); sky.addColorStop(0, rgb(C[0])); sky.addColorStop(.5, rgb(C[1])); sky.addColorStop(1, rgb(C[2])); ctx.fillStyle = sky; } else ctx.fillStyle = rgb(C[1]);
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (hy < canvas.height) { ctx.fillStyle = SUELO_COLOR; ctx.fillRect(0, hy, canvas.width, canvas.height - hy); }
+    }
     ctx.setTransform(v.esc, 0, 0, v.esc, v.ox, v.oy);
     ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();        // nada se sale de la composición
 
     cieloYSuelo(C, estado, aPantalla, aPantallaCapa, t);
     if (capas && capas.lejana) capa(capas.lejana, aPantallaCapa, .45, 1, hd ? DESENFOQUES.lejana : 0);
-    mundoNitido(mundo, fachada, estado, aPantalla, v);
+    mundoNitido(mundo, fachada, encima, estado, aPantalla, v);
     const entero = hd && !luz.degradado;   // las pasadas de pantalla entera (niebla, luz del día, grading): lo caro sin GPU
     if (hd) {
       tapa();
-      luces({ estado, aPantalla, ventanas, lamparas, foco, sofiaEn, t, dt });
+      luces({ estado, aPantalla, ventanas, lamparas, foco, sofiaEn, saludos, t, dt });
       if (entero) niebla(estado, aPantalla, t);
     }
     if (capas && capas.cercana && estado.fachada > .01) capa(capas.cercana, aPantallaCapa, 1.5, clamp(estado.fachada, 0, 1), hd ? DESENFOQUES.cercana : 0);
-    if (desenfoque) franja(estado, v, t);
+    if (desenfoque) {
+      let nitidoHasta = 0;   // hasta dónde (y de la composición) tiene que llegar lo nítido para no desenfocar a la gente
+      for (const p of [estado.sofia ? sofiaEn : null, foco, ...saludos]) if (p && Number.isFinite(p.x)) { const [, y, s] = aPantalla(p.x, p.y); nitidoHasta = Math.max(nitidoHasta, y + 40 * s); }
+      franja(estado, v, t, nitidoHasta);
+    }
     if (hd) {
       // la luz del día: una subida pareja ('screen') que aclara el mundo cuando amanece, antes de la viñeta
       const dia = Math.max(0, (estado.hora - .5) * 2) * (.4 + .6 * clamp(estado.fachada, 0, 1));

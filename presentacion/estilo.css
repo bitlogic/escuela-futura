@@ -1,20 +1,28 @@
-/* Tipografía del deck, local (Outfit y JetBrains Mono, licencia OFL): la charla no depende de la red. */
+/* Tipografía del deck, toda local: la charla no depende de la red. Outfit y JetBrains Mono (OFL) son las del deck; Plain y Apple Garamond
+   (brand kit, licenciadas, en stage/assets/ fuera de git, llegan por /stage/) quedan declaradas por si una lámina las pide. */
+@font-face { font-family: 'Plain'; src: url(/stage/assets/Plain-Regular.otf) format('opentype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Plain'; src: url(/stage/assets/Plain-Medium.otf) format('opentype'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Plain'; src: url(/stage/assets/Plain-Bold.otf) format('opentype'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Apple Garamond'; src: url(/stage/assets/AppleGaramond-Light.ttf) format('truetype'); font-weight: 300; font-display: swap; }
 @font-face { font-family: 'Outfit'; src: url(assets/outfit.woff2) format('woff2'); font-weight: 300 800; font-display: swap; }
 @font-face { font-family: 'JetBrains Mono'; src: url(assets/jetbrains-mono.woff2) format('woff2'); font-weight: 100 800; font-display: swap; }
 
-html, body { margin: 0; height: 100%; background: #06050F; color: #F3F0FF; overflow: hidden; font-family: 'Outfit', Arial, sans-serif; }
+html, body { margin: 0; height: 100%; background: #0B0920; color: #F3F0FF; overflow: hidden; font-family: 'Outfit', Arial, sans-serif; }
 
 /* El lienzo de 1920×1080 que se escala a la ventana. Cada lámina es una <section> apilada; la actual se ve. */
 .lienzo { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
 .lienzo section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; display: flex; flex-direction: column; box-sizing: border-box; font-size: 32px; font-weight: 400; line-height: 1.4; opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility 0s linear .45s; }
-.lienzo section.actual { opacity: 1; visibility: visible; z-index: 2; transition: opacity .45s ease; }
+.lienzo section.actual { opacity: 1; visibility: visible; z-index: 2; transition: opacity .4s cubic-bezier(.22, 1, .36, 1); }
 .lienzo section.anterior { opacity: 1; visibility: visible; z-index: 1; transition: none; }   /* se queda debajo mientras entra la nueva: fundido sin bache */
+body.con-escena .lienzo section.anterior { opacity: 0; transition: opacity .3s ease; }   /* con escena no hay bache que tapar (atrás está la escuela): la anterior se funde desde el primer cuadro, sin texto fantasma sobre la escena nueva */
 .lienzo section.quieta { transition: none; }
 
 /* Pasos dentro de una lámina: lo marcado con data-paso entra con un clic (fundido corto y un leve ascenso). */
-.lienzo section [data-paso] { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
-.lienzo section [data-paso].visto { opacity: 1; transform: none; }
+.lienzo section [data-paso] { opacity: 0; transform: translateY(18px); transition: opacity .55s cubic-bezier(.22, 1, .36, 1), transform .55s cubic-bezier(.22, 1, .36, 1); }
+.lienzo section [data-paso].visto { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 90ms); }   /* los elementos de un mismo paso entran escalonados (--i lo pone mostrarPaso) */
 .lienzo section.quieta [data-paso] { transition: none; }
+.lienzo section [data-hasta].pasado { display: none; }   /* lo que se va cuando entra un paso (capo: Preguntar se achica cuando llega Delegar) */
+.lienzo section [data-atenua] { transition: opacity .55s cubic-bezier(.22, 1, .36, 1); } .lienzo section [data-atenua].atenuado { opacity: .32; }   /* lo que ya se dijo se apaga cuando entra lo importante (ranking: el dato cede a la frase) */
 @media (prefers-reduced-motion: reduce) { .lienzo section [data-paso] { transform: none; transition: opacity .2s; } }
 
 /* Las reglas por defecto del formato del deck: div = columna flex; textos sin margen con sus tamaños por etiqueta. */
@@ -37,16 +45,73 @@ html, body { margin: 0; height: 100%; background: #06050F; color: #F3F0FF; overf
 
 /* La escena (presentacion/escena/): el mundo detrás de las láminas y la placa del texto. Solo cuando la lámina lo declara. */
 #ui-escena { position: fixed; inset: 0; z-index: 0; display: none; width: 100%; height: 100%; }
-#ui-escena.visible { display: block; }
+#ui-escena.visible { display: block; animation: escena-aparece 1.8s ease; }   /* la escuela aparece (lámina 3): fundido desde el fondo del deck */
+@keyframes escena-aparece { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { #ui-escena.visible { animation: none; } }
 #ui-placa { position: fixed; inset: 0; z-index: 1; display: none; pointer-events: none; }
 #ui-placa.visible { display: block; }
 #ui-placa.pos-izq { -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 38%, rgba(0,0,0,.85) 45%, rgba(0,0,0,.25) 55%, transparent 64%); mask-image: linear-gradient(90deg, #000 0%, #000 38%, rgba(0,0,0,.85) 45%, rgba(0,0,0,.25) 55%, transparent 64%); }
 #ui-placa.pos-der { -webkit-mask-image: linear-gradient(270deg, #000 0%, #000 38%, rgba(0,0,0,.85) 45%, rgba(0,0,0,.25) 55%, transparent 64%); mask-image: linear-gradient(270deg, #000 0%, #000 38%, rgba(0,0,0,.85) 45%, rgba(0,0,0,.25) 55%, transparent 64%); }
 #ui-placa.pos-abajo { -webkit-mask-image: linear-gradient(0deg, #000 0%, #000 50%, rgba(0,0,0,.85) 57%, rgba(0,0,0,.25) 66%, transparent 74%); mask-image: linear-gradient(0deg, #000 0%, #000 50%, rgba(0,0,0,.85) 57%, rgba(0,0,0,.25) 66%, transparent 74%); }
+#ui-placa.pos-arriba { -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 40%, rgba(0,0,0,.85) 47%, rgba(0,0,0,.25) 56%, transparent 64%); mask-image: linear-gradient(180deg, #000 0%, #000 40%, rgba(0,0,0,.85) 47%, rgba(0,0,0,.25) 56%, transparent 64%); }   /* el título sobre la escuela (escuela, vivo); escena.js afina el borde midiendo el texto */
 .lienzo { z-index: 2; }
-#ui-placa.pos-plena { opacity: .78; }
-body.con-escena .lienzo section[data-placa^="plena"] p[style*="#A8A2D0"] { color: rgba(243, 240, 255, .85) !important; }   /* el lavanda medio del deck no se lee sobre la plena texturada */   /* las láminas que son listas: la escuela queda detrás como textura, quieta */
+#ui-placa.pos-plena { opacity: .95; }   /* las láminas que son listas: la escuela queda detrás como textura, quieta */
 body.con-escena .lienzo section[data-escena] { background: transparent !important; }
 body.con-escena .lienzo section[data-escena] [data-marca-agua] { display: none; }
+/* Llamadas (4/11): con data-placa="llamadas" no hay placa; cada texto marcado .llamada lleva su propio recuadro sobre la escena,
+   del tamaño de lo que dice. Sin escena es texto común, como en el deck. */
+body.con-escena .lamina .llamada { background: rgba(11, 9, 32, .86); padding: 20px 32px; width: fit-content; }   /* el ancho lo acota .col, como siempre */
+body.con-escena .lamina.clara .llamada { background: rgba(243, 240, 255, .94); }
+body.con-escena .lamina h1.llamada { font-size: 96px; }
+body.con-escena .lamina h1.frase.llamada { font-size: 112px; }   /* las tres frases grandes miden lo mismo con o sin escena */
+body.con-escena .lamina .llamada.fila-lista { border: 0; padding: 14px 28px 16px; }
+body.con-escena .lamina .llamada.fila-lista h3 { font-size: 56px; }   /* crítica del 4/11: 40/26 no se leía desde la última fila */
+body.con-escena .lamina .llamada.fila-lista p { font-size: 36px; }
+body.con-escena .lamina .llamada.fila-lista .num { font-size: 40px; margin-top: 10px; }
 /* Durante el giro, las láminas y la placa se apagan rápido: el perfil se acuesta limpio, sin texto fantasma. */
 .lienzo.en-giro, #ui-placa.en-giro { opacity: 0 !important; transition: opacity .2s ease; }   /* el año o la palabra gigante del fondo no compiten con la escena */
+
+/* ===== El sistema del deck (4/11; paleta original "neón sobre navy", ver SISTEMA.md). ===== */
+.lienzo section.lamina { --fondo: #0B0920; --fondo-luz: #0F2A3A; --texto: #F3F0FF; --suave: #A8A2D0; --tenue: #7F79B0; --linea: #2A2452; --superficie: #15112F;
+  --teal: #2EE6D2; --magenta: #FF4FD8; --violeta: #7B5CFF; --curva: cubic-bezier(.22, 1, .36, 1);
+  background: radial-gradient(ellipse at 15% 20%, var(--fondo-luz) 0%, var(--fondo) 55%); color: var(--texto); font-family: 'Outfit', Arial, sans-serif; font-weight: 400; font-size: 40px; line-height: 1.3; padding: 128px 128px 160px; justify-content: center; gap: 40px; }
+.lienzo section.lamina.clara { --fondo: #F3F0FF; --fondo-luz: #FFE3F9; --texto: #120E2E; --suave: #5E5889; --tenue: #8A84B4; --linea: #D9D2F0; --superficie: #FFFFFF; --teal: #0E7C86; --magenta: #B0179F; --violeta: #5A3FD6; }
+.lienzo section.lamina.gradiente { background: linear-gradient(135deg, #0E7C86 0%, #3E3AC8 48%, #B0179F 100%); }   /* la tesis: la lámina entera es el degradado */
+.lienzo section.lamina.gradiente .marca { color: var(--texto); opacity: .8; }
+/* tipografía: Outfit para el texto, JetBrains Mono para las marcas y los números */
+.lamina .marca { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 28px; font-weight: 400; line-height: 1.3; letter-spacing: 4px; text-transform: uppercase; color: var(--teal); }
+.lamina h1 { font-size: 120px; font-weight: 600; line-height: 1.02; letter-spacing: -.025em; }
+.lamina h1.xl { font-size: 168px; font-weight: 700; line-height: .98; letter-spacing: -.03em; }
+.lamina h2 { font-size: 80px; font-weight: 600; line-height: 1.05; letter-spacing: -.02em; }
+.lamina h3 { font-size: 48px; font-weight: 600; line-height: 1.1; letter-spacing: -.01em; }
+.lamina .frase { font-size: 112px; font-weight: 600; line-height: 1.05; letter-spacing: -.025em; }   /* las tres frases grandes: tesis, decisión, cierre */
+.lamina .frase.xl { font-size: 168px; line-height: 1; }
+.lamina .cuerpo { font-size: 40px; font-weight: 400; line-height: 1.3; }
+.lamina .cita { font-size: 48px; font-weight: 400; line-height: 1.2; }   /* la consigna que después se tipea en vivo */
+.lamina .secundario { font-size: 36px; font-weight: 400; line-height: 1.3; color: var(--suave); }
+.lamina .nota { font-size: 26px; font-weight: 400; line-height: 1.35; color: var(--tenue); }
+.lamina .cifra { font-size: 200px; font-weight: 700; line-height: .9; letter-spacing: -.03em; }
+.lamina .teal { color: var(--teal); } .lamina .magenta { color: var(--magenta); } .lamina .violeta { color: var(--violeta); } .lamina .suave { color: var(--suave); } .lamina .tenue { color: var(--tenue); } .lamina .papel { color: var(--texto); }
+/* layout */
+.lamina .col { max-width: 900px; } .lamina .col.media { max-width: 1150px; } .lamina .col.ancha { max-width: 1664px; }
+.lamina .fila-lista { display: grid; grid-template-columns: 110px 1fr; align-items: start; padding: 18px 0 20px; border-top: 2px solid var(--linea); }
+.lamina .fila-lista:last-child { border-bottom: 2px solid var(--linea); }
+.lamina .num { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 40px; font-weight: 400; line-height: 1.15; margin-top: 8px; color: var(--suave); }   /* a la altura visual del h3; el color solo por clase, en la fila que lo merece */
+.lamina .num.teal { color: var(--teal); } .lamina .num.magenta { color: var(--magenta); } .lamina .num.violeta { color: var(--violeta); }
+.lamina .fila-lista p { font-size: 28px; line-height: 1.3; color: var(--suave); margin-top: 4px; }
+.lamina .regla { border-top: 2px solid var(--linea); padding-top: 32px; }
+.lamina .columnas { flex-direction: row; gap: 0; align-items: stretch; }
+.lamina .columnas > div { flex: 1; gap: 24px; padding-right: 72px; }
+.lamina .columnas > div + div { border-left: 2px solid var(--linea); padding-left: 72px; padding-right: 0; }
+.lamina .pie { flex-direction: row; justify-content: space-between; align-items: center; }
+.lamina .regla-tiempo { height: 2px; background: color-mix(in srgb, var(--suave) 50%, transparent); }
+.lamina .punto { width: 20px; height: 20px; border-radius: 50%; background: var(--magenta); box-shadow: 0 0 28px 8px rgba(255, 79, 216, .55); }
+.lamina .linea-tiempo { flex-direction: row; justify-content: space-between; }
+.lamina .linea-tiempo p { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 26px; font-weight: 400; line-height: 1.3; color: var(--tenue); letter-spacing: 3px; }
+.lamina .linea-tiempo p.activo { color: var(--teal); }
+.lamina .foto { width: 400px; height: 400px; object-fit: cover; border-radius: 50%; border: 6px solid currentColor; box-shadow: 0 0 60px 0 color-mix(in srgb, currentColor 34%, transparent); }   /* redonda, con el borde del color del dueño (.magenta, .violeta) */
+.lamina .barra { height: 28px; border-radius: 14px; background: var(--linea); } .lamina .barra.teal { background: linear-gradient(90deg, var(--teal) 0%, var(--violeta) 100%); }
+/* movimiento: la lámina que entra sube 16 px; lo pineado y los pasos no (los pasos tienen su propia entrada) */
+.lienzo section.lamina.entrando > :not([data-paso]) { animation: lamina-sube .7s var(--curva) both; }
+@keyframes lamina-sube { from { opacity: 0; transform: translateY(16px); } }
+@media (prefers-reduced-motion: reduce) { .lienzo section.lamina.entrando > * { animation: none; } .lienzo section [data-paso].visto { transition-delay: 0s; } }

@@ -58,18 +58,33 @@ export function prepararLamina(id, html) {
     else h.style.zIndex = primerFlujo >= 0 && i > primerFlujo ? '2' : '0';
   });
   // Pasos: los elementos con data-paso="N" (N ≥ 1) quedan ocultos hasta el clic N de la lámina (ver mostrarPaso).
-  const pasos = Math.max(0, ...[...section.querySelectorAll('[data-paso]')].map((e) => Number(e.dataset.paso) || 0));
+  // data-demo-paso="N": la demo (data-demo) entra recién en el paso N, no al llegar a la lámina; así la banda de "vivo" se ve antes del giro.
+  const demoPaso = Number(section.dataset.demoPaso) || 0;
+  const pasos = Math.max(0, demoPaso, ...[...section.querySelectorAll('[data-paso]')].map((e) => Number(e.dataset.paso) || 0));
   const titulo = ((section.querySelector('h1, h2, h3') || {}).textContent || id).replace(/\s+/g, ' ').trim();
   // La puesta en escena de la lámina (presentacion/escena/): data-escena (JSON) y data-placa. Sin ellos, la lámina se ve como siempre.
   let escena = null; try { escena = section.dataset.escena ? JSON.parse(section.dataset.escena) : null; } catch (e) { console.error(`La lámina ${id} tiene un data-escena inválido:`, e.message); }
   const placa = section.dataset.placa || null;
   const t = notas.match(/^\[(\d{1,2}:\d{2})(?:\s*[–-]\s*(\d{1,2}:\d{2}))?/) || [];
-  return { id, section: document.importNode(section, true), notas, titulo, pasos, demo: section.dataset.demo || null, escena, placa, desde: t[1] || null, hasta: t[2] || null, transicion: section.dataset.transition || 'fade' };
+  return { id, section: document.importNode(section, true), notas, titulo, pasos, demo: section.dataset.demo || null, demoPaso, escena, placa, desde: t[1] || null, hasta: t[2] || null, transicion: section.dataset.transition || 'fade' };
 }
 
 // Deja vistos los elementos de la lámina con data-paso ≤ k (k = 0: solo lo que no tiene paso).
 export function mostrarPaso(section, k) {
-  for (const e of section.querySelectorAll('[data-paso]')) e.classList.toggle('visto', (Number(e.dataset.paso) || 0) <= k);
+  const porPaso = new Map();   // --i: el orden del elemento dentro de su paso, para que entren escalonados (estilo.css)
+  for (const e of section.querySelectorAll('[data-paso]')) {
+    const n = Number(e.dataset.paso) || 0, i = porPaso.get(n) || 0; porPaso.set(n, i + 1);
+    e.style.setProperty('--i', String(i)); e.classList.toggle('visto', n <= k);
+  }
+  for (const e of section.querySelectorAll('[data-hasta]')) e.classList.toggle('pasado', k >= (Number(e.dataset.hasta) || 0));   // se oculta desde ese paso
+  for (const e of section.querySelectorAll('[data-atenua]')) e.classList.toggle('atenuado', k >= (Number(e.dataset.atenua) || 0));   // se atenúa desde ese paso: cede el lugar a lo que entra
+}
+
+// Avance automático: data-auto="a,b,c" en la <section>, segundos de espera en el paso 0, 1, 2… antes de avanzar solo (el último
+// avanza a la lámina siguiente). Si la lista se acaba antes de los pasos, la lámina se queda esperando la tecla. Devuelve segundos o null.
+export function autoDe(atributo, paso) {
+  const lista = String(atributo || '').split(',').map((s) => Number(s.trim())).filter((n) => Number.isFinite(n) && n > 0);
+  return paso < lista.length ? lista[paso] : null;
 }
 
 // Escala un lienzo de 1920×1080 para que entre en su contenedor (o en la ventana), centrado.
