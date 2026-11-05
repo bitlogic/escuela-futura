@@ -61,8 +61,9 @@ test('las 23 láminas declaran su puesta en escena (salvo tres): data-escena vá
   // las cuatro láminas de la calle: Sofía afuera, la misma cámara; entrevista la deja frente a la puerta
   for (const id of ['sofia', 'chatgpt', 'carrera']) { const e = leerEscena(atributo(seccion(id), 'data-escena')); assert.equal(e.sofia, 'calle', id); assert.equal(e.plano, 'edificio'); }
   assert.equal(leerEscena(atributo(seccion('entrevista'), 'data-escena')).sofia, 'frente');
-  // la esfera del deck quedó solo en la portada (4/11)
-  for (const id of deck.order) assert.equal(/<x-embed/.test(readFileSync(join(AQUI, 'slides', `${id}.html`), 'utf8')), id === 'cover', `${id}: esfera`);
+  // la esfera del deck se fue (4/11): en la portada están los seis agentes esperando (canvas data-portada); ninguna lámina lleva x-embed
+  for (const id of deck.order) assert.equal(/<x-embed/.test(readFileSync(join(AQUI, 'slides', `${id}.html`), 'utf8')), false, `${id}: esfera`);
+  assert.ok(/<canvas data-portada/.test(readFileSync(join(AQUI, 'slides', 'cover.html'), 'utf8')), 'la portada lleva a los seis agentes');
   assert.ok(!/elenco/.test(readFileSync(join(AQUI, 'slides', 'cover.html'), 'utf8')), 'la portada va sin nombres');
 });
 

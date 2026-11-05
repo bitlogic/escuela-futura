@@ -271,6 +271,11 @@ addEventListener('resize', ajustar); ajustar();
 try {
   ({ laminas } = await cargarDeck());
   for (const l of laminas) lienzo.appendChild(l.section);
+  // La portada: los seis agentes esperando en fila (escena/portada.js). Aparte de la escena: anda aunque esta esté apagada.
+  try {
+    const portadas = [...lienzo.querySelectorAll('canvas[data-portada]')];
+    if (portadas.length) { const [{ crearPortada }, { MODELOS, cargarImagen }] = await Promise.all([import('./escena/portada.js'), import('/stage/personajes.js')]); for (const c of portadas) { const sec = c.closest('section'); crearPortada(c, { cargarImagen, MODELOS }, { activa: () => sec.classList.contains('actual') || sec.classList.contains('anterior') }); } }
+  } catch (e) { console.error('Los agentes de la portada no pudieron dibujarse.', e); }
   // La escena detrás de las láminas (?sin-escena=1 la apaga del todo; ?plano=1 apaga el HD-2D).
   // Los módulos se importan acá, dentro del try, para que un error en la escena (o en stage/) nunca rompa la charla.
   if (params.get('sin-escena') !== '1') {

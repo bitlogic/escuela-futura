@@ -1,48 +1,15 @@
-<section id="cover" data-musica="musica/entrada.mp3" data-musica-bucle="1" data-transition="fade" style="background:radial-gradient(ellipse at 15% 20%, #0F2A3A 0%, #0B0920 55%);color:#F3F0FF;font-family:'Outfit', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:32px">
-<div id="esfera" style="position:absolute;left:1248px;top:268px;width:384px;height:384px;border-radius:50%;background:radial-gradient(circle at 38% 32%, #7B5CFF 0%, #3A24A8 28%, #1C1250 58%, #0B0920 100%);box-shadow:0 0 80px 10px rgba(123,92,255,0.35)"></div>
-<x-embed style="position:absolute;left:1120px;top:140px;width:640px;height:640px"><style>
-html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}
-.c{position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%)}
-.halo{width:100%;height:100%;background:radial-gradient(circle,rgba(123,92,255,.5) 0%,rgba(46,230,210,.2) 34%,rgba(255,79,216,.1) 50%,rgba(255,79,216,0) 66%);filter:blur(26px);animation:pulse 7s ease-in-out infinite}
-.base{width:60%;height:60%;background:radial-gradient(circle at 50% 50%,#1C1250 0%,#140B3C 62%,#0B0920 100%)}
-.luz{width:60%;height:60%;overflow:visible;-webkit-mask:radial-gradient(circle closest-side,#000 0%,#000 62%,rgba(0,0,0,0) 100%);mask:radial-gradient(circle closest-side,#000 0%,#000 62%,rgba(0,0,0,0) 100%);animation:gira 48s linear infinite}
-.b{position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%);mix-blend-mode:screen}
-.b1{width:88%;height:88%;background:radial-gradient(circle,rgba(46,230,210,1) 0%,rgba(46,230,210,0) 60%);filter:blur(12px);animation:d1 9s ease-in-out infinite}
-.b2{width:96%;height:96%;background:radial-gradient(circle,rgba(255,79,216,1) 0%,rgba(255,79,216,0) 58%);filter:blur(14px);animation:d2 11s ease-in-out infinite}
-.b3{width:84%;height:84%;background:radial-gradient(circle,rgba(155,92,255,1) 0%,rgba(155,92,255,0) 60%);filter:blur(12px);animation:d3 13s ease-in-out infinite}
-.b4{width:46%;height:46%;background:radial-gradient(circle,rgba(255,227,249,.95) 0%,rgba(255,227,249,0) 60%);filter:blur(8px);animation:d4 7s ease-in-out infinite}
-.sombra{width:60%;height:60%;background:radial-gradient(circle at 36% 30%,rgba(255,255,255,.22) 0%,rgba(255,255,255,0) 28%,rgba(11,9,32,0) 52%,rgba(11,9,32,.55) 82%,rgba(11,9,32,.92) 100%)}
-.borde{width:60%;height:60%;box-shadow:inset 0 0 3px 1px rgba(243,240,255,.22),inset 0 0 28px 6px rgba(46,230,210,.14),0 0 60px 8px rgba(123,92,255,.3)}
-.brillo{width:22%;height:12%;left:38%;top:24%;transform:translate(-50%,-50%) rotate(-18deg);background:radial-gradient(ellipse,rgba(255,255,255,.7) 0%,rgba(255,255,255,0) 70%);filter:blur(4px)}
-.anillo{width:78%;height:78%;background:conic-gradient(from 0deg,rgba(46,230,210,0) 0%,rgba(46,230,210,.9) 16%,rgba(255,79,216,0) 38%,rgba(255,79,216,.8) 60%,rgba(155,92,255,0) 80%,rgba(46,230,210,0) 100%);-webkit-mask:radial-gradient(circle closest-side,transparent 95.5%,#000 96.5%,#000 98.5%,transparent 99.5%);mask:radial-gradient(circle closest-side,transparent 95.5%,#000 96.5%,#000 98.5%,transparent 99.5%);filter:blur(1px);animation:spin 16s linear infinite}
-.anillo2{width:90%;height:90%;background:conic-gradient(from 180deg,rgba(255,79,216,0) 0%,rgba(255,79,216,.45) 30%,rgba(46,230,210,0) 55%,rgba(46,230,210,.4) 80%,rgba(255,79,216,0) 100%);-webkit-mask:radial-gradient(circle closest-side,transparent 97%,#000 97.8%,#000 98.8%,transparent 99.6%);mask:radial-gradient(circle closest-side,transparent 97%,#000 97.8%,#000 98.8%,transparent 99.6%);filter:blur(1px);animation:spinr 26s linear infinite}
-@keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.75}50%{transform:translate(-50%,-50%) scale(1.06);opacity:1}}
-@keyframes gira{to{transform:translate(-50%,-50%) rotate(360deg)}}
-@keyframes d1{0%,100%{transform:translate(-72%,-42%) scale(1)}50%{transform:translate(-28%,-60%) scale(1.15)}}
-@keyframes d2{0%,100%{transform:translate(-28%,-34%) scale(1)}50%{transform:translate(-70%,-66%) scale(1.1)}}
-@keyframes d3{0%,100%{transform:translate(-50%,-76%) scale(1)}33%{transform:translate(-32%,-32%) scale(1.2)}66%{transform:translate(-72%,-56%) scale(.95)}}
-@keyframes d4{0%,100%{transform:translate(-58%,-60%) scale(1);opacity:.9}50%{transform:translate(-42%,-42%) scale(1.3);opacity:.6}}
-@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
-@keyframes spinr{to{transform:translate(-50%,-50%) rotate(-360deg)}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important}}
-</style>
-<div class="c halo"></div>
-<div class="c base"></div>
-<div class="c luz"><div class="b b2"></div><div class="b b1"></div><div class="b b3"></div><div class="b b4"></div></div>
-<div class="c sombra"></div>
-<div class="c borde"></div>
-<div class="c brillo"></div>
-<div class="c anillo2"></div>
-<div class="c anillo"></div></x-embed>
+<section id="cover" data-musica="musica/entrada.mp3" data-musica-bucle="1" data-transition="fade" style="background:linear-gradient(to right, #0B0920 0%, rgba(11,9,32,0) 12%, rgba(11,9,32,0) 88%, #0B0920 100%), radial-gradient(ellipse at 15% 20%, #0F2A3A 0%, #0B0920 55%);color:#F3F0FF;font-family:'Outfit', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:32px">
+<canvas data-portada width="1400" height="880" style="position:absolute;left:1102px;top:480px;width:700px;height:440px"></canvas>
 <img src="assets/innova-educa-21.png" alt="Innova Educa 21" style="position:absolute;left:128px;top:128px;width:348px;height:120px;object-fit:contain">
-<p style="position:absolute;left:520px;top:172px;width:900px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;color:#2EE6D2">9.° CONGRESO INTERNACIONAL · CÓRDOBA · 05.11.2026</p>
+<p style="position:absolute;left:128px;bottom:178px;width:1200px;white-space:nowrap;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1;letter-spacing:3px;color:#2EE6D2">9.° CONGRESO INTERNACIONAL · CÓRDOBA · 05.11.2026</p>
 <h1 style="font-size:168px;font-weight:700;line-height:0.98;letter-spacing:-4px;width:1000px">Institución<br>Agéntica</h1>
-<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:32px;color:#FF4FD8;width:1000px">cuando la IA deja de responder y empieza a actuar</p>
-<aside>[0:00–0:30 · GREYLA] TÍTULO: “Institución Agéntica”, a sugerencia del equipo de Siglo 21. El moderador nos presenta; igual decimos quiénes somos en la lámina siguiente, cortito.
+<aside>LAYOUT (4/11, revisión con Alfredo): tres cosas y una línea. El logo solo, arriba a la izquierda. El título, dos líneas de 168 px, centrado en la altura a la izquierda. Abajo, una misma línea (y 920): a la izquierda la del congreso en teal, a la derecha los seis agentes parados sobre ella. La bajada “cuando la IA deja de responder y empieza a actuar” se sacó de la lámina (la dice Greyla).
+
+[0:00–0:30 · GREYLA] TÍTULO: “Institución Agéntica”, a sugerencia del equipo de Siglo 21. El moderador nos presenta; igual decimos quiénes somos en la lámina siguiente, cortito.
 
 GUION (Greyla): “Buenos días.” Una frase sobre el título: “Institución agéntica: cuando la IA deja de responder y empieza a actuar. En media hora les vamos a mostrar qué significa eso, en vivo.” (Pasar.)
 
-EL HILO VISUAL: la esfera de luz es “el tercer invitado”. Acá está sola sobre el fondo del deck, sin la escuela (suspenso: la escuela aparece recién en la lámina 3). Es la única lámina con la esfera (4/11: se sacó de fachada, escuela y cierre, no sumaba); después queda el punto que viaja por la línea de tiempo de Sofía. El orb se anima en modo Presentar. Los nombres no van en la portada (los dice el moderador y están en quiénes somos y en gracias).
+EL HILO VISUAL (4/11, en vez de la esfera): a la derecha del título, los seis agentes en pixel-art parados en fila, de frente a la sala, esperando que empiece la charla: respiran, se miran entre ellos cada tanto y alguno saca el globo de “…” (`escena/portada.js`). No se los nombra ni se los explica: la sala los ve de entrada sin saber qué son y los reconoce en la demo. Es el espejo del final: en la última lámina salen a la vereda a saludar. La esfera (el orb del deck de claude.ai) se sacó: no significaba nada en esta charla. Después queda el punto que viaja por la línea de tiempo de Sofía. Los nombres no van en la portada (los dice el moderador y están en quiénes somos y en gracias).
 
 EL OBJETIVO YA NO SE MANDA ACÁ: se manda en vivo, en la demo, después de explicar quiénes son los agentes (decisión del ensayo del 3/11 con Greyla: si corre solo, la sala lo ve como un jueguito).
 

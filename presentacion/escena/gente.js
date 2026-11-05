@@ -40,7 +40,7 @@ const SOFIA_TONO = 230;                                   // la hoja 2 teñida: 
 const azar = (a, b) => a + Math.random() * (b - a);
 
 /** Rota el tono de una hoja (copia de personajes.js, para no depender de su export desde Node). desdeY deja la cabeza como está. */
-function teñirLocal(img, grados, desdeY = 0) {
+export function teñirLocal(img, grados, desdeY = 0) {
   const cv = document.createElement('canvas'); cv.width = img.width; cv.height = img.height;
   const c = cv.getContext('2d'); c.drawImage(img, 0, 0);
   const d = c.getImageData(0, 0, cv.width, cv.height); const a = grados * Math.PI / 180, cs = Math.cos(a), sn = Math.sin(a);
@@ -54,7 +54,7 @@ function teñirLocal(img, grados, desdeY = 0) {
   c.putImageData(d, 0, 0); return cv;
 }
 /** El pelo violeta de Academia (como peloVioleta de personajes.js, que no se exporta). */
-function peloVioleta(cv, hastaY = 13) {
+export function peloVioleta(cv, hastaY = 13) {
   const c = cv.getContext('2d'); const d = c.getImageData(0, 0, cv.width, cv.height);
   for (let i = 0; i < d.data.length; i += 4) {
     if ((((i / 4) / cv.width) | 0) % 32 >= hastaY || d.data[i + 3] === 0) continue;
