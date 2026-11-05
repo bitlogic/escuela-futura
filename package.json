@@ -6,9 +6,10 @@
   "type": "module",
   "scripts": {
     "start": "node servidor/escuela.mjs",
-    "test": "node --test \"servidor/*.test.mjs\" \"mcp-escuela/*.test.mjs\" \"stage/*.test.js\" \"e2e/*.test.mjs\" \"presentacion/*.test.mjs\"",
+    "test": "node --test \"servidor/*.test.mjs\" \"mcp-escuela/*.test.mjs\" \"stage/*.test.js\" \"e2e/*.test.mjs\" \"presentacion/*.test.mjs\" \"pages/*.test.mjs\"",
     "e2e": "node e2e/corrida.mjs",
-    "charla": "node presentacion/servidor.mjs"
+    "charla": "node presentacion/servidor.mjs",
+    "pages": "node scripts/armar-pages.mjs"
   },
   "engines": {
     "node": ">=20"

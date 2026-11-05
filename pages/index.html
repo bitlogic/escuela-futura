@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Institución Agéntica</title>
+<meta name="description" content="Cuando la IA deja de responder y empieza a actuar. La versión para leer de la charla de Greyla Alvarez y Alfredo Edye en Innova Educa 21 (Universidad Siglo 21, Córdoba, 2026): por qué no se puede formar para trabajar con agentes desde una institución que no trabaja con agentes.">
+<meta name="theme-color" content="#0B0920">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="es_AR">
+<meta property="og:title" content="Institución Agéntica · Cuando la IA deja de responder y empieza a actuar">
+<meta property="og:description" content="No se puede formar personas para trabajar con agentes desde una institución que no trabaja con agentes. La charla de Innova Educa 21, para leer con tiempo.">
+<meta property="og:image" content="img/compartir.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="img/icono.png">
+<link rel="preload" href="vendor/presentacion/assets/outfit.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="estilo.css">
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+
+<!-- La escuela de la charla, de perfil y en pixel-art: queda fija detrás y cada capítulo con data-escena la mueve. -->
+<canvas id="escena" aria-hidden="true"></canvas>
+<div id="escena-velo" aria-hidden="true"></div><div id="escena-placa" hidden></div><div id="escena-demo" hidden></div>
+
+<header class="barra" id="barra">
+  <a class="barra-marca" href="#inicio">Institución <b>Agéntica</b></a>
+  <nav class="barra-nav" aria-label="Capítulos">
+    <a href="#sofia">Sofía</a>
+    <a href="#velocidad">Velocidad</a>
+    <a href="#tesis">La tesis</a>
+    <a href="#delegar">Delegar</a>
+    <a href="#escuela-futura">Escuela Futura</a>
+    <a href="#criterio">Criterio</a>
+  </nav>
+  <a class="boton boton-chico" href="#conversemos">Conversemos</a>
+  <div class="barra-progreso" aria-hidden="true"><i id="progreso"></i></div>
+</header>
+
+<main id="contenido">
+
+<!-- ============ PORTADA ============ -->
+<section class="escena portada" id="inicio" data-paso-escena='{"id":"fachada","camxAncha":215,"movil":{"camy":225,"viaje":{"zoom":1.05,"hora":0.3,"camy":222,"luzInterior":1,"segundos":12}},"escena":{"plano":"fachada","hora":0.04,"zoom":0.94,"camy":164,"luzInterior":0,"viaje":{"zoom":1.08,"hora":0.3,"camy":158,"luzInterior":1,"segundos":12}}}'>
+  <div class="portada-texto">
+    <p class="marca">Innova Educa 21 · Universidad Siglo 21 · Córdoba, 2026</p>
+    <h1>Institución <span class="acento">Agéntica</span></h1>
+    <p class="bajada">Cuando la IA deja de responder y empieza a actuar.</p>
+    <p class="portada-lead">La versión para leer de la charla que dimos Greyla Alvarez y Alfredo Edye. Con espacio para lo que en el escenario dijimos en una frase, y para lo que nos preguntaron después.</p>
+    <p class="portada-meta"><span>12 minutos de lectura</span><span>Sin la demo en vivo, con lo que se vio en ella</span></p>
+  </div>
+  <a class="bajar" href="#sofia"><span>Empezá por Sofía</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15m0 0-6-6m6 6 6-6"/></svg></a>
+</section>
+
+<!-- ============ SOFÍA ============ -->
+<section class="escena capitulo" id="sofia" aria-label="La historia de Sofía">
+  <div class="linea-sofia" id="linea-sofia" aria-hidden="true">
+    <span class="ls-regla"></span><span class="ls-punto" id="ls-punto"></span>
+    <span class="ls-anio" data-k="0">2022</span><span class="ls-anio" data-k=".5">2024</span><span class="ls-anio" data-k="1">2026</span>
+  </div>
+
+  <article class="paso derecha" data-paso-escena='{"id":"sofia","escena":{"plano":"edificio","hora":0.15,"camx":230,"camy":142,"zoom":1.05,"sofia":"calle"}}' data-sofia="0.04">
+    <div class="tarjeta">
+      <p class="marca">Marzo de 2022</p>
+      <h2>Sofía empieza la facultad.</h2>
+      <p>Eligió la carrera como la elegimos todos: con un plan de estudios que alguien diseñó pensando en el mundo en el que ella se iba a recibir.</p>
+    </div>
+  </article>
+
+  <article class="paso derecha" data-paso-escena='{"id":"chatgpt","escena":{"plano":"edificio","hora":0.15,"camx":230,"camy":142,"zoom":1.05,"sofia":"calle"}}' data-sofia="0.18">
+    <div class="tarjeta">
+      <p class="marca">Noviembre de 2022</p>
+      <h2>Ocho meses después, aparece ChatGPT.</h2>
+      <p>En plena época de parciales. Sofía rinde su primer parcial con una IA que le responde preguntas. Nadie en la facultad sabía muy bien qué hacer con eso. Ella tampoco.</p>
+    </div>
+  </article>
+
+  <article class="paso derecha" data-paso-escena='{"id":"carrera","escena":{"plano":"edificio","hora":0.15,"camx":230,"camy":142,"zoom":1.05,"sofia":"calle"}}' data-sofia="0.6">
+    <div class="tarjeta">
+      <p class="marca">Una sola carrera</p>
+      <h2>Tres maneras de trabajar con IA.</h2>
+      <ol class="paradigmas">
+        <li><span class="anio">2022</span><p><b>Pregunta.</b> La IA le responde.</p></li>
+        <li><span class="anio">2024</span><p><b>Copiloto.</b> La IA le sugiere. Escribe la tesis con un asistente que le propone qué poner.</p></li>
+        <li><span class="anio teal">2026</span><p><b class="teal">Agente.</b> La IA actúa. Recibe un objetivo y lo ejecuta.</p></li>
+      </ol>
+    </div>
+  </article>
+
+  <article class="paso derecha" data-paso-escena='{"id":"entrevista","escena":{"plano":"edificio","hora":0.15,"camx":230,"camy":142,"zoom":1.05,"sofia":"frente","quieto":true}}' data-sofia="1">
+    <div class="tarjeta">
+      <p class="marca">2026 · Su primera entrevista de trabajo</p>
+      <p class="cita-grande">“¿Cómo trabajás con agentes?”</p>
+      <p>Y después: <em>“Contanos una tarea que le hayas delegado a uno. ¿Qué le pediste? ¿Qué revisaste antes de usar lo que trajo?”</em></p>
+      <p class="remate">Es la pregunta para la que nadie, en toda su carrera, la preparó.</p>
+    </div>
+  </article>
+
+  <article class="paso derecha" data-paso-escena='{"id":"entrevista","escena":{"plano":"edificio","hora":0.15,"camx":230,"camy":142,"zoom":1.05,"sofia":"frente","quieto":true}}' data-sofia="1">
+    <div class="tarjeta">
+      <p class="marca">No es una pregunta inventada</p>
+      <p>Así se está entrevistando este año. Hay rúbricas que piden al candidato recorrer una tarea real que le dio a un agente: qué contexto le dio y qué revisó antes de usar el resultado. Lo que miden no es si sabe usar una herramienta. Es <strong>criterio</strong> y confianza bien calibrada.</p>
+      <p>Microsoft lo llamó <em>agent boss</em>: cada persona va a dirigir agentes. En su medición de este año, las dos habilidades humanas que más ganan valor son controlar la calidad de lo que produce la IA y el pensamiento crítico.</p>
+      <div class="mini-datos">
+        <div><b data-contar="50">50 %</b><span>controlar la calidad de lo que produce la IA</span></div>
+        <div><b data-contar="46">46 %</b><span>pensamiento crítico</span></div>
+      </div>
+      <p class="fuente">Microsoft, Work Trend Index (mayo de 2026), 20.000 trabajadores que usan IA. Metaview, guía de entrevistas sobre delegación a agentes (2026).</p>
+    </div>
+  </article>
+</section>
+
+<!-- ============ VELOCIDAD ============ -->
+<section class="lectura clara" id="velocidad">
+  <div class="col">
+    <p class="marca">I · Velocidad</p>
+    <h2 class="frase revelar">Por primera vez, una carrera dura más que la tecnología para la que fue diseñada.</h2>
+    <div class="texto revelar">
+      <p>Tres paradigmas tecnológicos en una sola carrera. En educación siempre pasó un poco: los planes de estudio se diseñan para un mundo que cambia mientras se cursan. Lo nuevo es la velocidad. Hoy el cambio pasa adentro de una misma cursada.</p>
+      <p>Y no le pasa solo a Sofía. Nos pasa a los que estamos del otro lado del escritorio: docentes, equipos de gestión, quienes diseñan los programas. Las instituciones también se formaron en un mundo que ya no está.</p>
+    </div>
+  </div>
+</section>
+
+<section class="lectura" id="ranking">
+  <div class="col ancha dos">
+    <div class="revelar">
+      <p class="marca">Habilidades para el futuro · Ranking global</p>
+      <h2>Una buena noticia, <span class="suave">y una pista.</span></h2>
+      <p>QS mide qué tan preparado está cada país para las habilidades que el trabajo va a pedir. Argentina es la primera de América Latina: puesto 31 del mundo, con 74,0 puntos. Arriba de Perú, de México, de Brasil.</p>
+      <p>Pero mirá dónde sacó su puntaje más bajo. No en talento. No en tecnología.</p>
+    </div>
+    <div class="ranking revelar" aria-label="Ranking QS World Future Skills Index 2027">
+      <div class="rk"><span class="rk-pos">#31</span><span class="rk-pais">Argentina</span><span class="rk-barra"><i style="--w:100%" class="teal"></i></span></div>
+      <div class="rk"><span class="rk-pos">#41</span><span class="rk-pais">Perú</span><span class="rk-barra"><i style="--w:77%"></i></span></div>
+      <div class="rk"><span class="rk-pos">#50</span><span class="rk-pais">México</span><span class="rk-barra"><i style="--w:62%"></i></span></div>
+      <p class="fuente">QS World Future Skills Index 2027 (QS, julio de 2026). La barra muestra la posición, no el puntaje.</p>
+    </div>
+  </div>
+  <div class="col ancha">
+    <p class="frase magenta revelar">En la alineación entre lo que formamos y lo que el trabajo pide.</p>
+    <p class="texto revelar">La distancia entre el aula y el trabajo. Que es, exactamente, la historia de Sofía. <span class="suave">(QS no publica la cifra de esa dimensión para cada país: sabemos que es el punto más débil, no por cuánto.)</span></p>
+  </div>
+</section>
+
+<!-- ============ LA PREGUNTA (las manos de la sala) ============ -->
+<section class="escena capitulo" id="pregunta" aria-label="Una pregunta para vos">
+  <article class="paso" data-paso-escena='{"id":"manos","camxAncha":135,"escena":{"plano":"aula","manos":0,"camx":100,"camy":190,"zoom":1.9}}'>
+    <div class="tarjeta">
+      <p class="marca">Una pregunta para vos</p>
+      <p class="pregunta-intro">En la charla le pedimos a la sala que levante la mano. Acá te toca a vos.</p>
+      <h2>¿Tu institución tiene una política de uso de IA para estudiantes?</h2>
+      <div class="opciones" data-pregunta="1" role="group" aria-label="Respuesta">
+        <button type="button" data-r="si">Sí</button><button type="button" data-r="no">No</button><button type="button" data-r="nose">No sé</button>
+      </div>
+      <p class="respuesta" data-respuesta="1" aria-live="polite"></p>
+    </div>
+  </article>
+  <article class="paso" data-paso-escena='{"id":"manos","camxAncha":135,"escena":{"plano":"aula","manos":0,"camx":100,"camy":190,"zoom":1.9}}'>
+    <div class="tarjeta">
+      <p class="marca">Y la segunda</p>
+      <h2>¿Y una para cómo trabaja con IA la propia institución?</h2>
+      <p class="pregunta-intro">No los estudiantes: la secretaría, el área de alumnos, la gestión, los equipos docentes.</p>
+      <div class="opciones" data-pregunta="2" role="group" aria-label="Respuesta">
+        <button type="button" data-r="si">Sí</button><button type="button" data-r="no">No</button><button type="button" data-r="nose">No sé</button>
+      </div>
+      <p class="respuesta" data-respuesta="2" aria-live="polite"></p>
+    </div>
+  </article>
+</section>
+
+<!-- ============ DATOS ============ -->
+<section class="lectura" id="datos">
+  <div class="col ancha">
+    <p class="marca">América Latina · 2026</p>
+    <h2 class="revelar">Casi todas usan IA. <span class="magenta">Pocas decidieron cómo.</span></h2>
+    <div class="cifras">
+      <div class="cifra revelar"><b data-contar="87">87 %</b><span>de las instituciones usa IA en al menos un área</span></div>
+      <div class="cifra revelar"><b class="magenta" data-contar="26">26 %</b><span>tiene una estrategia formal de IA</span></div>
+      <div class="cifra revelar"><b data-contar="30">30 %</b><span>de los estudiantes dice que su institución está a la altura</span></div>
+    </div>
+    <div class="dos-textos revelar">
+      <p>Lo que pasó con las manos en la sala, UNESCO lo midió en 200 instituciones de 19 países. La IA ya entró: el 92 % de los estudiantes y el 79 % de los docentes la usan activamente. Lo que falta no es entusiasmo ni herramientas.</p>
+      <p>Como dijo Alessandro Di Lullo, del Digital Education Council: <em>lo que muestran los datos no es resistencia de los educadores, sino la necesidad de claridad institucional.</em> Que la institución decida cómo trabaja con IA, en vez de que cada uno lo resuelva como pueda.</p>
+    </div>
+    <p class="fuente">UNESCO IESALC, 200 instituciones de 19 países (septiembre de 2026) · Digital Education Council, LATAM Survey 2026, más de 30.000 respuestas.</p>
+  </div>
+</section>
+
+<!-- ============ TESIS ============ -->
+<section class="tesis" id="tesis">
+  <div class="col ancha">
+    <p class="marca">Lo que venimos a decir</p>
+    <p class="frase-tesis revelar">No se puede formar personas para trabajar con agentes desde una institución que no trabaja con agentes.</p>
+    <div class="dos-textos revelar">
+      <p>No venimos a hablar del aula. Venimos a hablar de la institución que forma. Y no es una crítica: es coherencia. La institución también tiene que aprender esto, igual que Sofía.</p>
+      <p>Córdoba ya reformó la universidad una vez, en 1918. No venimos a proponer una segunda reforma. Venimos a proponer algo más modesto y más difícil: <strong>coherencia</strong> entre lo que enseñamos y cómo trabajamos.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DE PREGUNTAR A DELEGAR ============ -->
+<section class="lectura" id="delegar">
+  <div class="col ancha">
+    <p class="marca">II · Abrimos el capó</p>
+    <h2 class="revelar">De preguntar <span class="teal">a delegar.</span></h2>
+    <p class="texto revelar">Durante dos años le hicimos preguntas a la IA. Un agente recibe otra cosa: un objetivo. Probá la diferencia.</p>
+    <div class="comparar revelar">
+      <div class="comparar-tabs" role="tablist" aria-label="Preguntar o delegar">
+        <button type="button" role="tab" id="tab-preguntar" aria-controls="panel-preguntar" aria-selected="false" tabindex="-1">Preguntar</button>
+        <button type="button" role="tab" id="tab-delegar" aria-controls="panel-delegar" aria-selected="true">Delegar</button>
+      </div>
+      <div class="comparar-panel" role="tabpanel" id="panel-preguntar" aria-labelledby="tab-preguntar" hidden>
+        <p class="consigna">“¿Qué estudiantes necesitan apoyo?”</p>
+        <div class="vuelve"><span class="vuelve-r">Vuelve</span><p>Una lista. Y el trabajo de ver qué hacer con cada nombre sigue siendo tuyo.</p></div>
+      </div>
+      <div class="comparar-panel" role="tabpanel" id="panel-delegar" aria-labelledby="tab-delegar">
+        <p class="consigna">“Antes del parcial de Biología, identificá qué estudiantes de primer año están en riesgo y proponé qué hacemos con cada uno.”</p>
+        <div class="vuelve"><span class="vuelve-r teal">Vuelve</span><p>Un plan, con razones y con los datos a la vista, que espera tu decisión. <strong>Y lo que aprobás, lo ejecuta.</strong></p></div>
+      </div>
+    </div>
+    <div class="dos-textos revelar">
+      <p>Un agente divide el objetivo en pasos, consulta datos, usa herramientas, habla con otros agentes y vuelve con una propuesta. Antes de la decisión, prepara. Después de la decisión, acompaña: hace lo que le dieron permiso de hacer.</p>
+      <p>La distancia entre esas dos consignas es la competencia que tenemos que formar, en estudiantes y en nosotros: <strong>saber dar un buen objetivo y saber juzgar lo que vuelve.</strong></p>
+    </div>
+  </div>
+</section>
+
+<section class="escena capitulo" id="agente" aria-label="Qué es un agente">
+  <article class="paso" data-paso-escena='{"id":"agente","camxAncha":160,"escena":{"plano":"oficina","oficina":"coordinacion","foco":"pasos","camx":215},"paso":0}'>
+    <div class="tarjeta">
+      <p class="marca">Sin tecnicismos</p>
+      <h2>¿Qué es un agente?</h2>
+      <p>Un software con cinco características. Pensalo como un ayudante alumno nuevo en la cátedra: tiene ganas, es rápido, aprende cuando lo corregís… y todavía no sabe dónde queda la fotocopiadora.</p>
+    </div>
+  </article>
+  <article class="paso" data-paso-escena='{"id":"agente","camxAncha":160,"escena":{"plano":"oficina","oficina":"coordinacion","foco":"pasos","camx":215},"paso":1}'>
+    <div class="tarjeta rasgo"><span class="num teal">01</span><h3>Rol</h3><p>Un puesto en el equipo, con una responsabilidad clara. Tutor, Bienestar, Admisiones.</p></div>
+  </article>
+  <article class="paso" data-paso-escena='{"id":"agente","camxAncha":160,"escena":{"plano":"oficina","oficina":"coordinacion","foco":"pasos","camx":215},"paso":2}'>
+    <div class="tarjeta rasgo"><span class="num teal">02</span><h3>Habilidades</h3><p>Sabe hacer cosas, y se las enseñó la institución: cómo se detecta un riesgo de abandono, cómo se revisa una inscripción.</p></div>
+  </article>
+  <article class="paso" data-paso-escena='{"id":"agente","camxAncha":160,"escena":{"plano":"oficina","oficina":"coordinacion","foco":"pasos","camx":215},"paso":3}'>
+    <div class="tarjeta rasgo"><span class="num teal">03</span><h3>Herramientas</h3><p>Acceso a los datos y sistemas que ese puesto necesita. Ni más ni menos: igual que una persona nueva en la secretaría.</p></div>
+  </article>
+  <article class="paso" data-paso-escena='{"id":"agente","camxAncha":160,"escena":{"plano":"oficina","oficina":"coordinacion","foco":"pasos","camx":215},"paso":4}'>
+    <div class="tarjeta rasgo"><span class="num teal">04</span><h3>Memoria</h3><p>Recuerda lo que le dijiste, lo que hizo y lo que decidieron las personas. No arranca de cero cada vez.</p></div>
+  </article>
+  <article class="paso" data-paso-escena='{"id":"agente","camxAncha":160,"escena":{"plano":"oficina","oficina":"coordinacion","foco":"pasos","camx":215},"paso":5}'>
+    <div class="tarjeta rasgo"><span class="num magenta">05</span><h3>Actúa</h3><p>Recibe un objetivo, trabaja en pasos, habla con otros agentes y vuelve con una propuesta. <strong>Y lo que afecta a una persona, lo aprueba una persona.</strong></p></div>
+  </article>
+</section>
+
+<!-- ============ ESCUELA FUTURA ============ -->
+<section class="escena capitulo" id="escuela-futura" aria-label="Escuela Futura">
+  <article class="paso" data-paso-escena='{"id":"escuela","camxAncha":250,"escena":{"plano":"edificio","hora":0.5,"zoom":1.05,"fachada":0}}'>
+    <div class="tarjeta">
+      <p class="marca">III · Construcción</p>
+      <h2>Les presentamos a Escuela Futura.</h2>
+      <p>Una institución donde seis agentes trabajan junto a las personas. Y una persona decide.</p>
+      <p>A nosotros también nos costaba imaginar cómo funciona esto de verdad. Por eso la construimos: una simulación que se parece mucho al mundo real, y que en la charla corrió en vivo.</p>
+      <p class="aclaracion">Es ficticia. Los datos son sintéticos: no hay ningún estudiante real.</p>
+      <p class="regla"><span>Regla de la casa</span>Nada con consecuencias para una persona sale sin que una persona lo apruebe.</p>
+    </div>
+  </article>
+</section>
+
+<section class="lectura" id="equipo">
+  <div class="col ancha">
+    <p class="marca">El equipo</p>
+    <h2 class="revelar">Seis agentes, <span class="suave">cada uno con su puesto.</span></h2>
+    <div class="fila-agentes revelar">
+      <canvas id="agentes" width="1200" height="520" aria-hidden="true"></canvas>
+    </div>
+    <ul class="agentes">
+      <li style="--c:#7a9bff"><b>Coordinación</b><span>Recibe el objetivo, reparte el trabajo y arma la propuesta.</span></li>
+      <li style="--c:#f0c13f"><b>Tutor</b><span>Tutor virtual de las materias: sabe en qué temas se traban los estudiantes.</span></li>
+      <li style="--c:#44c9b3"><b>Advisor</b><span>Secretaría y servicios: inscripciones, correlativas, pagos y trámites.</span></li>
+      <li style="--c:#f07fb0"><b>Bienestar</b><span>Permanencia y acompañamiento: detecta señales de riesgo de abandono.</span></li>
+      <li style="--c:#e0b84a"><b>Admisiones</b><span>Atiende aspirantes y sigue a los ingresantes en su primer año.</span></li>
+      <li style="--c:#6fd987"><b>Academia</b><span>Propone programas a partir de lo que la escuela y su entorno piden.</span></li>
+    </ul>
+    <p class="texto revelar">Cada uno usa solo sus herramientas: consultas a los datos de la escuela que corresponden a su puesto. Ninguno contacta a un estudiante ni ejecuta algo con consecuencias. Proponen; una persona decide. En la demo, esa persona es quien dirige la escuela.</p>
+  </div>
+</section>
+
+<section class="lectura" id="demo">
+  <div class="col ancha">
+    <p class="marca">Lo que se vio en vivo</p>
+    <h2 class="revelar">Un objetivo, una propuesta <span class="teal">y una decisión.</span></h2>
+    <p class="texto revelar">La demo siguió un solo caso. Esto es lo que pasó, con capturas de la escuela vista desde arriba: a la izquierda, la conversación del equipo; a la derecha, los agentes trabajando en sus salas.</p>
+
+    <ol class="recorrido">
+      <li class="momento revelar">
+        <figure><button type="button" class="ampliar" aria-label="Ampliar captura: los agentes trabajando"><img src="img/demo-trabajando.jpg" width="1600" height="900" loading="lazy" alt="La escuela vista desde arriba: a la izquierda, Coordinación reparte el trabajo en el chat; a la derecha, las salas con cada agente en su escritorio."></button></figure>
+        <div>
+          <span class="momento-n">1</span>
+          <h3>El objetivo y el reparto</h3>
+          <p>Desde Dirección se escribe el objetivo: <em>antes del parcial de Biología, identificá qué estudiantes de primer año están en riesgo y proponé qué hacemos con cada uno.</em></p>
+          <p>Coordinación lo divide y delega en tres: Bienestar mira la asistencia y el campus, Tutor las notas y los temas donde se traban, Advisor los pagos y trámites que pueden dejar a alguien afuera del parcial. Cada uno consulta sus datos.</p>
+        </div>
+      </li>
+      <li class="momento revelar">
+        <figure><button type="button" class="ampliar" aria-label="Ampliar captura: la propuesta para decidir"><img src="img/demo-propuesta.jpg" width="1600" height="900" loading="lazy" alt="El panel de la propuesta para decidir sobre Martina R., riesgo alto, con lo que encontró cada agente, la nota, el riesgo de equivocarse y tres acciones para aprobar o rechazar."></button></figure>
+        <div>
+          <span class="momento-n">2</span>
+          <h3>Hablan entre ellos, y vuelven con una propuesta</h3>
+          <p>De 24 estudiantes, una está en riesgo: Martina R. Fue a 5 de las 22 clases desde el 18/8, en cruzamientos, el tema que se traba, resolvió 3 de 10, y tiene cuotas vencidas desde el 10/8 que la dejan sin poder rendir. Advisor ve además una beca rechazada y suma a Admisiones, que recuerda lo que Martina dijo al inscribirse: <em>“Quiero seguir Medicina el año que viene.”</em></p>
+          <p>Con lo de Advisor, Bienestar cambia el orden: la deuda es anterior a las faltas. Primero destrabar la deuda, después la llamada. La propuesta llegó en menos de un minuto, e incluye su propio <strong>riesgo de equivocarnos</strong> y lo que los datos no dicen: por qué dejó de venir.</p>
+        </div>
+      </li>
+      <li class="momento revelar">
+        <figure><button type="button" class="ampliar" aria-label="Ampliar captura: el tablero con las acciones"><img src="img/demo-tablero.jpg" width="1600" height="900" loading="lazy" alt="El Tablero de Escuela Futura: tres acciones pendientes para Martina R., asignadas a Secretaría, a la docente y a Dirección."></button></figure>
+        <div>
+          <span class="momento-n">3</span>
+          <h3>Una persona decide</h3>
+          <p>Dirección aprueba el plan de pagos y la práctica guiada. Y la llamada no la delega: <em>“La llamada la hago yo.”</em> Lo aprobado queda en el Tablero, con quién lo hace. Los agentes pueden terminar su parte y revisar la de otros; cerrar una tarea, solo una persona.</p>
+        </div>
+      </li>
+    </ol>
+
+    <aside class="detalle revelar">
+      <p class="marca">Un detalle de diseño que importa</p>
+      <p>Cada cifra y cada fecha que dice un agente se comprueba <strong>por código, no por otro modelo</strong>, contra los datos que consultó. En pantalla, cada dato lleva su tilde, y lo que no se pudo comprobar queda marcado. “3 de 10” no pasa si el 3 y el 10 salen de lugares distintos. La confianza no se pide: se diseña.</p>
+    </aside>
+  </div>
+</section>
+
+<section class="escena capitulo" id="decision" aria-label="La decisión">
+  <article class="paso derecha" data-paso-escena='{"id":"decision","escena":{"plano":"oficina","oficina":"direccion","hora":0.95,"camx":200,"camy":86}}'>
+    <div class="tarjeta">
+      <p class="cita-grande magenta">“A esta la llamo yo.”</p>
+      <h2>Los agentes proponen. Una persona decide.</h2>
+      <p>Hay una estudiante que no necesita un plan: necesita que alguien la llame. Eso no lo decidió el sistema.</p>
+      <p>Lo nuevo no es que la IA conteste mejor. Es que el trabajo se organiza distinto: objetivo, delegación, conversación entre agentes, propuesta… y una decisión humana. Esa última parte no se delega.</p>
+      <p class="suave">Tiene nombre: <em>human in the loop</em>, la persona adentro del circuito.</p>
+    </div>
+  </article>
+</section>
+
+<!-- ============ DILEMAS ============ -->
+<section class="lectura clara" id="aula">
+  <div class="col">
+    <p class="marca">IV · Para el aula</p>
+    <p class="frase-aula revelar"><span class="suave">La pregunta deja de ser</span><br><s class="tachar">cómo evitamos que usen IA.</s></p>
+    <p class="frase-aula revelar"><span class="suave">Pasa a ser</span><br><span class="magenta">qué consigna vale la pena pedir ahora.</span></p>
+    <div class="texto revelar">
+      <p>Cuando no está claro qué se puede, la conversación termina siendo sobre cómo atrapar a quien la usa. En Bitlogic lo vivimos primero: cuando la IA empezó a escribir código, la deuda que nos dejó no fue de código. Fue de comprensión.</p>
+      <p>Por eso no creemos que el contenido importe menos. Al contrario: para dar un buen objetivo y juzgar lo que vuelve, hay que saber mucho. Quien alguna vez tomó un parcial domiciliario ya lo sabía: la consigna era el verdadero examen. Lo que cambió es que ahora lo es en todas las materias.</p>
+      <p class="fuente">El 94 % de los estudiantes dice que es importante que la universidad incorpore la IA al plan de estudios, y casi la mitad pide formación para usarla de manera profesional y ética (QS, junio de 2026).</p>
+    </div>
+  </div>
+</section>
+
+<section class="lectura" id="criterio">
+  <div class="col ancha">
+    <p class="marca">Para la institución</p>
+    <h2 class="revelar">Delegar con criterio: <span class="suave">tres decisiones.</span></h2>
+    <div class="decisiones">
+      <div class="decision revelar"><span class="num teal">01</span><h3>Qué delegamos</h3><p>Buscar patrones, cruzar datos, preparar propuestas, responder lo repetitivo. Lo que en la demo hicieron los agentes.</p></div>
+      <div class="decision revelar"><span class="num magenta">02</span><h3>Qué nos reservamos</h3><p>El vínculo, el propósito y las decisiones que afectan a una persona. “A esta la llamo yo.”</p></div>
+      <div class="decision revelar"><span class="num violeta">03</span><h3>Qué revisamos</h3><p>Los datos que usó, por qué priorizó lo que priorizó y dónde se equivocó.</p></div>
+    </div>
+    <div class="dos-textos revelar">
+      <div>
+        <h3 class="sub">La tensión de los permisos</h3>
+        <p>Cuando un agente opera adentro de los sistemas de la institución, la pregunta es qué puede tocar: qué archivos, qué datos, qué credenciales. La buena noticia es que esto las instituciones ya lo saben hacer: son los mismos límites que hoy ponen alrededor de los legajos y de los sistemas de pago. Esa es la vara para medir a cualquier agente.</p>
+      </div>
+      <div>
+        <h3 class="sub">Los límites, dichos de frente</h3>
+        <p>Nada de esto es mágico. Los agentes no responden siempre igual. Dependen de la calidad de los datos que tiene la institución: si hay tres planillas distintas con la lista de inscriptos, el agente las va a encontrar. Las tres. Y cuestan. Es una decisión de diseño institucional, no una compra.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lectura clara" id="empezar">
+  <div class="col ancha">
+    <p class="marca">Para la próxima reunión de equipo</p>
+    <h2 class="revelar">Seis preguntas <span class="suave">antes del primer agente.</span></h2>
+    <p class="texto revelar">No hace falta una estrategia completa para empezar. Hace falta conversar esto con las personas que van a trabajar con los agentes. Marcá las que ya tienen respuesta en tu institución.</p>
+    <ol class="preguntas" id="preguntas">
+      <li class="revelar"><label><input type="checkbox" data-q="1"><span class="caja" aria-hidden="true"></span><span><b>¿Qué proceso depende hoy de que alguien se acuerde?</b> Las alertas antes de un parcial, el seguimiento de una beca, el aviso de una correlativa. Ahí suele estar el primer candidato.</span></label></li>
+      <li class="revelar"><label><input type="checkbox" data-q="2"><span class="caja" aria-hidden="true"></span><span><b>¿Qué datos necesita, y dónde están?</b> ¿Cuántas versiones de la misma planilla hay? El agente va a heredar el orden, o el desorden, que tengan.</span></label></li>
+      <li class="revelar"><label><input type="checkbox" data-q="3"><span class="caja" aria-hidden="true"></span><span><b>¿Qué puede tocar y qué no?</b> Usen la misma vara que para los legajos y los sistemas de pago: lo que el puesto necesita, ni más ni menos.</span></label></li>
+      <li class="revelar"><label><input type="checkbox" data-q="4"><span class="caja" aria-hidden="true"></span><span><b>¿Qué decisiones se reserva una persona, por escrito?</b> Todo lo que afecta a un estudiante, como mínimo. Que no dependa de la buena voluntad de nadie.</span></label></li>
+      <li class="revelar"><label><input type="checkbox" data-q="5"><span class="caja" aria-hidden="true"></span><span><b>¿Quién revisa lo que vuelve, y cómo nos enteramos cuando se equivoca?</b> Qué datos usó, por qué priorizó, qué no sabía.</span></label></li>
+      <li class="revelar"><label><input type="checkbox" data-q="6"><span class="caja" aria-hidden="true"></span><span><b>¿Cómo se lo contamos a estudiantes y docentes?</b> Lo que la institución hace con agentes también enseña. Más que el reglamento.</span></label></li>
+    </ol>
+    <div class="preguntas-pie">
+      <p class="preguntas-estado" id="preguntas-estado" aria-live="polite">Ninguna marcada todavía.</p>
+      <button type="button" class="boton boton-borde" id="copiar-preguntas">Copiar las preguntas para compartirlas</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CIERRE ============ -->
+<section class="escena capitulo" id="recibe" aria-label="Sofía se recibe">
+  <article class="paso" data-paso-escena='{"id":"recibe","escena":{"plano":"patio","sofia":"sale","camx":250,"camy":170,"zoom":1.3}}'>
+    <div class="tarjeta">
+      <p class="marca">Diciembre de 2026</p>
+      <h2>Sofía se recibe.</h2>
+      <p>Nadie le dio una materia de agentes. Eso se aprende en una semana.</p>
+      <p><strong>Aprendió de una institución que trabaja con agentes, con criterio:</strong> vio qué delegó, qué se reservó y qué revisó. Es lo mismo que con los hijos: no se enseña con la teoría, se enseña con el ejemplo. El problema es cuando la teoría no coincide con la práctica.</p>
+    </div>
+  </article>
+  <article class="paso" data-paso-escena='{"id":"recibe","escena":{"plano":"patio","sofia":"sale","camx":250,"camy":170,"zoom":1.3}}'>
+    <div class="tarjeta">
+      <p class="marca">Una confesión</p>
+      <p>Sofía no existe. La inventamos. Pero si trabajás en educación, conocés a muchas Sofías: entraron con un mundo y van a salir a otro.</p>
+      <p>Martina, la estudiante de la demo, podría haber sido Sofía en 2022. La diferencia es que alguien miró los datos a tiempo, y una persona decidió.</p>
+      <p class="fuente">Cuando quien conduce usa IA abiertamente, la confianza del equipo en los agentes sube 30 puntos (Microsoft, Work Trend Index 2026). El ejemplo enseña. En una escuela, también.</p>
+    </div>
+  </article>
+</section>
+
+<section class="escena capitulo cierre" id="cierre" aria-label="La idea para llevarse">
+  <article class="paso centro" data-paso-escena='{"id":"cierre","escena":{"plano":"fachada","hora":0.85}}'>
+    <div class="tarjeta ancha">
+      <p class="frase-cierre">Una institución agéntica <span class="teal">delega con criterio.</span><br>Y puede enseñarlo <span class="magenta">porque lo practica.</span></p>
+      <p class="cierre-sub">Lo que se expande no es nuestra capacidad de operar herramientas. Eso ya lo hace el agente. Lo que se expande es nuestro criterio.</p>
+    </div>
+  </article>
+</section>
+
+<!-- ============ CONVERSEMOS ============ -->
+<section class="lectura" id="conversemos">
+  <div class="col ancha dos">
+    <div>
+      <p class="marca">Conversemos</p>
+      <h2 class="revelar">Si tu institución está pensando esto, <span class="teal">nos gustaría escucharla.</span></h2>
+      <p class="texto revelar">No tenemos una receta. Tenemos preguntas, una simulación que ayuda a imaginarlo y experiencia construyendo equipos de agentes con instituciones de la región. Algunas conversaciones que nos encanta tener:</p>
+      <ul class="charlas revelar">
+        <li><b>Ver Escuela Futura con tu equipo.</b> La misma simulación de la charla, en vivo, con sus preguntas.</li>
+        <li><b>Elegir un primer proceso.</b> Uno chico, con datos que ya existen y una persona que decide.</li>
+        <li><b>Contarnos qué están probando.</b> Lo que funciona y lo que no. También aprendemos de eso.</li>
+      </ul>
+      <p class="revelar"><a class="boton" href="https://bitlogic.io" target="_blank" rel="noopener">Escribinos <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m0 0-6-6m6 6-6 6"/></svg></a></p>
+    </div>
+    <div class="personas revelar">
+      <figure class="persona"><img src="vendor/presentacion/assets/greyla.jpg" width="160" height="160" loading="lazy" alt="Greyla Alvarez" class="foto magenta"><figcaption><b>Greyla Alvarez</b><span>CEO y cofundadora · Benchlab</span></figcaption></figure>
+      <figure class="persona"><img src="vendor/presentacion/assets/alfredo.jpg" width="160" height="160" loading="lazy" alt="Alfredo Edye" class="foto violeta"><figcaption><b>Alfredo Edye</b><span>CEO y cofundador · <a href="https://bitlogic.io" target="_blank" rel="noopener">Bitlogic</a></span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="escena despedida" id="gracias" aria-label="Despedida" data-paso-escena='{"id":"gracias","escena":{"plano":"fachada","hora":0.3,"camy":104,"zoom":0.8,"luzInterior":1,"saludo":true,"viaje":{"hora":0.5,"luzInterior":0,"segundos":20}}}'>
+  <p class="pie-gracias">Gracias por leer hasta acá.</p>
+  <footer class="pie">
+    <p class="pie-titulo">Institución <b>Agéntica</b> <span>· Innova Educa 21 · Córdoba, 2026</span></p>
+    <details class="fuentes">
+      <summary>Fuentes y aclaraciones</summary>
+      <ul>
+        <li>QS World Future Skills Index 2027 (QS, julio de 2026).</li>
+        <li>UNESCO IESALC, encuesta a 200 instituciones de 19 países de América Latina (septiembre de 2026).</li>
+        <li>Digital Education Council, LATAM Survey 2026 (más de 30.000 respuestas).</li>
+        <li>QS, encuesta a estudiantes sobre IA en el plan de estudios (junio de 2026).</li>
+        <li>Microsoft, Work Trend Index 2025 y 2026.</li>
+        <li>Metaview, guía para entrevistar sobre delegación a agentes (2026).</li>
+        <li>Escuela Futura es una escuela ficticia: sus 24 estudiantes y todos sus datos son sintéticos. Sofía también es inventada.</li>
+        <li>Los personajes en pixel-art vienen de <a href="https://github.com/pixel-agents-hq/pixel-agents" target="_blank" rel="noopener">Pixel Agents</a> (licencia MIT, © 2026 Pablo De Lucca), basados en el Metro City character pack de JIK-A-4 (CC0). La escuela de perfil es la escena de la charla.</li>
+      </ul>
+    </details>
+  </footer>
+</section>
+
+</main>
+
+<dialog class="visor" id="visor" aria-label="Captura ampliada">
+  <img alt="">
+  <button type="button" class="visor-cerrar" aria-label="Cerrar">×</button>
+</dialog>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
