@@ -1,12 +1,12 @@
 # pages/ · la página para leer
 
-La charla **Institución Agéntica** (Innova Educa 21, Córdoba, 5/11/2026) como página estática, para quien la vio o le llega el link: más texto que las láminas, sin la demo en vivo (con capturas de lo que se vio) y con una invitación a conversar que no es una landing de ventas.
+La charla **Institución Agéntica** (Innova Educa 21, Córdoba, 5/11/2026) como nota editorial, publicada en https://escuelafutura.ai. Es para quien vio la charla o le llega el link: más texto que las láminas, sin la demo en vivo (con capturas de lo que se vio) y con una invitación a conversar que no es una landing de ventas.
 
-- `index.html`, `estilo.css`, `app.js`: la página. Mismo sistema visual que el deck (`presentacion/SISTEMA.md`): navy, lila, teal para la institución y los agentes, magenta para la persona que decide; Outfit y JetBrains Mono.
-- **La escuela de fondo** es la escena de la charla (`presentacion/escena/`), en un canvas fijo. Cada bloque con `data-paso-escena='{"id":…,"escena":{…}}'` la mueve cuando llega al centro de la pantalla; `escena` es lo mismo que el `data-escena` de una lámina (el `id` sirve para `SOFIA_K`). Extras de la página: `paso` (los focos de `agente`), `camxAncha` (en pantallas apaisadas, para correr la escuela al costado libre de la tarjeta) y `movil` (lo que cambia en vertical). Con `?sin-escena=1` se ve sin escena; `?plano=1` apaga el HD-2D.
-- **`vendor/`** es una copia generada: `node scripts/armar-pages.mjs` (o `npm run pages`) copia la escena, los módulos de `stage/` que usa, los personajes y las fuentes y fotos del deck, y reescribe las rutas `/stage/assets/…` relativas al módulo. Si cambia la escena de la charla, hay que volver a correrlo: `pages/pages.test.mjs` (en `npm test`) falla si la copia quedó vieja.
-- `img/`: capturas de la demo (`evaluaciones/2026-11-04-0312-claude-sonnet-5-5/`), la imagen para compartir y el ícono.
+- **Estática y sin JavaScript:** `index.html` y `estilo.css`. Sin animaciones (5/11: la primera versión, con la escena de la charla moviéndose detrás de cada bloque, se reemplazó por esta, más editorial y más corta: unas 10 pantallas en escritorio). Un test (`pages.test.mjs`, en `npm test`) lo cuida: que no haya `<script>` ni `@keyframes`, que exista todo lo que pide la página y que cada imagen tenga texto alternativo.
+- **Estructura:** apertura (volanta, título, bajada, firma y foto), la tesis en una banda, el índice y cinco capítulos con el título a la izquierda y el texto a la derecha (I Una sola carrera, II Pocas decidieron cómo, III De preguntar a delegar, IV Escuela Futura, V Delegar con criterio), una coda con el cierre y "Conversemos".
+- **Sistema visual:** la paleta del deck (`presentacion/SISTEMA.md`) en su versión clara, con la oscura si el sistema la pide; Outfit y JetBrains Mono (`assets/`, copias de `presentacion/assets/`).
+- **`img/`:** cuatro fotos fijas de la escena de perfil (`escena-*.jpg`, sacadas de la escena de la charla), tres capturas de la demo (`demo-*.jpg`, de `evaluaciones/2026-11-04-0312-claude-sonnet-5-5/`), la imagen para compartir y el ícono.
 
-Para verla en local, cualquier servidor estático desde la raíz del repo: `python3 -m http.server 8123` y abrir `http://localhost:8123/pages/`.
+Para verla en local: `python3 -m http.server 8123` desde la raíz del repo y abrir `http://localhost:8123/pages/`.
 
-Se publica en GitHub Pages con `.github/workflows/pages.yml` en cada push a `main` que toque `pages/` o la escena (en el repo: Settings → Pages → Source: GitHub Actions). El repo es privado: Pages en un repo privado necesita un plan de GitHub que lo permita, y el sitio publicado es público igual.
+Se publica con `.github/workflows/pages.yml` en cada push a `main` que toque `pages/` (Pages con origen "GitHub Actions" y dominio `escuelafutura.ai`).

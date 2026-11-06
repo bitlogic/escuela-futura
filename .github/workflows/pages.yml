@@ -1,12 +1,11 @@
 # Publica pages/ (la página para leer de la charla) en GitHub Pages.
-# Antes revisa que pages/vendor/ esté al día con la escena de la charla (scripts/armar-pages.mjs --revisar).
 # En el repo: Settings → Pages → Source: "GitHub Actions".
 name: Página pública
 
 on:
   push:
     branches: [main]
-    paths: ['pages/**', 'presentacion/escena/**', 'stage/oficina.js', 'stage/personajes.js', 'stage/luz.js', 'scripts/armar-pages.mjs', '.github/workflows/pages.yml']
+    paths: ['pages/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 
 permissions:
@@ -26,11 +25,6 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: pages/vendor al día con la charla
-        run: node scripts/armar-pages.mjs --revisar
       - name: Sin los tests en el sitio
         run: rm -f pages/*.test.mjs
       - uses: actions/configure-pages@v5

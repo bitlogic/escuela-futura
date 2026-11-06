@@ -49,7 +49,7 @@ const lienzo = (w, h) => { const c = document.createElement('canvas'); c.width =
 
 export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, lienzo: lienzoLaminas = null, deps, opciones = {}, alFallar = null }) {
   const { SALAS, TEMAS, MODELOS, cargarImagen } = deps;
-  const op = { hd: true, sinEscena: false, simple: false, cubrir: false, medirLienzo: false, ...opciones };
+  const op = { hd: true, sinEscena: false, simple: false, ...opciones };
   const camara = crearCamara();
   const edificio = crearEdificio({ SALAS, TEMAS });
   const gente = await crearGente({ cargarImagen, MODELOS, plantas: edificio.plantas });
@@ -182,8 +182,7 @@ export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, 
   }
 
   // ---------- El bucle ----------
-  // medirLienzo (pages/): el canvas mide lo que ocupa en la página, no la ventana entera.
-  function medir() { const dpr = Math.min(1.5, devicePixelRatio || 1); const w = Math.round((op.medirLienzo ? canvas.clientWidth || innerWidth : innerWidth) * dpr), h = Math.round((op.medirLienzo ? canvas.clientHeight || innerHeight : innerHeight) * dpr); if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; } }
+  function medir() { const dpr = Math.min(1.5, devicePixelRatio || 1); const w = Math.round(innerWidth * dpr), h = Math.round(innerHeight * dpr); if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; } }
   addEventListener('resize', () => { medir(); if (activa && placaActual) aplicarPlaca(placaActual.l, placaActual.pl); }); medir();
   document.addEventListener('visibilitychange', () => { parada = document.hidden; if (!parada) arrancar(); });
   function arrancar() { if (!rafId) { ultimo = performance.now(); rafId = requestAnimationFrame(cuadro); } }
@@ -210,10 +209,7 @@ export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, 
     const estado = estadoActual(cam);
     gente.tick(dt, estado);
     // El canvas de la escena cubre la ventana entera; la composición es de 1920×1080 escalada.
-    const eMin = Math.min(canvas.width / 1920, canvas.height / 1080), eMax = Math.max(canvas.width / 1920, canvas.height / 1080);
-    const cubrir = typeof op.cubrir === 'function' ? op.cubrir() : +op.cubrir || 0;   // cubrir (pages/), 0..1: de entrar entera (0, la charla) a llenar el canvas recortando (1, como object-fit: cover)
-    const esc = eMin * Math.pow(eMax / eMin, Math.max(0, Math.min(1, cubrir))),
-          vista = { esc, ox: (canvas.width - 1920 * esc) / 2, oy: (canvas.height - 1080 * esc) / 2 };
+    const esc = Math.min(canvas.width / 1920, canvas.height / 1080), vista = { esc, ox: (canvas.width - 1920 * esc) / 2, oy: (canvas.height - 1080 * esc) / 2 };
     dibujarMundo(estado);
     const aP = (wx, wy) => { const [x, y, s] = camara.aPantalla(wx, wy); return [x, y, s]; };
     const aPC = (wx, wy, f) => camara.aPantallaCapa(wx, wy, f);
@@ -230,7 +226,6 @@ export async function crearEscena({ canvas, placa, capaDemo, iframeDemo = null, 
     ir, paso: pasoA, demo, tecla,
     apagar,
     pausar(si) { parada = si; if (!si) arrancar(); },
-    medir,                             // pages/: volver a medir el canvas cuando cambia su caja sin que cambie la ventana
     estado() { return activa ? { activa, plano: fijo.plano, ...fijo, ...cur, ...camara.actual(), hd: luz.hd, degradado: !!luz.degradado, fps: luz.fps, viaje: viaje ? Math.round(viaje.t / viaje.dur * 100) / 100 : null } : { activa: false }; },
     get activa() { return activa; },
     alFin(f) { fin = f; },             // para el banco: un callback por cuadro con el estado
